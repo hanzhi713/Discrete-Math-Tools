@@ -1,3 +1,4 @@
 .htaccess
 node_modules/*
 /Doc/*
+.babelrc
