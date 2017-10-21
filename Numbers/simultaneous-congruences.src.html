@@ -1,0 +1,246 @@
+<!doctype html>
+<html>
+<head>
+    <link rel="shortcut icon" href="../img/head.ico" type="image/x-icon">
+    <meta charset="utf-8">
+    <link href="../css/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <link href="../css/bootstrap-responsive.min.css" rel="stylesheet" type="text/css">
+    <script src="../js/jquery-3.2.1.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+    <title>Simultaneous Congruences</title>
+</head>
+<style>
+    * {
+        font-family: Baskerville, "Palatino Linotype", Palatino, "Century Schoolbook L", "Times New Roman", serif;
+    }
+
+    .v {
+        font-size: 23px;
+        width: 50px;
+        text-align: center;
+    }
+
+    .button {
+        font-size: 22px;
+    }
+</style>
+<body style="text-align:center; width: 800px; margin:auto auto; font-size: 24px;">
+<p style="font-size:26px; margin: 20px;">Simultaneous Congruences: The Chinese Remainder Theorem</p>
+<table style="margin: auto auto">
+    <tr style="height: 50px; vertical-align: top">
+        <td>Congruences: ax≡b (mod m)</td>
+        <td><label for="result" style="font-size: 24px">Solution:</label></td>
+    </tr>
+    <tr>
+        <td style="padding-right: 20px; vertical-align: top; text-align: center">
+            <div id="equations">
+                <div class="equation">
+                    <input type="text" style="font-size: 16px;" class="v" name="a" placeholder="a1"/>x≡<input type="text" style="font-size: 16px;" class="v" name="b"
+                                                                                                              placeholder="b1"/>&nbsp;(mod&nbsp;<input
+                        type="text" style="font-size: 16px;" class="v" name="m" placeholder="m1"/>)<br/>
+                    <br/>
+                </div>
+                <div class="equation">
+                    <input type="text" style="font-size: 16px;" class="v" name="a" placeholder="a2"/>x≡<input type="text" style="font-size: 16px;" class="v" name="b"
+                                                                                                              placeholder="b2"/>&nbsp;(mod&nbsp;<input
+                        type="text" style="font-size: 16px;" class="v" name="m" placeholder="m2"/>)<br/>
+                    <br/>
+                </div>
+            </div>
+            <input type="button" style="font-size: 19px;" class="btn btn-default" value="Add" onClick="addOne();"/>&nbsp;
+            <input type="button" style="font-size: 19px;" class="btn btn-default" value="Delete" onClick="deleteOne();"/>&nbsp;
+            <input type="button" style="font-size: 19px;" class="btn btn-default btn-primary" value="Solve" onClick="init();"></td>
+        <td style="vertical-align: top;">
+            <textarea id="result" name="result" class="form-control" rows="10"
+                      style="font-size:20px; width: 300px; line-height: 25px;"></textarea>
+        </td>
+    </tr>
+</table>
+<br/>
+By Hanzhi Zhou
+<script>
+    /**
+     * @author Hanzhi Zhou
+     * */
+    /**
+     * @type {int}
+     * */
+    var x = 0;
+    /**
+     * @type {int}
+     * */
+    var y = 1;
+    /**
+     * @type {int}
+     * */
+    var d = 0;
+    /**
+     * @type {object}
+     * */
+    var equs = document.getElementById("equations");
+    /**
+     * @type {object}
+     * */
+    var result = document.getElementById("result");
+    function addOne() {
+        var newequ = document.createElement('div');
+        newequ.className = "equation";
+        var num = document.getElementsByName('a').length + 1;
+        newequ.innerHTML = '<input type="text" style="font-size: 16px;" class="v" name="a" placeholder="a' + num + '"/>x≡<input type="text" style="font-size: 16px;" class="v" name="b" placeholder="b' + num + '"/>&nbsp;(mod&nbsp;<input type="text" style="font-size: 16px;" class="v" name="m" placeholder="m' + num + '"/>)<br /><br />';
+        newequ.style.display = 'none';
+        equs.appendChild(newequ);
+        $(newequ).show(500);
+    }
+    function deleteOne() {
+        var equations = document.getElementsByClassName("equation");
+        $(equations[equations.length - 1]).hide(500, function(){equs.removeChild(equations[equations.length - 1])});
+    }
+    //initialize global variables
+    function initVariables() {
+        x = 0;
+        y = 1;
+        d = 0;
+    }
+
+    function init() {
+        result.value = "";
+        var inputAs = document.getElementsByName('a');
+        var inputBs = document.getElementsByName('b');
+        var inputMs = document.getElementsByName('m');
+        var As = new Array(inputAs.length);
+        var Bs = new Array(inputBs.length);
+        var Ms = new Array(inputMs.length);
+        // record the coefficients of the congruences in arrays
+        for (var i = 0; i < inputAs.length; i++) {
+            var a = parseInt(inputAs[i].value);
+            var b = parseInt(inputBs[i].value);
+            var m = parseInt(inputMs[i].value);
+            if (isNaN(a) || isNaN(b) || isNaN(m)) {
+                result.value = "Illegal Input!!!";
+                return;
+            }
+            else {
+                As[i] = a;
+                Bs[i] = b;
+                Ms[i] = m;
+            }
+        }
+        for (i = 0; i < Ms.length; i++) {
+            for (var j = i + 1; j < Ms.length; j++) {
+                initVariables();
+                gcd(Ms[i], Ms[j]);
+                if (d !== 1) {
+                    result.value = "No solution! Ms are not relatively prime to each other";
+                    return;
+                }
+            }
+        }
+        for (i = 0; i < As.length; i++) {
+            if (As[i] > 1) {
+                // get x which satisfies a*c≡1 (mod m), or ac-my=1
+                if (solveDiophantine(As[i], -Ms[i], 1)) {
+                    result.value += As[i] + " * " + x + "≡" + "1 (mod " + Ms[i] + ")→";
+                    //multiply ax≡b (mod m) by c
+                    //so it becomes x≡b*c≡r(mod m), where r = b*c-q*m, q∈Integers
+                    Bs[i] = (Bs[i] * x) % Ms[i];
+                    As[i] = 1;
+                    result.value += "x≡" + Bs[i] + " (mod " + Ms[i] + ")\n";
+                }
+                else {
+                    result.value += "No solution!!!";
+                    return;
+                }
+            }
+            else {
+                result.value += "x≡" + Bs[i] + " (mod " + Ms[i] + ")\n";
+            }
+        }
+        var M = 1;
+        // calculate M, which is m1*m2*...mn
+        for (i = 0; i < Ms.length; i++) {
+            M = M * Ms[i];
+        }
+        result.value += "M = " + M + "\n";
+        // prepare the array of solutions
+        var Xs = new Array(Ms.length);
+        // solving xiMi≡bi (mod mi)
+        for (i = 0; i < Ms.length; i++) {
+            a = As[i];
+            b = Bs[i];
+            m = Ms[i];
+            var Mi = M / m;
+            result.value += Mi + "*x" + (i + 1) + "≡" + b + " (mod " + m + ")→";
+            solveDiophantine(Mi, -m, b);
+            result.value += "x" + (i + 1) + "=" + x + "\n";
+            Xs[i] = x;
+        }
+        // the general solution x
+        var sol = 0;
+        for (i = 0; i < Ms.length; i++) {
+            sol += Xs[i] * M / Ms[i];
+        }
+        sol = sol % M;
+        result.value += "General Solution: x=" + sol + "+" + M + "*n";
+        //Done!
+    }
+    /**
+     * @function
+     * solve x, y such that ax+by=c
+     * @param {int} a
+     * @param {int} b
+     * @param {int} c
+     * */
+    function solveDiophantine(a, b, c) {
+        initVariables();
+        gcd(a, b);
+        if (Math.floor(c / d) === (c / d)) {
+            a = a / d;
+            b = b / d;
+            c = c / d;
+            // now gcd(a,b)=1
+
+            initVariables();
+            gcd(a, b);
+            x = c * x;
+            //make sure that x is the smallest positive integer (for convenience of further calculations)
+            if (b > 0) {
+                while (x < 0) {
+                    x += b;
+                }
+            }
+            else {
+                while (x < 0) {
+                    x += -b;
+                }
+            }
+        }
+        else {
+            return false;
+        }
+        return true;
+    }
+    /**
+     * @function
+     * find d = cd(a, b) and x and y such that ax+by=d
+     * pass the result by changing global variables x, y and d.
+     * @param {int} a
+     * @param {int} b
+     * */
+    function gcd(a, b) {
+        if (a === 0) {
+            d = b;
+        }
+        else {
+            var q = parseInt(b / a);
+            var r = b % a;
+            gcd(r, a);
+
+            //working backward to obtain x and y such that ax+by=gcd(a, b)
+            var temp = y;
+            y = x;
+            x = temp - parseInt(b / a) * x;
+        }
+    }
+</script>
+</body>
+</html>
