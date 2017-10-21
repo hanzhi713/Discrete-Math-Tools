@@ -1,4 +1,0 @@
-ErrorDocument 404 /Doc/err.php?code=404
-ErrorDocument 403 /Doc/err.php?code=403
-RewriteCond %{HTTP_HOST} !^fm.cdn.rdfz-edu.org [NC]
-RewriteRule ^(.*)$ https://fm.cdn.rdfz-edu.org:6/$1 [R=301,L]
