@@ -1,4 +1,4 @@
 .htaccess
-node_modules/*
-/Doc/*
 .babelrc
+/Graphs/js/node_modules/
+/Doc/

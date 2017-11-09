@@ -1577,6 +1577,8 @@ function myDijkstra() {
             textBorderStyle: 'dashed',
             textBorderColor: 'green'
         });
+        animationFlag = true;
+
         // start the whole algorithm
         animateNode(currentNode, function () {
             addNextLabel(currentNode, currentNode.connectedEdges(), 0);

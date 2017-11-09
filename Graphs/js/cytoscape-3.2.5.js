@@ -328,6 +328,10 @@ var util = {
     }
   },
 
+  copyArray: function copyArray(arr) {
+    return arr.slice();
+  },
+
   clonePosition: function clonePosition(pos) {
     return { x: pos.x, y: pos.y };
   },
@@ -1182,7 +1186,7 @@ math.intersectLineEllipse = function (x, y, centerX, centerY, ellipseWradius, el
   return [(centerX - x) * lenProportion + x, (centerY - y) * lenProportion + y];
 };
 
-math.checkInEllipse = function (x, y, padding, width, height, centerX, centerY) {
+math.checkInEllipse = function (x, y, width, height, centerX, centerY, padding) {
   x -= centerX;
   y -= centerY;
 
@@ -1779,7 +1783,7 @@ module.exports = typeof Promise !== 'undefined' ? Promise : api; // eslint-disab
 
 var is = __webpack_require__(0);
 var util = __webpack_require__(1);
-var newQuery = __webpack_require__(10);
+var newQuery = __webpack_require__(11);
 
 var Selector = function Selector(selector) {
   var self = this;
@@ -1985,7 +1989,7 @@ module.exports = Selector;
 var util = __webpack_require__(1);
 var is = __webpack_require__(0);
 var Map = __webpack_require__(118);
-var Set = __webpack_require__(11);
+var Set = __webpack_require__(9);
 
 var Element = __webpack_require__(13);
 
@@ -2222,7 +2226,12 @@ elesfn.json = function (obj) {
       classes: null
     };
 
-    json.classes = Array.from(p.classes).join(' ');
+    json.classes = '';
+
+    var i = 0;
+    p.classes.forEach(function (cls) {
+      return json.classes += i++ === 0 ? cls : ' ' + cls;
+    });
 
     return json;
   }
@@ -2730,6 +2739,99 @@ module.exports = __webpack_require__(137);
 "use strict";
 
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+/* global Set */
+
+var undef =  true ? 'undefined' : _typeof(undefined);
+
+var ObjectSet = function () {
+  function ObjectSet(arrayOrObjectSet) {
+    _classCallCheck(this, ObjectSet);
+
+    this._obj = Object.create(null);
+
+    if (arrayOrObjectSet != null) {
+      var arr = void 0;
+
+      if (arrayOrObjectSet.instanceString != null && arrayOrObjectSet.instanceString() === this.instanceString()) {
+        arr = arrayOrObjectSet.toArray();
+      } else {
+        arr = arrayOrObjectSet;
+      }
+
+      for (var i = 0; i < arr.length; i++) {
+        this.add(arr[i]);
+      }
+    }
+  }
+
+  _createClass(ObjectSet, [{
+    key: 'instanceString',
+    value: function instanceString() {
+      return 'set';
+    }
+  }, {
+    key: 'add',
+    value: function add(val) {
+      this._obj[val] = 1;
+    }
+  }, {
+    key: 'delete',
+    value: function _delete(val) {
+      this._obj[val] = 0;
+    }
+  }, {
+    key: 'clear',
+    value: function clear() {
+      this._obj = Object.create(null);
+    }
+  }, {
+    key: 'has',
+    value: function has(val) {
+      return this._obj[val] === 1;
+    }
+  }, {
+    key: 'toArray',
+    value: function toArray() {
+      var _this = this;
+
+      return Object.keys(this._obj).filter(function (key) {
+        return _this.has(key);
+      });
+    }
+  }, {
+    key: 'forEach',
+    value: function forEach(callback, thisArg) {
+      return this.toArray().forEach(callback, thisArg);
+    }
+  }, {
+    key: 'size',
+    get: function get() {
+      return this.toArray().length;
+    }
+  }]);
+
+  return ObjectSet;
+}();
+
+// TODO use the stdlib Set in future...
+// module.exports = typeof Set !== undef ? Set : ObjectSet;
+
+
+module.exports = ObjectSet;
+
+/***/ }),
+/* 10 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
 var util = __webpack_require__(1);
 var is = __webpack_require__(0);
 var Event = __webpack_require__(15);
@@ -2765,6 +2867,7 @@ function Emitter(opts) {
   util.assign(this, defaults, opts);
 
   this.listeners = [];
+  this.emitting = 0;
 }
 
 var p = Emitter.prototype;
@@ -2797,8 +2900,11 @@ var forEachEvent = function forEachEvent(self, handler, events, qualifier, callb
     if (match) {
       var type = match[1];
       var namespace = match[2] ? match[2] : null;
+      var ret = handler(self, evt, type, namespace, qualifier, callback, conf);
 
-      handler(self, evt, type, namespace, qualifier, callback, conf);
+      if (ret === false) {
+        break;
+      } // allow exiting early
     }
   }
 };
@@ -2867,6 +2973,10 @@ p.one = function (events, qualifier, callback, conf) {
 p.removeListener = p.off = function (events, qualifier, callback, conf) {
   var _this = this;
 
+  if (this.emitting !== 0) {
+    this.listeners = util.copyArray(this.listeners);
+  }
+
   var listeners = this.listeners;
 
   var _loop = function _loop(i) {
@@ -2875,6 +2985,8 @@ p.removeListener = p.off = function (events, qualifier, callback, conf) {
     forEachEvent(_this, function (self, event, type, namespace, qualifier, callback /*, conf*/) {
       if (listener.type === type && (!namespace || listener.namespace === namespace) && (!qualifier || self.qualifierCompare(listener.qualifier, qualifier)) && (!callback || listener.callback === callback)) {
         listeners.splice(i, 1);
+
+        return false;
       }
     }, events, qualifier, callback, conf);
   };
@@ -2888,6 +3000,9 @@ p.removeListener = p.off = function (events, qualifier, callback, conf) {
 
 p.emit = p.trigger = function (events, extraParams, manualCallback) {
   var listeners = this.listeners;
+  var numListenersBeforeEmit = listeners.length;
+
+  this.emitting++;
 
   if (!is.array(extraParams)) {
     extraParams = [extraParams];
@@ -2901,35 +3016,42 @@ p.emit = p.trigger = function (events, extraParams, manualCallback) {
         namespace: eventObj.namespace,
         callback: manualCallback
       }];
+
+      numListenersBeforeEmit = listeners.length;
     }
 
-    for (var i = 0; i < listeners.length; i++) {
-      var _listener = listeners[i];
+    var _loop2 = function _loop2(i) {
+      var listener = listeners[i];
 
-      if (_listener.type === eventObj.type && (!_listener.namespace || _listener.namespace === eventObj.namespace || _listener.namespace === universalNamespace) && self.eventMatches(self.context, _listener, eventObj)) {
+      if (listener.type === eventObj.type && (!listener.namespace || listener.namespace === eventObj.namespace || listener.namespace === universalNamespace) && self.eventMatches(self.context, listener, eventObj)) {
         var args = [eventObj];
 
         if (extraParams != null) {
           util.push(args, extraParams);
         }
 
-        self.beforeEmit(self.context, _listener, eventObj);
+        self.beforeEmit(self.context, listener, eventObj);
 
-        if (_listener.conf && _listener.conf.one) {
-          listeners.splice(i, 1);
-          i--;
+        if (listener.conf && listener.conf.one) {
+          self.listeners = self.listeners.filter(function (l) {
+            return l !== listener;
+          });
         }
 
-        var context = self.callbackContext(self.context, _listener, eventObj);
-        var ret = _listener.callback.apply(context, args);
+        var context = self.callbackContext(self.context, listener, eventObj);
+        var ret = listener.callback.apply(context, args);
 
-        self.afterEmit(self.context, _listener, eventObj);
+        self.afterEmit(self.context, listener, eventObj);
 
         if (ret === false) {
           eventObj.stopPropagation();
           eventObj.preventDefault();
         }
       } // if listener matches
+    };
+
+    for (var i = 0; i < numListenersBeforeEmit; i++) {
+      _loop2(i);
     } // for listener
 
     if (self.bubble(self.context) && !eventObj.isPropagationStopped()) {
@@ -2937,13 +3059,15 @@ p.emit = p.trigger = function (events, extraParams, manualCallback) {
     }
   }, events);
 
+  this.emitting--;
+
   return this;
 };
 
 module.exports = Emitter;
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2976,85 +3100,6 @@ var newQuery = function newQuery() {
 };
 
 module.exports = newQuery;
-
-/***/ }),
-/* 11 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-/* global Set */
-
-var undef =  true ? 'undefined' : _typeof(undefined);
-
-var ObjectSet = function () {
-  function ObjectSet(arrayOrObjectSet) {
-    _classCallCheck(this, ObjectSet);
-
-    this._obj = Object.create(null);
-
-    if (arrayOrObjectSet != null) {
-      var arr = void 0;
-
-      if (arrayOrObjectSet.instanceString != null && arrayOrObjectSet.instanceString() === this.instanceString()) {
-        arr = arrayOrObjectSet.toArray();
-      } else {
-        arr = arrayOrObjectSet;
-      }
-
-      for (var i = 0; i < arr.length; i++) {
-        this.add(arr[i]);
-      }
-    }
-  }
-
-  _createClass(ObjectSet, [{
-    key: 'instanceString',
-    value: function instanceString() {
-      return 'set';
-    }
-  }, {
-    key: 'add',
-    value: function add(val) {
-      this._obj[val] = 1;
-    }
-  }, {
-    key: 'delete',
-    value: function _delete(val) {
-      this._obj[val] = 0;
-    }
-  }, {
-    key: 'clear',
-    value: function clear() {
-      this._obj = Object.create(null);
-    }
-  }, {
-    key: 'has',
-    value: function has(val) {
-      return this._obj[val] === 1;
-    }
-  }, {
-    key: 'toArray',
-    value: function toArray() {
-      var _this = this;
-
-      return Object.keys(this._obj).filter(function (key) {
-        return _this.has(key);
-      });
-    }
-  }]);
-
-  return ObjectSet;
-}();
-
-module.exports = (typeof Set === 'undefined' ? 'undefined' : _typeof(Set)) !== undef ? Set : ObjectSet;
 
 /***/ }),
 /* 12 */
@@ -3181,6 +3226,11 @@ var Core = function Core(opts) {
     }
   };
 
+  // start with the default stylesheet so we have something before loading an external stylesheet
+  if (_p.styleEnabled) {
+    cy.setStyle([]);
+  }
+
   // create the renderer
   cy.initRenderer(util.extend({
     hideEdgesOnViewport: options.hideEdgesOnViewport,
@@ -3236,7 +3286,7 @@ var Core = function Core(opts) {
 
     // init style
     if (_p.styleEnabled) {
-      cy.setStyle(initStyle);
+      cy.style().append(initStyle);
     }
 
     // initial load
@@ -3507,10 +3557,10 @@ module.exports = Core;
 
 var util = __webpack_require__(1);
 var is = __webpack_require__(0);
+var Set = __webpack_require__(9);
 
 // represents a node or an edge
 var Element = function Element(cy, params, restore) {
-  var self = this;
   restore = restore === undefined || restore ? true : false;
 
   if (cy === undefined || params === undefined || !is.core(cy)) {
@@ -4208,6 +4258,18 @@ styfn.cssRule = function (name, value) {
   return this; // chaining
 };
 
+styfn.append = function (style) {
+  if (is.stylesheet(style)) {
+    style.appendToStyle(this);
+  } else if (is.array(style)) {
+    this.appendFromJson(style);
+  } else if (is.string(style)) {
+    this.appendFromString(style);
+  } // you probably wouldn't want to append a Style, since you'd duplicate the default parts
+
+  return this;
+};
+
 // static function
 Style.fromJson = function (cy, json) {
   var style = new Style(cy);
@@ -4315,7 +4377,7 @@ var Collection = __webpack_require__(7);
 var Core = __webpack_require__(12);
 var incExts = __webpack_require__(76);
 var is = __webpack_require__(0);
-var Emitter = __webpack_require__(9);
+var Emitter = __webpack_require__(10);
 
 // registered extensions to cytoscape, indexed by name
 var extensions = {};
@@ -4651,6 +4713,11 @@ sheetfn.style = sheetfn.css;
 sheetfn.generateStyle = function (cy) {
   var style = new Style(cy);
 
+  return this.appendToStyle(style);
+};
+
+// append a dummy stylesheet object on a real style object
+sheetfn.appendToStyle = function (style) {
   for (var i = 0; i < this.length; i++) {
     var context = this[i];
     var selector = context.selector;
@@ -4677,7 +4744,7 @@ module.exports = Stylesheet;
 "use strict";
 
 
-module.exports = "3.2.1";
+module.exports = "3.2.5";
 
 /***/ }),
 /* 24 */
@@ -6836,8 +6903,7 @@ module.exports = elesfn;
 "use strict";
 
 
-var util = __webpack_require__(1);
-var Set = __webpack_require__(11);
+var Set = __webpack_require__(9);
 
 var elesfn = {
   classes: function classes(_classes) {
@@ -6847,75 +6913,31 @@ var elesfn = {
     var classesMap = new Set(_classes);
 
     // check and update each ele
-    for (var j = 0; j < self.length; j++) {
+
+    var _loop = function _loop(j) {
       var ele = self[j];
       var _p = ele._private;
       var eleClasses = _p.classes;
       var changedEle = false;
 
       // check if ele has all of the passed classes
-      var _iteratorNormalCompletion = true;
-      var _didIteratorError = false;
-      var _iteratorError = undefined;
+      classesMap.forEach(function (cls) {
+        var eleHasClass = eleClasses.has(cls);
 
-      try {
-        for (var _iterator = classesMap[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-          var cls = _step.value;
-
-          var eleHasClass = eleClasses.has(cls);
-
-          if (!eleHasClass) {
-            changedEle = true;
-            break;
-          }
+        if (!eleHasClass) {
+          changedEle = true;
         }
+      });
 
-        // check if ele has classes outside of those passed
-      } catch (err) {
-        _didIteratorError = true;
-        _iteratorError = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion && _iterator.return) {
-            _iterator.return();
-          }
-        } finally {
-          if (_didIteratorError) {
-            throw _iteratorError;
-          }
-        }
-      }
-
+      // check if ele has classes outside of those passed
       if (!changedEle) {
-        var _iteratorNormalCompletion2 = true;
-        var _didIteratorError2 = false;
-        var _iteratorError2 = undefined;
+        eleClasses.forEach(function (eleCls) {
+          var specdClass = classesMap.has(eleCls);
 
-        try {
-          for (var _iterator2 = eleClasses[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-            var eleCls = _step2.value;
-
-
-            var specdClass = classesMap.has(eleCls);
-            if (!specdClass) {
-              changedEle = true;
-              break;
-            }
+          if (!specdClass) {
+            changedEle = true;
           }
-        } catch (err) {
-          _didIteratorError2 = true;
-          _iteratorError2 = err;
-        } finally {
-          try {
-            if (!_iteratorNormalCompletion2 && _iterator2.return) {
-              _iterator2.return();
-            }
-          } finally {
-            if (_didIteratorError2) {
-              throw _iteratorError2;
-            }
-          }
-        }
+        });
       }
 
       if (changedEle) {
@@ -6923,6 +6945,10 @@ var elesfn = {
 
         changed.push(ele);
       }
+    };
+
+    for (var j = 0; j < self.length; j++) {
+      _loop(j);
     }
 
     // trigger update style on those eles that had class changes
@@ -6948,29 +6974,29 @@ var elesfn = {
     var changed = []; // eles who had classes changed
 
     for (var i = 0, il = self.length; i < il; i++) {
-      var ele = self[i];
-      var changedEle = false;
+      var _ele = self[i];
+      var _changedEle = false;
 
       for (var j = 0; j < classes.length; j++) {
         var cls = classes[j];
-        var eleClasses = ele._private.classes;
-        var hasClass = eleClasses.has(cls);
+        var _eleClasses = _ele._private.classes;
+        var hasClass = _eleClasses.has(cls);
         var shouldAdd = toggle || toggle === undefined && !hasClass;
 
         if (shouldAdd) {
-          eleClasses.add(cls);
+          _eleClasses.add(cls);
 
-          if (!hasClass && !changedEle) {
-            changed.push(ele);
-            changedEle = true;
+          if (!hasClass && !_changedEle) {
+            changed.push(_ele);
+            _changedEle = true;
           }
         } else {
           // then remove
-          eleClasses.delete(cls);
+          _eleClasses.delete(cls);
 
-          if (hasClass && !changedEle) {
-            changed.push(ele);
-            changedEle = true;
+          if (hasClass && !_changedEle) {
+            changed.push(_ele);
+            _changedEle = true;
           }
         }
       } // for j classes
@@ -7113,7 +7139,7 @@ module.exports = elesfn;
 "use strict";
 
 
-var Set = __webpack_require__(11);
+var Set = __webpack_require__(9);
 
 var elesfn = {
   parent: function parent(selector) {
@@ -7621,6 +7647,11 @@ elesfn.updateCompoundBounds = function () {
     return this;
   }
 
+  // save cycles when batching -- but bounds will be stale (or not exist yet)
+  if (cy.batching()) {
+    return this;
+  }
+
   var updated = [];
 
   function update(parent) {
@@ -7775,6 +7806,11 @@ var updateBounds = function updateBounds(b, x1, y1, x2, y2) {
     return;
   }
 
+  // don't update with null dim
+  if (x1 == null || y1 == null || x2 == null || y2 == null) {
+    return;
+  }
+
   b.x1 = x1 < b.x1 ? x1 : b.x1;
   b.x2 = x2 > b.x2 ? x2 : b.x2;
   b.y1 = y1 < b.y1 ? y1 : b.y1;
@@ -7790,6 +7826,10 @@ var prefixedProperty = function prefixedProperty(obj, field, prefix) {
 };
 
 var updateBoundsFromArrow = function updateBoundsFromArrow(bounds, ele, prefix) {
+  if (ele.cy().headless()) {
+    return;
+  }
+
   var _p = ele._private;
   var rstyle = _p.rstyle;
   var halfArW = rstyle.arrowWidth / 2;
@@ -7814,6 +7854,10 @@ var updateBoundsFromArrow = function updateBoundsFromArrow(bounds, ele, prefix) 
 };
 
 var updateBoundsFromLabel = function updateBoundsFromLabel(bounds, ele, prefix) {
+  if (ele.cy().headless()) {
+    return;
+  }
+
   var prefixDash = void 0;
 
   if (prefix) {
@@ -7935,8 +7979,8 @@ var updateBoundsFromLabel = function updateBoundsFromLabel(bounds, ele, prefix) 
 // get the bounding box of the elements (in raw model position)
 var boundingBoxImpl = function boundingBoxImpl(ele, options) {
   var cy = ele._private.cy;
-  var cy_p = cy._private;
-  var styleEnabled = cy_p.styleEnabled;
+  var styleEnabled = cy.styleEnabled();
+  var headless = cy.headless();
 
   var bounds = {
     x1: Infinity,
@@ -8000,7 +8044,7 @@ var boundingBoxImpl = function boundingBoxImpl(ele, options) {
 
       // handle edge dimensions (rough box estimate)
       //////////////////////////////////////////////
-      if (styleEnabled) {
+      if (styleEnabled && !headless) {
         ex1 = Math.min(rstyle.srcX, rstyle.midX, rstyle.tgtX);
         ex2 = Math.max(rstyle.srcX, rstyle.midX, rstyle.tgtX);
         ey1 = Math.min(rstyle.srcY, rstyle.midY, rstyle.tgtY);
@@ -8017,8 +8061,8 @@ var boundingBoxImpl = function boundingBoxImpl(ele, options) {
 
       // precise haystacks
       ////////////////////
-      if (styleEnabled && ele.pstyle('curve-style').strValue === 'haystack') {
-        var hpts = rstyle.haystackPts;
+      if (styleEnabled && !headless && ele.pstyle('curve-style').strValue === 'haystack') {
+        var hpts = rstyle.haystackPts || [];
 
         ex1 = hpts[0].x;
         ey1 = hpts[0].y;
@@ -8782,7 +8826,7 @@ module.exports = elesfn;
 "use strict";
 
 
-var Emitter = __webpack_require__(9);
+var Emitter = __webpack_require__(10);
 var define = __webpack_require__(3);
 var is = __webpack_require__(0);
 var util = __webpack_require__(1);
@@ -8790,7 +8834,11 @@ var Selector = __webpack_require__(6);
 
 var emitterOptions = {
   qualifierCompare: function qualifierCompare(selector1, selector2) {
-    return selector1.sameText(selector2);
+    if (selector1 == null || selector2 == null) {
+      return selector1 == null && selector2 == null;
+    } else {
+      return selector1.sameText(selector2);
+    }
   },
   eventMatches: function eventMatches(ele, listener, eventObj) {
     var selector = listener.qualifier;
@@ -11741,7 +11789,7 @@ module.exports = step;
 "use strict";
 
 
-var Emitter = __webpack_require__(9);
+var Emitter = __webpack_require__(10);
 var define = __webpack_require__(3);
 var is = __webpack_require__(0);
 var util = __webpack_require__(1);
@@ -11749,7 +11797,11 @@ var Selector = __webpack_require__(6);
 
 var emitterOptions = {
   qualifierCompare: function qualifierCompare(selector1, selector2) {
-    return selector1.sameText(selector2);
+    if (selector1 == null || selector2 == null) {
+      return selector1 == null && selector2 == null;
+    } else {
+      return selector1.sameText(selector2);
+    }
   },
   eventMatches: function eventMatches(cy, listener, eventObj) {
     var selector = listener.qualifier;
@@ -11973,6 +12025,10 @@ var corefn = {
     this.notifications(true);
   },
 
+  batching: function batching() {
+    return this._private.batchCount > 0;
+  },
+
   startBatch: function startBatch() {
     var _p = this._private;
 
@@ -12093,11 +12149,9 @@ var corefn = {
       return;
     }
 
-    var rOpts = util.extend({}, options, {
-      cy: cy
-    });
+    cy._private.renderer = new RendererProto(util.extend({}, options, { cy: cy }));
 
-    cy._private.renderer = new RendererProto(rOpts);
+    this.notify({ type: 'init' });
   },
 
   destroyRenderer: function destroyRenderer() {
@@ -12516,6 +12570,10 @@ var corefn = {
       elements = this.mutableElements();
     }
 
+    if (is.elementOrCollection(elements) && elements.empty()) {
+      return;
+    } // can't fit to nothing
+
     bb = bb || elements.boundingBox();
 
     var w = this.width();
@@ -12753,6 +12811,10 @@ var corefn = {
     } else if (!is.elementOrCollection(elements)) {
       elements = this.mutableElements();
     }
+
+    if (elements.length === 0) {
+      return;
+    } // can't centre pan to nothing
 
     var bb = elements.boundingBox();
     var w = this.width();
@@ -13431,7 +13493,7 @@ var defaults = {
   stop: undefined, // callback on layoutstop
   transform: function transform(node, position) {
     return position;
-  } // transform a given node position. Useful for changing flow direction in discrete layouts 
+  } // transform a given node position. Useful for changing flow direction in discrete layouts
 };
 
 function BreadthFirstLayout(options) {
@@ -13615,6 +13677,12 @@ BreadthFirstLayout.prototype.run = function () {
       for (var j = 0; j < _eles.length; j++) {
         var _ele2 = _eles[j];
 
+        if (_ele2 == null) {
+          _eles.splice(j, 1);
+          j--;
+          continue;
+        }
+
         _ele2._private.scratch.breadthfirst = {
           depth: _i4,
           index: j
@@ -13673,7 +13741,7 @@ BreadthFirstLayout.prototype.run = function () {
       var _intEle = _info.intEle;
       var intInfo = _intEle._private.scratch.breadthfirst;
 
-      depths[_info.depth].splice(_info.index, 1); // remove from old depth & index
+      depths[_info.depth][_info.index] = null; // remove from old depth & index (create hole to be cleaned)
 
       // add to end of new depth
       var newDepth = intInfo.depth + 1;
@@ -16079,7 +16147,7 @@ BRp.registerArrowShapes = function () {
   // spacing: dist(arrowTip, nodeBoundary)
   // gap: dist(edgeTip, nodeBoundary), edgeTip may != arrowTip
 
-  var bbCollide = function bbCollide(x, y, size, angle, translation, padding) {
+  var bbCollide = function bbCollide(x, y, size, angle, translation, edgeWidth, padding) {
     var x1 = translation.x - size / 2 - padding;
     var x2 = translation.x + size / 2 + padding;
     var y1 = translation.y - size / 2 - padding;
@@ -16193,7 +16261,7 @@ BRp.registerArrowShapes = function () {
 
     roughCollide: bbCollide,
 
-    draw: function draw(context, size, angle, translation) {
+    draw: function draw(context, size, angle, translation, edgeWidth) {
       var ptsTrans = transformPoints(this.points, size, angle, translation);
       var ctrlPt = this.controlPoint;
       var ctrlPtTrans = transform(ctrlPt[0], ctrlPt[1], size, angle, translation);
@@ -16211,7 +16279,7 @@ BRp.registerArrowShapes = function () {
 
     pointsTee: [-0.15, -0.4, -0.15, -0.5, 0.15, -0.5, 0.15, -0.4],
 
-    collide: function collide(x, y, size, angle, translation, padding) {
+    collide: function collide(x, y, size, angle, translation, edgeWidth, padding) {
       var triPts = pointsToArr(transformPoints(this.points, size + 2 * padding, angle, translation));
       var teePts = pointsToArr(transformPoints(this.pointsTee, size + 2 * padding, angle, translation));
 
@@ -16220,7 +16288,7 @@ BRp.registerArrowShapes = function () {
       return inside;
     },
 
-    draw: function draw(context, size, angle, translation) {
+    draw: function draw(context, size, angle, translation, edgeWidth) {
       var triPts = transformPoints(this.points, size, angle, translation);
       var teePts = transformPoints(this.pointsTee, size, angle, translation);
 
@@ -16231,37 +16299,34 @@ BRp.registerArrowShapes = function () {
   defineArrowShape('triangle-cross', {
     points: [-0.15, -0.3, 0, 0, 0.15, -0.3, -0.15, -0.3],
 
-    crossLinePoints: [-0.24175, -0.4, 0.24175, -0.4],
+    baseCrossLinePts: [-0.15, -0.4, // first half of the rectangle
+    -0.15, -0.4, 0.15, -0.4, // second half of the rectangle
+    0.15, -0.4],
 
-    forceStroke: true,
+    crossLinePts: function crossLinePts(size, edgeWidth) {
+      // shift points so that the distance between the cross points matches edge width
+      var p = this.baseCrossLinePts.slice();
+      var shiftFactor = edgeWidth / size;
+      var y0 = 3;
+      var y1 = 5;
 
-    matchEdgeWidth: true,
+      p[y0] = p[y0] - shiftFactor;
+      p[y1] = p[y1] - shiftFactor;
 
-    scaleCoord: function scaleCoord(constant, size, edgeWidth) {
-      return constant + edgeWidth * 0.012 + math.log2(size - 28.95) * 0.001;
+      return p;
     },
 
-    scaleCrossLineXCoord: function scaleCrossLineXCoord(size, edgeWidth) {
-      return this.scaleCoord(0.42, size, edgeWidth);
-    },
-
-    scaleCrossLineYCoord: function scaleCrossLineYCoord(size, edgeWidth) {
-      return this.scaleCoord(-0.01, size, edgeWidth);
-    },
-
-    collide: function collide(x, y, size, angle, translation, padding) {
+    collide: function collide(x, y, size, angle, translation, edgeWidth, padding) {
       var triPts = pointsToArr(transformPoints(this.points, size + 2 * padding, angle, translation));
-      var crossLinePts = pointsToArr(transformPoints(this.crossLinePoints, size + 2 * padding, angle, translation));
-
-      var inside = math.pointInsidePolygonPoints(x, y, triPts) || math.inLineVicinity(x, y, crossLinePts[0], crossLinePts[1], crossLinePts[2], crossLinePts[3], padding);
+      var teePts = pointsToArr(transformPoints(this.crossLinePts(size, edgeWidth), size + 2 * padding, angle, translation));
+      var inside = math.pointInsidePolygonPoints(x, y, triPts) || math.pointInsidePolygonPoints(x, y, teePts);
 
       return inside;
     },
 
     draw: function draw(context, size, angle, translation, edgeWidth) {
-      var scaledCrossLine = [this.crossLinePoints[0] + this.scaleCrossLineXCoord(size, edgeWidth), this.crossLinePoints[1] - this.scaleCrossLineYCoord(size, edgeWidth), this.crossLinePoints[2] - this.scaleCrossLineXCoord(size, edgeWidth), this.crossLinePoints[3] - this.scaleCrossLineYCoord(size, edgeWidth)];
       var triPts = transformPoints(this.points, size, angle, translation);
-      var crossLinePts = transformPoints(scaledCrossLine, size, angle, translation);
+      var crossLinePts = transformPoints(this.crossLinePts(size, edgeWidth), size, angle, translation);
 
       renderer.arrowShapeImpl(this.name)(context, triPts, crossLinePts);
     }
@@ -16278,14 +16343,14 @@ BRp.registerArrowShapes = function () {
   defineArrowShape('circle', {
     radius: 0.15,
 
-    collide: function collide(x, y, size, angle, translation, padding) {
+    collide: function collide(x, y, size, angle, translation, edgeWidth, padding) {
       var t = translation;
       var inside = Math.pow(t.x - x, 2) + Math.pow(t.y - y, 2) <= Math.pow((size + 2 * padding) * this.radius, 2);
 
       return inside;
     },
 
-    draw: function draw(context, size, angle, translation) {
+    draw: function draw(context, size, angle, translation, edgeWidth) {
       renderer.arrowShapeImpl(this.name)(context, translation.x, translation.y, this.radius * size);
     },
 
@@ -16522,8 +16587,8 @@ BRp.findNearestElements = function (x, y, interactiveElementsOnly, isTouch) {
     for (var i = 0; i < arrows.length; i++) {
       var ar = arrows[i];
       var shape = r.arrowShapes[edge.pstyle(ar.name + '-arrow-shape').value];
-
-      if (shape.roughCollide(x, y, arSize, ar.angle, { x: ar.x, y: ar.y }, edgeThreshold) && shape.collide(x, y, arSize, ar.angle, { x: ar.x, y: ar.y }, edgeThreshold)) {
+      var edgeWidth = edge.pstyle('width').pfValue;
+      if (shape.roughCollide(x, y, arSize, ar.angle, { x: ar.x, y: ar.y }, edgeWidth, edgeThreshold) && shape.collide(x, y, arSize, ar.angle, { x: ar.x, y: ar.y }, edgeWidth, edgeThreshold)) {
         addEle(edge);
         return true;
       }
@@ -16962,7 +17027,7 @@ BRp.findEdgeControlPoints = function (edges) {
     }
   }
 
-  var src, tgt, src_p, tgt_p, srcPos, tgtPos, srcW, srcH, tgtW, tgtH, srcShape, tgtShape;
+  var src, tgt, srcPos, tgtPos, srcW, srcH, tgtW, tgtH, srcShape, tgtShape;
   var vectorNormInverse;
   var badBezier;
 
@@ -16986,9 +17051,6 @@ BRp.findEdgeControlPoints = function (edges) {
       src = tgt;
       tgt = temp;
     }
-
-    src_p = src._private;
-    tgt_p = tgt._private;
 
     srcPos = src.position();
     tgtPos = tgt.position();
@@ -17045,6 +17107,9 @@ BRp.findEdgeControlPoints = function (edges) {
 
       var edgeIsUnbundled = curveStyle === 'unbundled-bezier' || curveStyle === 'segments';
 
+      // whether the normalised pair order is the reverse of the edge's src-tgt order
+      var edgeIsSwapped = src.id() !== edge.source().id();
+
       var ctrlptDists = edge.pstyle('control-point-distances');
       var loopDir = edge.pstyle('loop-direction').pfValue;
       var loopSwp = edge.pstyle('loop-sweep').pfValue;
@@ -17061,6 +17126,8 @@ BRp.findEdgeControlPoints = function (edges) {
       var tgtEndpt = edge.pstyle('target-endpoint').value;
       var srcArrShape = edge.pstyle('source-arrow-shape').value;
       var tgtArrShape = edge.pstyle('target-arrow-shape').value;
+      var arrowScale = edge.pstyle('arrow-scale').value;
+      var lineWidth = edge.pstyle('width').pfValue;
 
       var srcX1 = rs.lastSrcCtlPtX;
       var srcY1 = rs.lastSrcCtlPtY;
@@ -17111,15 +17178,25 @@ BRp.findEdgeControlPoints = function (edges) {
       var tgtArr1 = rs.lastTgtArr;
       var tgtArr2 = tgtArrShape;
 
+      var lineW1 = rs.lastLineW;
+      var lineW2 = lineWidth;
+
+      var arrScl1 = rs.lastArrScl;
+      var arrScl2 = arrowScale;
+
       if (badBezier) {
         rs.badBezier = true;
       } else {
         rs.badBezier = false;
       }
 
-      if (srcX1 === srcX2 && srcY1 === srcY2 && srcW1 === srcW2 && srcH1 === srcH2 && tgtX1 === tgtX2 && tgtY1 === tgtY2 && tgtW1 === tgtW2 && tgtH1 === tgtH2 && curveStyle1 === curveStyle2 && ctrlptDists1 === ctrlptDists2 && ctrlptWs1 === ctrlptWs2 && segmentWs1 === segmentWs2 && segmentDs1 === segmentDs2 && stepSize1 === stepSize2 && loopDir1 === loopDir2 && loopSwp1 === loopSwp2 && edgeDistances1 === edgeDistances2 && srcEndpt1 === srcEndpt2 && tgtEndpt1 === tgtEndpt2 && srcArr1 === srcArr2 && tgtArr1 === tgtArr2 && (edgeIndex1 === edgeIndex2 && numEdges1 === numEdges2 || edgeIsUnbundled)) {
-        continue; // then the control points haven't changed and we can skip calculating them
+      var ptCacheHit;
+
+      if (srcX1 === srcX2 && srcY1 === srcY2 && srcW1 === srcW2 && srcH1 === srcH2 && tgtX1 === tgtX2 && tgtY1 === tgtY2 && tgtW1 === tgtW2 && tgtH1 === tgtH2 && curveStyle1 === curveStyle2 && ctrlptDists1 === ctrlptDists2 && ctrlptWs1 === ctrlptWs2 && segmentWs1 === segmentWs2 && segmentDs1 === segmentDs2 && stepSize1 === stepSize2 && loopDir1 === loopDir2 && loopSwp1 === loopSwp2 && edgeDistances1 === edgeDistances2 && srcEndpt1 === srcEndpt2 && tgtEndpt1 === tgtEndpt2 && srcArr1 === srcArr2 && tgtArr1 === tgtArr2 && lineW1 === lineW2 && arrScl1 === arrScl2 && (edgeIndex1 === edgeIndex2 && numEdges1 === numEdges2 || edgeIsUnbundled)) {
+        ptCacheHit = true; // then the control points haven't changed and we can skip calculating them
       } else {
+        ptCacheHit = false;
+
         rs.lastSrcCtlPtX = srcX2;
         rs.lastSrcCtlPtY = srcY2;
         rs.lastSrcCtlPtW = srcW2;
@@ -17143,341 +17220,359 @@ BRp.findEdgeControlPoints = function (edges) {
         rs.lastTgtEndpt = tgtEndpt2;
         rs.lastSrcArr = srcArr2;
         rs.lastTgtArr = tgtArr2;
+        rs.lastLineW = lineW2;
+        rs.lastArrScl = arrScl2;
       }
 
-      if (!pairEdges.calculatedIntersection && src !== tgt && (pairEdges.hasBezier || pairEdges.hasUnbundled)) {
+      if (!ptCacheHit) {
 
-        pairEdges.calculatedIntersection = true;
+        if (!pairEdges.calculatedIntersection && src !== tgt && (pairEdges.hasBezier || pairEdges.hasUnbundled)) {
 
-        // pt outside src shape to calc distance/displacement from src to tgt
-        var srcOutside = srcShape.intersectLine(srcPos.x, srcPos.y, srcW, srcH, tgtPos.x, tgtPos.y, 0);
+          pairEdges.calculatedIntersection = true;
 
-        pairEdges.srcIntn = srcOutside;
+          // pt outside src shape to calc distance/displacement from src to tgt
+          var srcOutside = srcShape.intersectLine(srcPos.x, srcPos.y, srcW, srcH, tgtPos.x, tgtPos.y, 0);
 
-        // pt outside tgt shape to calc distance/displacement from src to tgt
-        var tgtOutside = tgtShape.intersectLine(tgtPos.x, tgtPos.y, tgtW, tgtH, srcPos.x, srcPos.y, 0);
+          pairEdges.srcIntn = srcOutside;
 
-        pairEdges.tgtIntn = tgtOutside;
+          // pt outside tgt shape to calc distance/displacement from src to tgt
+          var tgtOutside = tgtShape.intersectLine(tgtPos.x, tgtPos.y, tgtW, tgtH, srcPos.x, srcPos.y, 0);
 
-        var midptSrcPts = {
-          x1: srcOutside[0],
-          x2: tgtOutside[0],
-          y1: srcOutside[1],
-          y2: tgtOutside[1]
-        };
+          pairEdges.tgtIntn = tgtOutside;
 
-        var posPts = {
-          x1: srcPos.x,
-          x2: tgtPos.x,
-          y1: srcPos.y,
-          y2: tgtPos.y
-        };
-
-        var dy = tgtOutside[1] - srcOutside[1];
-        var dx = tgtOutside[0] - srcOutside[0];
-        var l = Math.sqrt(dx * dx + dy * dy);
-
-        var vector = {
-          x: dx,
-          y: dy
-        };
-
-        var vectorNorm = {
-          x: vector.x / l,
-          y: vector.y / l
-        };
-        vectorNormInverse = {
-          x: -vectorNorm.y,
-          y: vectorNorm.x
-        };
-
-        // if node shapes overlap, then no ctrl pts to draw
-        if (tgtShape.checkPoint(srcOutside[0], srcOutside[1], 0, tgtW, tgtH, tgtPos.x, tgtPos.y) && srcShape.checkPoint(tgtOutside[0], tgtOutside[1], 0, srcW, srcH, srcPos.x, srcPos.y)) {
-          vectorNormInverse = {};
-          badBezier = true;
-        }
-      }
-
-      rs.srcIntn = pairEdges.srcIntn;
-      rs.tgtIntn = pairEdges.tgtIntn;
-
-      if (src === tgt) {
-        // Self-edge
-
-        rs.edgeType = 'self';
-
-        var j = i;
-        var loopDist = stepSize;
-
-        if (edgeIsUnbundled) {
-          j = 0;
-          loopDist = ctrlptDist;
-        }
-
-        var loopAngle = loopDir - Math.PI / 2;
-        var outAngle = loopAngle - loopSwp / 2;
-        var inAngle = loopAngle + loopSwp / 2;
-
-        // increase by step size for overlapping loops, keyed on direction and sweep values
-        var dc = String(loopDir + '_' + loopSwp);
-        j = dirCounts[dc] === undefined ? dirCounts[dc] = 0 : ++dirCounts[dc];
-
-        rs.ctrlpts = [srcPos.x + Math.cos(outAngle) * 1.4 * loopDist * (j / 3 + 1), srcPos.y + Math.sin(outAngle) * 1.4 * loopDist * (j / 3 + 1), srcPos.x + Math.cos(inAngle) * 1.4 * loopDist * (j / 3 + 1), srcPos.y + Math.sin(inAngle) * 1.4 * loopDist * (j / 3 + 1)];
-      } else if (hasCompounds && (src.isParent() || src.isChild() || tgt.isParent() || tgt.isChild()) && (src.parents().anySame(tgt) || tgt.parents().anySame(src))) {
-        // Compound edge
-
-        rs.edgeType = 'compound';
-
-        // because the line approximation doesn't apply for compound beziers
-        // (loop/self edges are already elided b/c of cheap src==tgt check)
-        rs.badBezier = false;
-
-        var j = i;
-        var loopDist = stepSize;
-
-        if (edgeIsUnbundled) {
-          j = 0;
-          loopDist = ctrlptDist;
-        }
-
-        var loopW = 50;
-
-        var loopaPos = {
-          x: srcPos.x - srcW / 2,
-          y: srcPos.y - srcH / 2
-        };
-
-        var loopbPos = {
-          x: tgtPos.x - tgtW / 2,
-          y: tgtPos.y - tgtH / 2
-        };
-
-        var loopPos = {
-          x: Math.min(loopaPos.x, loopbPos.x),
-          y: Math.min(loopaPos.y, loopbPos.y)
-        };
-
-        // avoids cases with impossible beziers
-        var minCompoundStretch = 0.5;
-        var compoundStretchA = Math.max(minCompoundStretch, Math.log(srcW * 0.01));
-        var compoundStretchB = Math.max(minCompoundStretch, Math.log(tgtW * 0.01));
-
-        rs.ctrlpts = [loopPos.x, loopPos.y - (1 + Math.pow(loopW, 1.12) / 100) * loopDist * (j / 3 + 1) * compoundStretchA, loopPos.x - (1 + Math.pow(loopW, 1.12) / 100) * loopDist * (j / 3 + 1) * compoundStretchB, loopPos.y];
-      } else if (curveStyle === 'segments') {
-        // Segments (multiple straight lines)
-
-        rs.edgeType = 'segments';
-        rs.segpts = [];
-
-        for (var s = 0; s < segmentsN; s++) {
-          var w = segmentWs.pfValue[s];
-          var d = segmentDs.pfValue[s];
-
-          var w1 = 1 - w;
-          var w2 = w;
-
-          var midptPts = edgeDistances === 'node-position' ? posPts : midptSrcPts;
-
-          var adjustedMidpt = {
-            x: midptPts.x1 * w1 + midptPts.x2 * w2,
-            y: midptPts.y1 * w1 + midptPts.y2 * w2
+          var midptSrcPts = {
+            x1: srcOutside[0],
+            x2: tgtOutside[0],
+            y1: srcOutside[1],
+            y2: tgtOutside[1]
           };
 
-          rs.segpts.push(adjustedMidpt.x + vectorNormInverse.x * d, adjustedMidpt.y + vectorNormInverse.y * d);
+          var posPts = {
+            x1: srcPos.x,
+            x2: tgtPos.x,
+            y1: srcPos.y,
+            y2: tgtPos.y
+          };
+
+          var dy = tgtOutside[1] - srcOutside[1];
+          var dx = tgtOutside[0] - srcOutside[0];
+          var l = Math.sqrt(dx * dx + dy * dy);
+
+          var vector = {
+            x: dx,
+            y: dy
+          };
+
+          var vectorNorm = {
+            x: vector.x / l,
+            y: vector.y / l
+          };
+          vectorNormInverse = {
+            x: -vectorNorm.y,
+            y: vectorNorm.x
+          };
+
+          // if node shapes overlap, then no ctrl pts to draw
+          if (tgtShape.checkPoint(srcOutside[0], srcOutside[1], 0, tgtW, tgtH, tgtPos.x, tgtPos.y) && srcShape.checkPoint(tgtOutside[0], tgtOutside[1], 0, srcW, srcH, srcPos.x, srcPos.y)) {
+            vectorNormInverse = {};
+            badBezier = true;
+          }
         }
 
-        // Straight edge
-      } else if (pairEdges.length % 2 === 1 && i === Math.floor(pairEdges.length / 2) && !edgeIsUnbundled) {
+        if (!edgeIsSwapped) {
+          rs.srcIntn = pairEdges.srcIntn;
+          rs.tgtIntn = pairEdges.tgtIntn;
+        } else {
+          // ensure that the per-edge cached value for intersections are correct for swapped bundled edges
+          rs.srcIntn = pairEdges.tgtIntn;
+          rs.tgtIntn = pairEdges.srcIntn;
+        }
 
-        rs.edgeType = 'straight';
-      } else {
-        // (Multi)bezier
+        if (src === tgt) {
+          // Self-edge
 
-        var multi = edgeIsUnbundled;
+          rs.edgeType = 'self';
 
-        rs.edgeType = multi ? 'multibezier' : 'bezier';
-        rs.ctrlpts = [];
-
-        for (var b = 0; b < bezierN; b++) {
-          var normctrlptDist = (0.5 - pairEdges.length / 2 + i) * stepSize;
-          var manctrlptDist;
-          var sign = math.signum(normctrlptDist);
-
-          if (multi) {
-            ctrlptDist = ctrlptDists ? ctrlptDists.pfValue[b] : stepSize; // fall back on step size
-            ctrlptWeight = ctrlptWs.value[b];
-          }
+          var j = i;
+          var loopDist = stepSize;
 
           if (edgeIsUnbundled) {
-            // multi or single unbundled
-            manctrlptDist = ctrlptDist;
-          } else {
-            manctrlptDist = ctrlptDist !== undefined ? sign * ctrlptDist : undefined;
+            j = 0;
+            loopDist = ctrlptDist;
           }
 
-          var distanceFromMidpoint = manctrlptDist !== undefined ? manctrlptDist : normctrlptDist;
+          var loopAngle = loopDir - Math.PI / 2;
+          var outAngle = loopAngle - loopSwp / 2;
+          var inAngle = loopAngle + loopSwp / 2;
 
-          var w1 = 1 - ctrlptWeight;
-          var w2 = ctrlptWeight;
+          // increase by step size for overlapping loops, keyed on direction and sweep values
+          var dc = String(loopDir + '_' + loopSwp);
+          j = dirCounts[dc] === undefined ? dirCounts[dc] = 0 : ++dirCounts[dc];
 
-          var midptPts = edgeDistances === 'node-position' ? posPts : midptSrcPts;
+          rs.ctrlpts = [srcPos.x + Math.cos(outAngle) * 1.4 * loopDist * (j / 3 + 1), srcPos.y + Math.sin(outAngle) * 1.4 * loopDist * (j / 3 + 1), srcPos.x + Math.cos(inAngle) * 1.4 * loopDist * (j / 3 + 1), srcPos.y + Math.sin(inAngle) * 1.4 * loopDist * (j / 3 + 1)];
+        } else if (hasCompounds && (src.isParent() || src.isChild() || tgt.isParent() || tgt.isChild()) && (src.parents().anySame(tgt) || tgt.parents().anySame(src))) {
+          // Compound edge
 
-          var adjustedMidpt = {
-            x: midptPts.x1 * w1 + midptPts.x2 * w2,
-            y: midptPts.y1 * w1 + midptPts.y2 * w2
-          };
+          rs.edgeType = 'compound';
 
-          rs.ctrlpts.push(adjustedMidpt.x + vectorNormInverse.x * distanceFromMidpoint, adjustedMidpt.y + vectorNormInverse.y * distanceFromMidpoint);
-        }
-      }
+          // because the line approximation doesn't apply for compound beziers
+          // (loop/self edges are already elided b/c of cheap src==tgt check)
+          rs.badBezier = false;
 
-      // find endpts for edge
-      this.findEndpoints(edge);
+          var j = i;
+          var loopDist = stepSize;
 
-      var badStart = !is.number(rs.startX) || !is.number(rs.startY);
-      var badAStart = !is.number(rs.arrowStartX) || !is.number(rs.arrowStartY);
-      var badEnd = !is.number(rs.endX) || !is.number(rs.endY);
-      var badAEnd = !is.number(rs.arrowEndX) || !is.number(rs.arrowEndY);
-
-      var minCpADistFactor = 3;
-      var arrowW = this.getArrowWidth(edge.pstyle('width').pfValue, edge.pstyle('arrow-scale').value) * this.arrowShapeWidth;
-      var minCpADist = minCpADistFactor * arrowW;
-
-      if (rs.edgeType === 'bezier') {
-        var startACpDist = math.dist({ x: rs.ctrlpts[0], y: rs.ctrlpts[1] }, { x: rs.startX, y: rs.startY });
-        var closeStartACp = startACpDist < minCpADist;
-        var endACpDist = math.dist({ x: rs.ctrlpts[0], y: rs.ctrlpts[1] }, { x: rs.endX, y: rs.endY });
-        var closeEndACp = endACpDist < minCpADist;
-
-        var overlapping = false;
-
-        if (badStart || badAStart || closeStartACp) {
-          overlapping = true;
-
-          // project control point along line from src centre to outside the src shape
-          // (otherwise intersection will yield nothing)
-          var cpD = { // delta
-            x: rs.ctrlpts[0] - srcPos.x,
-            y: rs.ctrlpts[1] - srcPos.y
-          };
-          var cpL = Math.sqrt(cpD.x * cpD.x + cpD.y * cpD.y); // length of line
-          var cpM = { // normalised delta
-            x: cpD.x / cpL,
-            y: cpD.y / cpL
-          };
-          var radius = Math.max(srcW, srcH);
-          var cpProj = { // *2 radius guarantees outside shape
-            x: rs.ctrlpts[0] + cpM.x * 2 * radius,
-            y: rs.ctrlpts[1] + cpM.y * 2 * radius
-          };
-
-          var srcCtrlPtIntn = srcShape.intersectLine(srcPos.x, srcPos.y, srcW, srcH, cpProj.x, cpProj.y, 0);
-
-          if (closeStartACp) {
-            rs.ctrlpts[0] = rs.ctrlpts[0] + cpM.x * (minCpADist - startACpDist);
-            rs.ctrlpts[1] = rs.ctrlpts[1] + cpM.y * (minCpADist - startACpDist);
-          } else {
-            rs.ctrlpts[0] = srcCtrlPtIntn[0] + cpM.x * minCpADist;
-            rs.ctrlpts[1] = srcCtrlPtIntn[1] + cpM.y * minCpADist;
+          if (edgeIsUnbundled) {
+            j = 0;
+            loopDist = ctrlptDist;
           }
-        }
 
-        if (badEnd || badAEnd || closeEndACp) {
-          overlapping = true;
+          var loopW = 50;
 
-          // project control point along line from tgt centre to outside the tgt shape
-          // (otherwise intersection will yield nothing)
-          var cpD = { // delta
-            x: rs.ctrlpts[0] - tgtPos.x,
-            y: rs.ctrlpts[1] - tgtPos.y
-          };
-          var cpL = Math.sqrt(cpD.x * cpD.x + cpD.y * cpD.y); // length of line
-          var cpM = { // normalised delta
-            x: cpD.x / cpL,
-            y: cpD.y / cpL
-          };
-          var radius = Math.max(srcW, srcH);
-          var cpProj = { // *2 radius guarantees outside shape
-            x: rs.ctrlpts[0] + cpM.x * 2 * radius,
-            y: rs.ctrlpts[1] + cpM.y * 2 * radius
+          var loopaPos = {
+            x: srcPos.x - srcW / 2,
+            y: srcPos.y - srcH / 2
           };
 
-          var tgtCtrlPtIntn = tgtShape.intersectLine(tgtPos.x, tgtPos.y, tgtW, tgtH, cpProj.x, cpProj.y, 0);
+          var loopbPos = {
+            x: tgtPos.x - tgtW / 2,
+            y: tgtPos.y - tgtH / 2
+          };
 
-          if (closeEndACp) {
-            rs.ctrlpts[0] = rs.ctrlpts[0] + cpM.x * (minCpADist - endACpDist);
-            rs.ctrlpts[1] = rs.ctrlpts[1] + cpM.y * (minCpADist - endACpDist);
-          } else {
-            rs.ctrlpts[0] = tgtCtrlPtIntn[0] + cpM.x * minCpADist;
-            rs.ctrlpts[1] = tgtCtrlPtIntn[1] + cpM.y * minCpADist;
+          var loopPos = {
+            x: Math.min(loopaPos.x, loopbPos.x),
+            y: Math.min(loopaPos.y, loopbPos.y)
+          };
+
+          // avoids cases with impossible beziers
+          var minCompoundStretch = 0.5;
+          var compoundStretchA = Math.max(minCompoundStretch, Math.log(srcW * 0.01));
+          var compoundStretchB = Math.max(minCompoundStretch, Math.log(tgtW * 0.01));
+
+          rs.ctrlpts = [loopPos.x, loopPos.y - (1 + Math.pow(loopW, 1.12) / 100) * loopDist * (j / 3 + 1) * compoundStretchA, loopPos.x - (1 + Math.pow(loopW, 1.12) / 100) * loopDist * (j / 3 + 1) * compoundStretchB, loopPos.y];
+        } else if (curveStyle === 'segments') {
+          // Segments (multiple straight lines)
+
+          rs.edgeType = 'segments';
+          rs.segpts = [];
+
+          for (var s = 0; s < segmentsN; s++) {
+            var w = segmentWs.pfValue[s];
+            var d = segmentDs.pfValue[s];
+
+            var w1 = 1 - w;
+            var w2 = w;
+
+            var midptPts = edgeDistances === 'node-position' ? posPts : midptSrcPts;
+
+            var adjustedMidpt = {
+              x: midptPts.x1 * w1 + midptPts.x2 * w2,
+              y: midptPts.y1 * w1 + midptPts.y2 * w2
+            };
+
+            rs.segpts.push(adjustedMidpt.x + vectorNormInverse.x * d, adjustedMidpt.y + vectorNormInverse.y * d);
           }
-        }
 
-        if (overlapping) {
-          // recalc endpts
-          this.findEndpoints(edge);
-        }
-      }
+          // Straight edge
+        } else if (pairEdges.length % 2 === 1 && i === Math.floor(pairEdges.length / 2) && !edgeIsUnbundled) {
 
-      if (rs.edgeType === 'multibezier' || rs.edgeType === 'bezier' || rs.edgeType === 'self' || rs.edgeType === 'compound') {
-        rs.allpts = [];
-
-        rs.allpts.push(rs.startX, rs.startY);
-
-        for (var b = 0; b + 1 < rs.ctrlpts.length; b += 2) {
-          // ctrl pt itself
-          rs.allpts.push(rs.ctrlpts[b], rs.ctrlpts[b + 1]);
-
-          // the midpt between ctrlpts as intermediate destination pts
-          if (b + 3 < rs.ctrlpts.length) {
-            rs.allpts.push((rs.ctrlpts[b] + rs.ctrlpts[b + 2]) / 2, (rs.ctrlpts[b + 1] + rs.ctrlpts[b + 3]) / 2);
-          }
-        }
-
-        rs.allpts.push(rs.endX, rs.endY);
-
-        var m, mt;
-        if (rs.ctrlpts.length / 2 % 2 === 0) {
-          m = rs.allpts.length / 2 - 1;
-
-          rs.midX = rs.allpts[m];
-          rs.midY = rs.allpts[m + 1];
+          rs.edgeType = 'straight';
         } else {
-          m = rs.allpts.length / 2 - 3;
-          mt = 0.5;
+          // (Multi)bezier
 
-          rs.midX = math.qbezierAt(rs.allpts[m], rs.allpts[m + 2], rs.allpts[m + 4], mt);
-          rs.midY = math.qbezierAt(rs.allpts[m + 1], rs.allpts[m + 3], rs.allpts[m + 5], mt);
+          var multi = edgeIsUnbundled;
+
+          rs.edgeType = multi ? 'multibezier' : 'bezier';
+          rs.ctrlpts = [];
+
+          for (var b = 0; b < bezierN; b++) {
+            var normctrlptDist = (0.5 - pairEdges.length / 2 + i) * stepSize;
+            var manctrlptDist;
+            var sign = math.signum(normctrlptDist);
+
+            if (multi) {
+              ctrlptDist = ctrlptDists ? ctrlptDists.pfValue[b] : stepSize; // fall back on step size
+              ctrlptWeight = ctrlptWs.value[b];
+            }
+
+            if (edgeIsUnbundled) {
+              // multi or single unbundled
+              manctrlptDist = ctrlptDist;
+            } else {
+              manctrlptDist = ctrlptDist !== undefined ? sign * ctrlptDist : undefined;
+            }
+
+            var distanceFromMidpoint = manctrlptDist !== undefined ? manctrlptDist : normctrlptDist;
+
+            var w1 = 1 - ctrlptWeight;
+            var w2 = ctrlptWeight;
+
+            if (edgeIsSwapped) {
+              var temp = w1;
+              w1 = w2;
+              w2 = temp;
+            }
+
+            var midptPts = edgeDistances === 'node-position' ? posPts : midptSrcPts;
+
+            var adjustedMidpt = {
+              x: midptPts.x1 * w1 + midptPts.x2 * w2,
+              y: midptPts.y1 * w1 + midptPts.y2 * w2
+            };
+
+            rs.ctrlpts.push(adjustedMidpt.x + vectorNormInverse.x * distanceFromMidpoint, adjustedMidpt.y + vectorNormInverse.y * distanceFromMidpoint);
+          }
         }
-      } else if (rs.edgeType === 'straight') {
-        // need to calc these after endpts
-        rs.allpts = [rs.startX, rs.startY, rs.endX, rs.endY];
 
-        // default midpt for labels etc
-        rs.midX = (rs.startX + rs.endX + rs.arrowStartX + rs.arrowEndX) / 4;
-        rs.midY = (rs.startY + rs.endY + rs.arrowStartY + rs.arrowEndY) / 4;
-      } else if (rs.edgeType === 'segments') {
-        rs.allpts = [];
-        rs.allpts.push(rs.startX, rs.startY);
-        rs.allpts.push.apply(rs.allpts, rs.segpts);
-        rs.allpts.push(rs.endX, rs.endY);
+        // find endpts for edge
+        this.findEndpoints(edge);
 
-        if (rs.segpts.length % 4 === 0) {
-          var i2 = rs.segpts.length / 2;
-          var i1 = i2 - 2;
+        var badStart = !is.number(rs.startX) || !is.number(rs.startY);
+        var badAStart = !is.number(rs.arrowStartX) || !is.number(rs.arrowStartY);
+        var badEnd = !is.number(rs.endX) || !is.number(rs.endY);
+        var badAEnd = !is.number(rs.arrowEndX) || !is.number(rs.arrowEndY);
 
-          rs.midX = (rs.segpts[i1] + rs.segpts[i2]) / 2;
-          rs.midY = (rs.segpts[i1 + 1] + rs.segpts[i2 + 1]) / 2;
-        } else {
-          var i1 = rs.segpts.length / 2 - 1;
+        var minCpADistFactor = 3;
+        var arrowW = this.getArrowWidth(edge.pstyle('width').pfValue, edge.pstyle('arrow-scale').value) * this.arrowShapeWidth;
+        var minCpADist = minCpADistFactor * arrowW;
 
-          rs.midX = rs.segpts[i1];
-          rs.midY = rs.segpts[i1 + 1];
+        if (rs.edgeType === 'bezier') {
+          var startACpDist = math.dist({ x: rs.ctrlpts[0], y: rs.ctrlpts[1] }, { x: rs.startX, y: rs.startY });
+          var closeStartACp = startACpDist < minCpADist;
+          var endACpDist = math.dist({ x: rs.ctrlpts[0], y: rs.ctrlpts[1] }, { x: rs.endX, y: rs.endY });
+          var closeEndACp = endACpDist < minCpADist;
+
+          var overlapping = false;
+
+          if (badStart || badAStart || closeStartACp) {
+            overlapping = true;
+
+            // project control point along line from src centre to outside the src shape
+            // (otherwise intersection will yield nothing)
+            var cpD = { // delta
+              x: rs.ctrlpts[0] - srcPos.x,
+              y: rs.ctrlpts[1] - srcPos.y
+            };
+            var cpL = Math.sqrt(cpD.x * cpD.x + cpD.y * cpD.y); // length of line
+            var cpM = { // normalised delta
+              x: cpD.x / cpL,
+              y: cpD.y / cpL
+            };
+            var radius = Math.max(srcW, srcH);
+            var cpProj = { // *2 radius guarantees outside shape
+              x: rs.ctrlpts[0] + cpM.x * 2 * radius,
+              y: rs.ctrlpts[1] + cpM.y * 2 * radius
+            };
+
+            var srcCtrlPtIntn = srcShape.intersectLine(srcPos.x, srcPos.y, srcW, srcH, cpProj.x, cpProj.y, 0);
+
+            if (closeStartACp) {
+              rs.ctrlpts[0] = rs.ctrlpts[0] + cpM.x * (minCpADist - startACpDist);
+              rs.ctrlpts[1] = rs.ctrlpts[1] + cpM.y * (minCpADist - startACpDist);
+            } else {
+              rs.ctrlpts[0] = srcCtrlPtIntn[0] + cpM.x * minCpADist;
+              rs.ctrlpts[1] = srcCtrlPtIntn[1] + cpM.y * minCpADist;
+            }
+          }
+
+          if (badEnd || badAEnd || closeEndACp) {
+            overlapping = true;
+
+            // project control point along line from tgt centre to outside the tgt shape
+            // (otherwise intersection will yield nothing)
+            var cpD = { // delta
+              x: rs.ctrlpts[0] - tgtPos.x,
+              y: rs.ctrlpts[1] - tgtPos.y
+            };
+            var cpL = Math.sqrt(cpD.x * cpD.x + cpD.y * cpD.y); // length of line
+            var cpM = { // normalised delta
+              x: cpD.x / cpL,
+              y: cpD.y / cpL
+            };
+            var radius = Math.max(srcW, srcH);
+            var cpProj = { // *2 radius guarantees outside shape
+              x: rs.ctrlpts[0] + cpM.x * 2 * radius,
+              y: rs.ctrlpts[1] + cpM.y * 2 * radius
+            };
+
+            var tgtCtrlPtIntn = tgtShape.intersectLine(tgtPos.x, tgtPos.y, tgtW, tgtH, cpProj.x, cpProj.y, 0);
+
+            if (closeEndACp) {
+              rs.ctrlpts[0] = rs.ctrlpts[0] + cpM.x * (minCpADist - endACpDist);
+              rs.ctrlpts[1] = rs.ctrlpts[1] + cpM.y * (minCpADist - endACpDist);
+            } else {
+              rs.ctrlpts[0] = tgtCtrlPtIntn[0] + cpM.x * minCpADist;
+              rs.ctrlpts[1] = tgtCtrlPtIntn[1] + cpM.y * minCpADist;
+            }
+          }
+
+          if (overlapping) {
+            // recalc endpts
+            this.findEndpoints(edge);
+          }
         }
-      }
 
-      this.storeEdgeProjections(edge);
-      this.calculateArrowAngles(edge);
+        if (rs.edgeType === 'multibezier' || rs.edgeType === 'bezier' || rs.edgeType === 'self' || rs.edgeType === 'compound') {
+          rs.allpts = [];
+
+          rs.allpts.push(rs.startX, rs.startY);
+
+          for (var b = 0; b + 1 < rs.ctrlpts.length; b += 2) {
+            // ctrl pt itself
+            rs.allpts.push(rs.ctrlpts[b], rs.ctrlpts[b + 1]);
+
+            // the midpt between ctrlpts as intermediate destination pts
+            if (b + 3 < rs.ctrlpts.length) {
+              rs.allpts.push((rs.ctrlpts[b] + rs.ctrlpts[b + 2]) / 2, (rs.ctrlpts[b + 1] + rs.ctrlpts[b + 3]) / 2);
+            }
+          }
+
+          rs.allpts.push(rs.endX, rs.endY);
+
+          var m, mt;
+          if (rs.ctrlpts.length / 2 % 2 === 0) {
+            m = rs.allpts.length / 2 - 1;
+
+            rs.midX = rs.allpts[m];
+            rs.midY = rs.allpts[m + 1];
+          } else {
+            m = rs.allpts.length / 2 - 3;
+            mt = 0.5;
+
+            rs.midX = math.qbezierAt(rs.allpts[m], rs.allpts[m + 2], rs.allpts[m + 4], mt);
+            rs.midY = math.qbezierAt(rs.allpts[m + 1], rs.allpts[m + 3], rs.allpts[m + 5], mt);
+          }
+        } else if (rs.edgeType === 'straight') {
+          // need to calc these after endpts
+          rs.allpts = [rs.startX, rs.startY, rs.endX, rs.endY];
+
+          // default midpt for labels etc
+          rs.midX = (rs.startX + rs.endX + rs.arrowStartX + rs.arrowEndX) / 4;
+          rs.midY = (rs.startY + rs.endY + rs.arrowStartY + rs.arrowEndY) / 4;
+        } else if (rs.edgeType === 'segments') {
+          rs.allpts = [];
+          rs.allpts.push(rs.startX, rs.startY);
+          rs.allpts.push.apply(rs.allpts, rs.segpts);
+          rs.allpts.push(rs.endX, rs.endY);
+
+          if (rs.segpts.length % 4 === 0) {
+            var i2 = rs.segpts.length / 2;
+            var i1 = i2 - 2;
+
+            rs.midX = (rs.segpts[i1] + rs.segpts[i2]) / 2;
+            rs.midY = (rs.segpts[i1 + 1] + rs.segpts[i2 + 1]) / 2;
+          } else {
+            var i1 = rs.segpts.length / 2 - 1;
+
+            rs.midX = rs.segpts[i1];
+            rs.midY = rs.segpts[i1 + 1];
+          }
+        }
+
+        this.storeEdgeProjections(edge);
+        this.calculateArrowAngles(edge);
+      } // if point cache miss
+
       this.recalculateEdgeLabelProjections(edge);
       this.calculateLabelAngles(edge);
     } // for pair edges
@@ -18738,7 +18833,9 @@ BRp.init = function (options) {
     var className = '__________cytoscape_container';
     var stylesheetAlreadyExists = document.getElementById(stylesheetId) != null;
 
-    ctr.className = (ctr.className || '') + ' ' + className;
+    if (ctr.className.indexOf(className) < 0) {
+      ctr.className = (ctr.className || '') + ' ' + className;
+    }
 
     if (!stylesheetAlreadyExists) {
       var stylesheet = document.createElement('style');
@@ -18817,7 +18914,6 @@ BRp.init = function (options) {
   r.registerNodeShapes();
   r.registerArrowShapes();
   r.registerCalculationListeners();
-  r.load();
 };
 
 BRp.notify = function (params) {
@@ -18841,6 +18937,11 @@ BRp.notify = function (params) {
 
     has[type] = true;
   } // for
+
+  if (has['init']) {
+    r.load();
+    return;
+  }
 
   if (has['destroy']) {
     r.destroy();
@@ -19669,7 +19770,7 @@ BRp.load = function () {
         r.hoverData.last = near;
       }
 
-      if (down && r.nodeIsDraggable(down)) {
+      if (down) {
 
         if (isOverThresholdDrag) {
           // then we can take action
@@ -19683,8 +19784,8 @@ BRp.load = function () {
             }
 
             goIntoBoxMode();
-          } else {
-            // otherwise drag
+          } else if (down && down.grabbed() && r.nodeIsDraggable(down)) {
+            // drag node
             var justStartedDrag = !r.dragData.didDrag;
 
             if (justStartedDrag) {
@@ -21038,7 +21139,7 @@ BRp.generateEllipse = function () {
     },
 
     checkPoint: function checkPoint(x, y, padding, width, height, centerX, centerY) {
-      return math.checkInEllipse(x, y, padding, width, height, centerX, centerY);
+      return math.checkInEllipse(x, y, width, height, centerX, centerY, padding);
     }
   };
 };
@@ -21062,37 +21163,38 @@ BRp.generateRoundRectangle = function () {
     checkPoint: function checkPoint(x, y, padding, width, height, centerX, centerY) {
 
       var cornerRadius = math.getRoundRectangleRadius(width, height);
+      var diam = cornerRadius * 2;
 
       // Check hBox
-      if (math.pointInsidePolygon(x, y, this.points, centerX, centerY, width, height - 2 * cornerRadius, [0, -1], padding)) {
+      if (math.pointInsidePolygon(x, y, this.points, centerX, centerY, width, height - diam, [0, -1], padding)) {
         return true;
       }
 
       // Check vBox
-      if (math.pointInsidePolygon(x, y, this.points, centerX, centerY, width - 2 * cornerRadius, height, [0, -1], padding)) {
+      if (math.pointInsidePolygon(x, y, this.points, centerX, centerY, width - diam, height, [0, -1], padding)) {
         return true;
       }
 
       // Check top left quarter circle
-      if (math.checkInEllipse(x, y, centerX - width / 2 + cornerRadius, centerY - height / 2 + cornerRadius, cornerRadius * 2, cornerRadius * 2, padding)) {
+      if (math.checkInEllipse(x, y, diam, diam, centerX - width / 2 + cornerRadius, centerY - height / 2 + cornerRadius, padding)) {
 
         return true;
       }
 
       // Check top right quarter circle
-      if (math.checkInEllipse(x, y, centerX + width / 2 - cornerRadius, centerY - height / 2 + cornerRadius, cornerRadius * 2, cornerRadius * 2, padding)) {
+      if (math.checkInEllipse(x, y, diam, diam, centerX + width / 2 - cornerRadius, centerY - height / 2 + cornerRadius, padding)) {
 
         return true;
       }
 
       // Check bottom right quarter circle
-      if (math.checkInEllipse(x, y, centerX + width / 2 - cornerRadius, centerY + height / 2 - cornerRadius, cornerRadius * 2, cornerRadius * 2, padding)) {
+      if (math.checkInEllipse(x, y, diam, diam, centerX + width / 2 - cornerRadius, centerY + height / 2 - cornerRadius, padding)) {
 
         return true;
       }
 
       // Check bottom left quarter circle
-      if (math.checkInEllipse(x, y, centerX - width / 2 + cornerRadius, centerY + height / 2 - cornerRadius, cornerRadius * 2, cornerRadius * 2, padding)) {
+      if (math.checkInEllipse(x, y, diam, diam, centerX - width / 2 + cornerRadius, centerY + height / 2 - cornerRadius, padding)) {
 
         return true;
       }
@@ -21309,14 +21411,15 @@ BRp.generateBottomRoundrectangle = function () {
     checkPoint: function checkPoint(x, y, padding, width, height, centerX, centerY) {
 
       var cornerRadius = math.getRoundRectangleRadius(width, height);
+      var diam = 2 * cornerRadius;
 
       // Check hBox
-      if (math.pointInsidePolygon(x, y, this.points, centerX, centerY, width, height - 2 * cornerRadius, [0, -1], padding)) {
+      if (math.pointInsidePolygon(x, y, this.points, centerX, centerY, width, height - diam, [0, -1], padding)) {
         return true;
       }
 
       // Check vBox
-      if (math.pointInsidePolygon(x, y, this.points, centerX, centerY, width - 2 * cornerRadius, height, [0, -1], padding)) {
+      if (math.pointInsidePolygon(x, y, this.points, centerX, centerY, width - diam, height, [0, -1], padding)) {
         return true;
       }
 
@@ -21329,13 +21432,13 @@ BRp.generateBottomRoundrectangle = function () {
       }
 
       // Check bottom right quarter circle
-      if (math.checkInEllipse(x, y, centerX + width / 2 - cornerRadius, centerY + height / 2 - cornerRadius, cornerRadius * 2, cornerRadius * 2, padding)) {
+      if (math.checkInEllipse(x, y, diam, diam, centerX + width / 2 - cornerRadius, centerY + height / 2 - cornerRadius, padding)) {
 
         return true;
       }
 
       // Check bottom left quarter circle
-      if (math.checkInEllipse(x, y, centerX - width / 2 + cornerRadius, centerY + height / 2 - cornerRadius, cornerRadius * 2, cornerRadius * 2, padding)) {
+      if (math.checkInEllipse(x, y, diam, diam, centerX - width / 2 + cornerRadius, centerY + height / 2 - cornerRadius, padding)) {
 
         return true;
       }
@@ -21640,12 +21743,12 @@ CRp.arrowShapeImpl = function (name) {
         context.beginPath();
       }
 
-      var crossLinePts = crossLinePoints;
+      var teePts = crossLinePoints;
       var firstTeePt = crossLinePoints[0];
       context.moveTo(firstTeePt.x, firstTeePt.y);
 
-      for (var i = 0; i < crossLinePts.length; i++) {
-        var pt = crossLinePts[i];
+      for (var i = 0; i < teePts.length; i++) {
+        var pt = teePts[i];
 
         context.lineTo(pt.x, pt.y);
       }
@@ -21883,13 +21986,6 @@ CRp.drawArrowhead = function (context, edge, prefix, x, y, angle, opacity) {
   }
 
   var gco = context.globalCompositeOperation;
-
-  var shapeImpl = self.arrowShapes[arrowShape];
-
-  // check if the shape needs both fill and stroke operations to be drawn
-  if (shapeImpl.forceStroke && arrowFill === 'filled') {
-    arrowFill = 'both';
-  }
 
   if (opacity !== 1 || arrowFill === 'hollow') {
     // then extra clear is needed
@@ -22928,7 +23024,7 @@ CRp.hasPie = function (node) {
 
 CRp.drawPie = function (context, node, nodeOpacity, pos) {
   node = node[0]; // ensure ele ref
-  pos || node.position();
+  pos = pos || node.position();
 
   var cyStyle = node.cy().style();
   var pieSize = node.pstyle('pie-size');
@@ -24436,16 +24532,21 @@ function CanvasRenderer(options) {
     bufferContexts: new Array(CRp.CANVAS_LAYERS)
   };
 
+  var tapHlOff = '-webkit-tap-highlight-color: rgba(0,0,0,0);';
+
   r.data.canvasContainer = document.createElement('div'); // eslint-disable-line no-undef
   var containerStyle = r.data.canvasContainer.style;
-  r.data.canvasContainer.setAttribute('style', '-webkit-tap-highlight-color: rgba(0,0,0,0);');
+  r.data.canvasContainer.setAttribute('style', tapHlOff);
   containerStyle.position = 'relative';
   containerStyle.zIndex = '0';
   containerStyle.overflow = 'hidden';
 
   var container = options.cy.container();
   container.appendChild(r.data.canvasContainer);
-  container.setAttribute('style', (container.getAttribute('style') || '') + '-webkit-tap-highlight-color: rgba(0,0,0,0);');
+
+  if ((container.getAttribute('style') || '').indexOf(tapHlOff) < 0) {
+    container.setAttribute('style', (container.getAttribute('style') || '') + tapHlOff);
+  }
 
   for (var i = 0; i < CRp.CANVAS_LAYERS; i++) {
     var canvas = r.data.canvases[i] = document.createElement('canvas'); // eslint-disable-line no-undef
@@ -25399,7 +25500,9 @@ p.get = function (key) {
   return this._obj[key];
 };
 
-module.exports = typeof Map !== 'undefined' ? Map : ObjectMap;
+// TODO use the stdlib Map in future...
+// module.exports = typeof Map !== 'undefined' ? Map : ObjectMap;
+module.exports = ObjectMap;
 
 /***/ }),
 /* 119 */
@@ -25415,7 +25518,7 @@ var _require = __webpack_require__(17),
 
 var tokens = __webpack_require__(122);
 var util = __webpack_require__(1);
-var newQuery = __webpack_require__(10);
+var newQuery = __webpack_require__(11);
 
 // when a token like a variable has escaped meta characters, we need to clean the backslashes out
 // so that values get compared properly in Selector.filter()
@@ -25997,7 +26100,7 @@ module.exports = { matches: matches, filter: filter };
 
 var util = __webpack_require__(1);
 var exprs = __webpack_require__(119);
-var newQuery = __webpack_require__(10);
+var newQuery = __webpack_require__(11);
 
 // of all the expressions, find the first match in the remaining text
 var consumeExpr = function consumeExpr(remaining) {
@@ -27249,7 +27352,7 @@ module.exports = styfn;
 
 var styfn = {};
 
-styfn.applyFromJson = function (json) {
+styfn.appendFromJson = function (json) {
   var style = this;
 
   for (var i = 0; i < json.length; i++) {
@@ -27276,7 +27379,7 @@ styfn.fromJson = function (json) {
   var style = this;
 
   style.resetToDefault();
-  style.applyFromJson(json);
+  style.appendFromJson(json);
 
   return style;
 };
@@ -28214,7 +28317,7 @@ var Selector = __webpack_require__(6);
 
 var styfn = {};
 
-styfn.applyFromString = function (string) {
+styfn.appendFromString = function (string) {
   var self = this;
   var style = this;
   var remaining = '' + string;
@@ -28343,7 +28446,7 @@ styfn.fromString = function (string) {
   var style = this;
 
   style.resetToDefault();
-  style.applyFromString(string);
+  style.appendFromString(string);
 
   return style;
 };
