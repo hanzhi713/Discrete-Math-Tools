@@ -2,3 +2,4 @@
 .babelrc
 /Graphs/js/node_modules/
 /Doc/
+/.idea/
