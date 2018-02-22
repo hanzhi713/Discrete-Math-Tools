@@ -176,22 +176,27 @@ $(function () {
     ca.graphml({ layoutBy: 'circle' });
 
     cy.edgehandles({
+        // preview: true, // whether to show added edges preview before releasing selection
+        // stackOrder: 4, // Controls stack order of edgehandles canvas element by setting it's z-index
+        // handleSize: 10, // the size of the edge handle put on nodes
+        // handleHitThreshold: 6, // a threshold for hit detection that makes it easier to grab the handle
+        // handleIcon: false, // an image to put on the handle
+        // handleColor: '#ff0000', // the colour of the handle and the line drawn from it
+        // handleLineType: 'ghost', // can be 'ghost' for real edge, 'straight' for a straight line, or 'draw' for a draw-as-you-go line
+        // handleLineWidth: 3, // width of handle line in pixels
+        // handleOutlineColor: '#000000', // the colour of the handle outline
+        // handleOutlineWidth: 0, // the width of the handle outline in pixels
+        // handleNodes: 'node', // selector/filter function for whether edges can be made from a given node
+        // handlePosition: 'middle top', // sets the position of the handle in the format of "X-AXIS Y-AXIS" such as "left top", "middle top"
+        // hoverDelay: 100, // time spend over a target node before it is considered a target selection
+        // cxt: false, // whether cxt events trigger edgehandles (useful on touch)
+        // enabled: true, // whether to start the plugin in the enabled state
+        // toggleOffOnLeave: false, // whether an edge is cancelled by leaving a node (true), or whether you need to go over again to cancel (false; allows multiple edges in one pass)
         preview: true, // whether to show added edges preview before releasing selection
-        stackOrder: 4, // Controls stack order of edgehandles canvas element by setting it's z-index
-        handleSize: 10, // the size of the edge handle put on nodes
-        handleHitThreshold: 6, // a threshold for hit detection that makes it easier to grab the handle
-        handleIcon: false, // an image to put on the handle
-        handleColor: '#ff0000', // the colour of the handle and the line drawn from it
-        handleLineType: 'ghost', // can be 'ghost' for real edge, 'straight' for a straight line, or 'draw' for a draw-as-you-go line
-        handleLineWidth: 3, // width of handle line in pixels
-        handleOutlineColor: '#000000', // the colour of the handle outline
-        handleOutlineWidth: 0, // the width of the handle outline in pixels
+        hoverDelay: 150, // time spent hovering over a target node before it is considered selected
         handleNodes: 'node', // selector/filter function for whether edges can be made from a given node
         handlePosition: 'middle top', // sets the position of the handle in the format of "X-AXIS Y-AXIS" such as "left top", "middle top"
-        hoverDelay: 100, // time spend over a target node before it is considered a target selection
-        cxt: false, // whether cxt events trigger edgehandles (useful on touch)
-        enabled: true, // whether to start the plugin in the enabled state
-        toggleOffOnLeave: false, // whether an edge is cancelled by leaving a node (true), or whether you need to go over again to cancel (false; allows multiple edges in one pass)
+        handleInDrawMode: false, // whether to show the handle in draw mode
         edgeType: function edgeType(sourceNode, targetNode) {
             // can return 'flat' for flat edges between nodes or 'node' for intermediate node between them
             // returning null/undefined means an edge can't be added between the two nodes
@@ -224,9 +229,6 @@ $(function () {
                 }
             };
         },
-        start: function start(sourceNode) {
-            // fired when edgehandles interaction starts (drag on handle)
-        },
         complete: function complete(sourceNode, targetNodes, addedEntities) {
             // fired when edgehandles is done and entities are added
             if (auto_refresh.checked) cyReLayout();
@@ -241,13 +243,6 @@ $(function () {
                     });
                 }
             });
-        },
-        stop: function stop(sourceNode) {
-            // fired when edgehandles interaction is stopped (either complete with added edges or incomplete)
-        },
-        cancel: function cancel(sourceNode, renderedPosition, invalidTarget) {
-            // fired when edgehandles are cancelled ( incomplete - nothing has been added ) - renderedPosition is where the edgehandle was released, invalidTarget is
-            // a collection on which the handle was released, but which for other reasons (loopAllowed | edgeType) is an invalid target
         }
     });
 
@@ -1464,6 +1459,7 @@ function myDijkstra() {
                 // animate the edge
                 animateEdge(edgeBetween, function () {
                     if (!animationFlag) return;
+
                     // if the target node haven't got a permanent label
                     if (target.data('permanent') === undefined)
 
@@ -1490,6 +1486,7 @@ function myDijkstra() {
                 // animate this edge
                 animateEdge(edge, function () {
                     if (!animationFlag) return;
+
                     // if the target node doesn't have a temporary label,
                     // or the new weight is lower than the current label
                     // update the label
@@ -1584,6 +1581,7 @@ function myDijkstra() {
             addNextLabel(currentNode, currentNode.connectedEdges(), 0);
         });
     }
+
     // same story as the above, but without animation
     // looks nicer, no awful callbacks
     else {
@@ -2223,7 +2221,7 @@ function traceEulerianCycle(start, c) {
                 }
             });
 
-            // break the journey (node: the next half of the journey journey will be added back later)
+            // break the journey (note: the next half of the journey journey will be added back later)
             nextJourney = node.next;
             currentNode = node.cargo;
             node.next = null;
@@ -2257,6 +2255,7 @@ function minimalWeightMatching() {
     stopAnimation();
     clearCyStyle();
     cy.elements().unselect();
+
     // precondition: the graph is connected
     if (!isConnected()) return alert("Graph not connected!");
 
@@ -2311,7 +2310,7 @@ function minimalWeightMatching() {
 function minimalWeightMatchingMultiThread(weightMatrix, numOfThreads, callback) {
     var _marked = /*#__PURE__*/regeneratorRuntime.mark(join);
 
-    // generator is used to merge the results from each thread
+    // generator is used to merge the results from each worker
     function join() {
         var flag, i, minWeight, minPairing, _i11;
 
@@ -2418,6 +2417,7 @@ function CPP() {
     stopAnimation();
     clearCyStyle();
     cy.elements().unselect();
+
     // get the collection of odd nodes
     cy.nodes().forEach(function (ele) {
         if (ele.degree() % 2 !== 0) ele.select();
@@ -2426,7 +2426,7 @@ function CPP() {
     var n = nodes.length;
     if (n > 14) if (!confirm("Warning! This graph has " + n + " nodes of odd degree, at most " + f(n) / (f(n / 2) * Math.pow(2, n / 2)) + " iterations are needed and it might take a long time！")) return;
 
-    // get the weight matrix of these nodes (a subgraph)
+    // get the weight matrix of these nodes (the subgraph consisting only the nodes of odd degree)
     var weightMatrix = new Array(n);
     var paths = new Array(n);
     for (var _x = 0; _x < n; _x++) {
@@ -2436,9 +2436,11 @@ function CPP() {
             weightMatrix[_x][y] = paths[_x].distanceTo(nodes[y]);
         }
     }
+
     // get the minimal weight perfect matching
     minimalWeightMatchingMultiThread(weightMatrix, 4, displayResult);
 
+    // the callback function used to show the result on the result canvas
     function displayResult(minPairing) {
         clearResult();
         ca.add(cy.elements());
@@ -2669,3 +2671,4 @@ function readGraphML() {
     cy.graphml(matrix_input.value);
     cyReLayout();
 }
+//# sourceMappingURL=main-undirected.js.map

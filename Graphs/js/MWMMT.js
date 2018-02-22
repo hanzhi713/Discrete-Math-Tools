@@ -50,7 +50,7 @@ var onmessage = function (message) {
     var matches = new Array(len);
     var tempWeight, tempEles;
     for (var x = start; x < end; x++)
-        for (var y = 0; y < len; y++) {
+        for (var y = x + 1; y < len; y++) {
             if (weightMatrix[x][y] === 0)
                 continue;
             tempWeight = weightMatrix[x][y];

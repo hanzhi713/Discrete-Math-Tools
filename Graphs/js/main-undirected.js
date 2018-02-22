@@ -1579,6 +1579,7 @@ function myDijkstra() {
                 animateEdge(edgeBetween, () => {
                     if (!animationFlag)
                         return;
+
                     // if the target node haven't got a permanent label
                     if (target.data('permanent') === undefined)
 
@@ -1607,6 +1608,7 @@ function myDijkstra() {
                 animateEdge(edge, () => {
                     if (!animationFlag)
                         return;
+
                     // if the target node doesn't have a temporary label,
                     // or the new weight is lower than the current label
                     // update the label
@@ -1706,6 +1708,7 @@ function myDijkstra() {
             addNextLabel(currentNode, currentNode.connectedEdges(), 0);
         });
     }
+
     // same story as the above, but without animation
     // looks nicer, no awful callbacks
     else {
@@ -2337,7 +2340,7 @@ function traceEulerianCycle(start, c) {
                 }
             });
 
-            // break the journey (node: the next half of the journey journey will be added back later)
+            // break the journey (note: the next half of the journey journey will be added back later)
             nextJourney = node.next;
             currentNode = node.cargo;
             node.next = null;
@@ -2372,6 +2375,7 @@ function minimalWeightMatching() {
     stopAnimation();
     clearCyStyle();
     cy.elements().unselect();
+
     // precondition: the graph is connected
     if (!isConnected())
         return alert("Graph not connected!");
@@ -2428,7 +2432,7 @@ function minimalWeightMatching() {
  * @return void
  * */
 function minimalWeightMatchingMultiThread(weightMatrix, numOfThreads, callback) {
-    // generator is used to merge the results from each thread
+    // generator is used to merge the results from each worker
     function*join() {
         while (true) {
             yield null;
@@ -2501,6 +2505,7 @@ function CPP() {
     stopAnimation();
     clearCyStyle();
     cy.elements().unselect();
+
     // get the collection of odd nodes
     cy.nodes().forEach((ele) => {
         if (ele.degree() % 2 !== 0)
@@ -2512,7 +2517,7 @@ function CPP() {
         if (!confirm("Warning! This graph has " + n + " nodes of odd degree, at most " + (f(n) / (f(n / 2) * Math.pow(2, n / 2))) + " iterations are needed and it might take a long time！"))
             return;
 
-    // get the weight matrix of these nodes (a subgraph)
+    // get the weight matrix of these nodes (the subgraph consisting only the nodes of odd degree)
     let weightMatrix = new Array(n);
     let paths = new Array(n);
     for (let x = 0; x < n; x++) {
@@ -2521,9 +2526,11 @@ function CPP() {
         for (let y = x + 1; y < n; y++)
             weightMatrix[x][y] = paths[x].distanceTo(nodes[y]);
     }
+
     // get the minimal weight perfect matching
     minimalWeightMatchingMultiThread(weightMatrix, 4, displayResult);
 
+    // the callback function used to show the result on the result canvas
     function displayResult(minPairing) {
         clearResult();
         ca.add(cy.elements());
