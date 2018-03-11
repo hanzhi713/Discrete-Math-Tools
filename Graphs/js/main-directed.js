@@ -1,4 +1,5 @@
 'use strict';
+
 /**
  * @function
  * @public
@@ -23,6 +24,7 @@ function hideResult(c) {
         });
     }
 }
+
 /**
  * @function
  * @private
@@ -39,6 +41,7 @@ function hideWeight(isSimple) {
         $('#wlabel').hide(500);
     }
 }
+
 /**
  * @public
  * @function
@@ -52,6 +55,7 @@ function hideDuration(cb) {
     else
         d.hide(400);
 }
+
 /**
  * @public
  * @function
@@ -61,6 +65,7 @@ function callToAlgorithms() {
     let algo = document.getElementById('algorithms');
     eval(algo.options[algo.selectedIndex].value);
 }
+
 /**
  * @author Hanzhi Zhou (Tom)
  * */
@@ -323,6 +328,7 @@ $(() => {
     reLayout();
     hideResult(document.getElementById('hide_result'));
 });
+
 /**
  * restore the default style of cy elements
  * @function
@@ -335,6 +341,7 @@ function clearCyStyle() {
     cy.style().resetToDefault().selector('node').style(defaultNodeStyle).selector('edge').style(defaultEdgeStyle).update();
     cy.$(':selected').select();
 }
+
 /**
  * @function
  * @public
@@ -345,6 +352,7 @@ function clearCaStyle() {
     ca.style().resetToDefault().selector('node').style(defaultNodeStyle).selector('edge').style(defaultEdgeStyle).update();
     ca.$(':selected').select();
 }
+
 /**
  * @function
  * @public
@@ -551,6 +559,7 @@ function initConventionalMenu(c) {
         ]
     });
 }
+
 /**
  * @function
  * @param {object} c
@@ -721,6 +730,7 @@ function addOneNode(random, position) {
             });
     }
 }
+
 /**
  * @function
  * @public
@@ -753,6 +763,7 @@ function addEdge() {
     if (auto_refresh.checked)
         cyReLayout();
 }
+
 /**
  * @function
  * @public
@@ -770,6 +781,7 @@ function snapToGrid(c, flag) {
         c.snapToGrid('gridOff');
     }
 }
+
 /**
  * @function
  * @public
@@ -790,6 +802,7 @@ function changeLayout(idx) {
     }
     reLayout();
 }
+
 /**
  * @function
  * @public
@@ -799,6 +812,7 @@ function reLayout() {
     cyReLayout();
     caReLayout();
 }
+
 /**
  * Rerun the layout for the graph and recalculate its total weight
  * @function
@@ -817,6 +831,7 @@ function cyReLayout() {
     CyLayout = cy.layout(layout_options[layoutname]);
     CyLayout.run();
 }
+
 /**
  * Rerun the layout for the graph and recalculate its total weight
  * @function
@@ -835,6 +850,7 @@ function caReLayout() {
     CaLayout = ca.layout(layout_options[layoutname]);
     CaLayout.run();
 }
+
 /**
  * @function
  * @public
@@ -864,6 +880,7 @@ function removeNode() {
     if (auto_refresh.checked)
         cyReLayout();
 }
+
 /**
  * @function
  * @public
@@ -883,6 +900,7 @@ function removeEdge() {
     if (auto_refresh.checked)
         cyReLayout();
 }
+
 /**
  * @public
  * @function
@@ -908,6 +926,7 @@ function duplicateEdge(edge, c) {
         }
     });
 }
+
 /**
  * @function
  * @public
@@ -919,6 +938,7 @@ function removeSelected() {
     if (auto_refresh.checked)
         cyReLayout();
 }
+
 /**
  * @function
  * @public
@@ -938,6 +958,7 @@ function addEdgeBetweenSelected() {
     if (auto_refresh.checked)
         cyReLayout();
 }
+
 /**
  * @function
  * @public
@@ -953,6 +974,7 @@ function addEdgeBwt(src, tg, w) {
         x += 1;
     return cy.add({group: 'edges', data: {id: id_pre + x, source: src, target: tg, weight: w}});
 }
+
 /**
  * @function
  * @public
@@ -963,6 +985,7 @@ function getWeight(edge) {
     let weight = edge.data('weight');
     return isNaN(weight) ? 1 : weight;
 }
+
 /**
  * given a node and the edge connected to it,
  * get the other node
@@ -980,6 +1003,7 @@ function getTarget(node, edge) {
         targetNode = cy.$id(edge.data('source'));
     return targetNode;
 }
+
 /**
  * @function
  * @public
@@ -995,6 +1019,7 @@ function getCaTarget(node, edge) {
         targetNode = ca.$id(edge.data('source'));
     return targetNode;
 }
+
 /**
  * @function
  * @public
@@ -1005,6 +1030,7 @@ function clearSource() {
     cy.remove(cy.elements());
     document.getElementById('cy_weight').innerHTML = '';
 }
+
 /**
  * @function
  * @public
@@ -1016,6 +1042,7 @@ function clearResult() {
     document.getElementById('ca_weight').innerHTML = '';
     document.getElementById('path').innerHTML = '';
 }
+
 /**
  * @function
  * @public
@@ -1026,6 +1053,7 @@ function stopAnimation() {
     ca.elements().stop();
     animationFlag = false;
 }
+
 /**
  * @function
  * @public
@@ -1035,6 +1063,7 @@ function readAM() {
     clearCyStyle();
     createFromAM(eval(matrix_input.value));
 }
+
 /**
  * @function
  * @public
@@ -1044,6 +1073,7 @@ function readWM() {
     clearCyStyle();
     createFromWM(eval(matrix_input.value));
 }
+
 /**
  * create graph from an adjacency matrix
  * @function
@@ -1092,6 +1122,7 @@ function createFromAM(m) {
     cy.endBatch();
     cyReLayout();
 }
+
 /**
  * create the graph from a weight matrix
  * @function
@@ -1132,6 +1163,7 @@ function createFromWM(m) {
     cy.endBatch();
     cyReLayout();
 }
+
 /**
  * generate a random graph
  * @function
@@ -1202,6 +1234,7 @@ function generateGraph() {
         createFromAM(matrix);
     }
 }
+
 /**
  * Generate a complete graph of n vertices by first generating its corresponding adjacency matrix
  * @function
@@ -1297,6 +1330,7 @@ function getCyStartNode(prompt_text, default_value) {
         root = root[0];
     return root;
 }
+
 /**
  * Breadth first search is implemented in the library
  * @function
@@ -1321,6 +1355,7 @@ function breadthFirstSearch() {
     caReLayout();
     pathList.traverse(animation.checked, true);
 }
+
 /**
  * DFS implemented in the library
  * @function
@@ -1345,6 +1380,7 @@ function depthFirstSearch() {
     caReLayout();
     pathList.traverse(animation.checked, true);
 }
+
 // /**
 //  * Kruskal is implemented in the library
 //  * @function
@@ -1431,6 +1467,7 @@ function colorRGB2Hex(color) {
  * */
 const jetMap = [[0, 0, 143], [0, 0, 159], [0, 0, 175], [0, 0, 191], [0, 0, 207], [0, 0, 223], [0, 0, 239], [0, 0, 255], [0, 16, 255], [0, 32, 255], [0, 48, 255], [0, 64, 255], [0, 80, 255], [0, 96, 255], [0, 112, 255], [0, 128, 255], [0, 143, 255], [0, 159, 255], [0, 175, 255], [0, 191, 255], [0, 207, 255], [0, 223, 255], [0, 239, 255], [0, 255, 255], [16, 255, 239], [32, 255, 223], [48, 255, 207], [64, 255, 191], [80, 255, 175], [96, 255, 159], [112, 255, 143], [128, 255, 128], [143, 255, 112], [159, 255, 96], [175, 255, 80], [191, 255, 64], [207, 255, 48], [223, 255, 32], [239, 255, 16], [255, 255, 0], [255, 239, 0], [255, 223, 0], [255, 207, 0], [255, 191, 0], [255, 175, 0], [255, 159, 0], [255, 143, 0], [255, 128, 0], [255, 112, 0], [255, 96, 0], [255, 80, 0], [255, 64, 0], [255, 48, 0], [255, 32, 0], [255, 16, 0], [255, 0, 0], [239, 0, 0], [223, 0, 0], [207, 0, 0], [191, 0, 0], [175, 0, 0], [159, 0, 0], [143, 0, 0], [128, 0, 0]];
 const jetMapHex = ['#00008f', '#00009f', '#0000af', '#0000bf', '#0000cf', '#0000df', '#0000ef', '#0000ff', '#0010ff', '#0020ff', '#0030ff', '#0040ff', '#0050ff', '#0060ff', '#0070ff', '#0080ff', '#008fff', '#009fff', '#00afff', '#00bfff', '#00cfff', '#00dfff', '#00efff', '#00ffff', '#10ffef', '#20ffdf', '#30ffcf', '#40ffbf', '#50ffaf', '#60ff9f', '#70ff8f', '#80ff80', '#8fff70', '#9fff60', '#afff50', '#bfff40', '#cfff30', '#dfff20', '#efff10', '#ffff00', '#ffef00', '#ffdf00', '#ffcf00', '#ffbf00', '#ffaf00', '#ff9f00', '#ff8f00', '#ff8000', '#ff7000', '#ff6000', '#ff5000', '#ff4000', '#ff3000', '#ff2000', '#ff1000', '#ff0000', '#ef0000', '#df0000', '#cf0000', '#bf0000', '#af0000', '#9f0000', '#8f0000', '#800000'];
+
 /**
  * perform page rank
  * @public
@@ -1465,12 +1502,13 @@ function pageRank() {
         });
         n.style({
             fontSize: 13 + Math.floor(Math.pow(size, 0.33)) + 'px',
-            label: n => `${n.data('id')}\n${(rank * 100).toFixed(2)}%`,
+            label: n => `${n.data('id')}\n${(r * 100).toFixed(2)}%`,
             textWrap: 'wrap',
             textValign: 'top',
         })
     });
 }
+
 /**
  * perform detailed page rank
  * @public
@@ -1504,7 +1542,7 @@ function myPageRank() {
      * */
     const tailNumber = (1 - dpFactor) / len;
     const animationDuration = Math.round(+duration.value);
-    const normalizeInMiddle = false;
+    const normalizeInMiddle = true;
 
     /**
      * @type {int} no-animation calculation method
@@ -1638,11 +1676,11 @@ function myPageRank() {
         if (edges !== undefined) {
             // show the transferred weight on the edge
             edges.style({
-                textRotation : 'autorotate',
+                textRotation: 'autorotate',
                 label: e => e.data('tpr'),
                 fontSize: '16px',
                 color: '#c20b00',
-                fontWeight : 'bold'
+                fontWeight: 'bold'
             });
             // animate this edge
             edges.animate({
@@ -2487,6 +2525,7 @@ class LinkedListNode {
         this.next = next;
     }
 }
+
 class LinkedList {
     constructor() {
         /**
@@ -2657,6 +2696,7 @@ class LinkedList {
         }
     }
 }
+
 // /**
 //  * @see traceEulerianCycle()
 //  * @function
@@ -3091,6 +3131,7 @@ function getAM(c, output) {
         matrix_input.value = matrixToString(matrix);
     return matrix;
 }
+
 /**
  * get the weight matrix
  * @function
@@ -3126,6 +3167,7 @@ function getWM(c, output) {
         matrix_input.value = matrixToString(matrix);
     return matrix;
 }
+
 /**
  * Concert a two dimensional matrix to string
  * @function
