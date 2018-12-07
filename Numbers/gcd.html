@@ -1,1 +1,104 @@
-<!doctype html><html><head><link rel="shortcut icon" href="../img/head.ico" type="image/x-icon"><meta charset="utf-8"><link href="../css/bootstrap.min.css" rel="stylesheet" type="text/css"><link href="../css/bootstrap-responsive.min.css" rel="stylesheet" type="text/css"><script src="../js/jquery-3.2.1.min.js"></script><script src="../js/bootstrap.min.js"></script><title>Greatest common divisor</title></head><style>*{font-family:Baskerville,"Palatino Linotype",Palatino,"Century Schoolbook L","Times New Roman",serif}.v{width:50px}.lb{font-size:24px}</style><body style="text-align:center"><p style="font-size:26px;margin:20px">Greatest Common Divisor</p><form onSubmit="init(this); return false;" role="form" class="form-inline" style="font-size:24px"><label for="a" class="lb">a:</label><input type="text" style="font-size:20px" class="v" name="a" id="a" placeholder="a"><label for="b" class="lb">b:</label><input type="text" style="font-size:20px" class="v" name="b" id="b" placeholder="b"><br><input type="submit" class="btn btn-default" value="gcd" style="font-size:24px;margin:10px"><br><label class="lb" for="result">Result</label><br><textarea name="result" style="font-size:18px;line-height:24px;width:400px" rows="15" id="result"></textarea><br><br>By Hanzhi Zhou</form><script>function initVariables(){x=0,y=1,d=0}function init(a){a.result.value="",initVariables();var e=parseInt(a.a.value),l=parseInt(a.b.value);return isNaN(e)||isNaN(l)?void(a.result.value+="Illegal Input!!!"):(gcd(e,l,a),void(a.result.value+=x+"*"+e+" + "+y+"*"+l+" = "+d))}function gcd(a,e,l){if(0===a)l.result.value+="Result: "+e+"\n",d=e;else{var t=parseInt(e/a),u=e%a;l.result.value+=e+" = "+t+" * "+a+" + "+u+"\n",gcd(u,a,l);var n=y;y=x,x=n-parseInt(e/a)*x}}var x=0,y=1,d=0;</script></body></html>
+<!doctype html>
+<html>
+<head>
+    <link rel="shortcut icon" href="../img/head.ico" type="image/x-icon">
+    <meta charset="utf-8">
+    <link href="../css/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <link href="../css/bootstrap-responsive.min.css" rel="stylesheet" type="text/css">
+    <script src="../js/jquery-3.2.1.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+    <title>Greatest common divisor</title>
+</head>
+<style>
+    * {
+        font-family: Baskerville, "Palatino Linotype", Palatino, "Century Schoolbook L", "Times New Roman", serif;
+    }
+    .v {
+        width: 50px;
+    }
+    .lb{
+        font-size: 24px;
+    }
+</style>
+<body style="text-align:center;">
+<p style="font-size:26px; margin: 20px;">Greatest Common Divisor</p>
+<form onSubmit="init(this); return false;" role="form" class="form-inline" style="font-size:24px;">
+    <label for="a" class="lb">a:</label>
+    <input type="text" style="font-size: 20px;" class="v" name="a" id="a" placeholder="a"/>
+    <label for="b" class="lb">b:</label>
+    <input type="text" style="font-size: 20px;" class="v" name="b" id="b" placeholder="b"/>
+    <br/>
+    <input type="submit" class="btn btn-default" value="gcd" style="font-size:24px;margin: 10px;"/>
+    <br/>
+    <label class="lb" for="result">Result</label><br/>
+    <textarea name="result" style="font-size:18px; line-height: 24px; width: 400px;" rows="15" id="result"></textarea>
+    <br/><br/>
+    By Hanzhi Zhou
+</form>
+<script>
+    /**
+     * @author Hanzhi Zhou
+     * */
+    /**
+     * @type {int}
+     * */
+    var x = 0;
+    /**
+     * @type {int}
+     * */
+    var y = 1;
+    /**
+     * @type {int}
+     * */
+    var d = 0;
+    function initVariables() {
+        x = 0;
+        y = 1;
+        d = 0;
+    }
+    /**
+     * @param {object} form
+     * @return {void}
+     * */
+    function init(form) {
+        //initialize global variables
+        form.result.value = "";
+        initVariables();
+
+        var a = parseInt(form.a.value);
+        var b = parseInt(form.b.value);
+
+        if (isNaN(a) || isNaN(b)) {
+            form.result.value += "Illegal Input!!!";
+            return;
+        }
+        gcd(a, b, form);
+        form.result.value += x + '*' + a + ' + ' + y + '*' + b + ' = ' + d;
+    }
+
+    /**
+     * @param {int} a
+     * @param {int} b
+     * @param {object} form
+     * @return {void}
+     * */
+    function gcd(a, b, form) {
+        if (a === 0) {
+            form.result.value += 'Result: ' + b + '\n';
+            d = b;
+        }
+        else {
+            var q = parseInt(b / a);
+            var r = b % a;
+            form.result.value += b + ' = ' + q + ' * ' + a + ' + ' + r + '\n';
+            gcd(r, a, form);
+
+            //working backward to obtain x and y such that ax+by=gcd(a, b)
+            var temp = y;
+            y = x;
+            x = temp - parseInt(b / a) * x;
+        }
+    }
+</script>
+</body>
+</html>
