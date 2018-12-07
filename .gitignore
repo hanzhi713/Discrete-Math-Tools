@@ -1,7 +1,5 @@
 .htaccess
 .babelrc
-/Graphs/js/node_modules/
-/Doc/
-/.idea/
-dist/
+node_modules
 .eslintrc
+.prettierrc
