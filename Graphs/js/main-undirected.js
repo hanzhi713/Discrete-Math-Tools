@@ -19,7 +19,7 @@ function hideResult(c) {
         cy_div.animate({width: '580px'}, 300, () => {
             ca_div.show(500, () => {
                 reLayout();
-            })
+            });
         });
     }
 }
@@ -174,77 +174,77 @@ $(() => {
     cy.graphml({layoutBy: 'circle'});
     ca.graphml({layoutBy: 'circle'});
 
-    cy.edgehandles({
-        // preview: true, // whether to show added edges preview before releasing selection
-        // stackOrder: 4, // Controls stack order of edgehandles canvas element by setting it's z-index
-        // handleSize: 10, // the size of the edge handle put on nodes
-        // handleHitThreshold: 6, // a threshold for hit detection that makes it easier to grab the handle
-        // handleIcon: false, // an image to put on the handle
-        // handleColor: '#ff0000', // the colour of the handle and the line drawn from it
-        // handleLineType: 'ghost', // can be 'ghost' for real edge, 'straight' for a straight line, or 'draw' for a draw-as-you-go line
-        // handleLineWidth: 3, // width of handle line in pixels
-        // handleOutlineColor: '#000000', // the colour of the handle outline
-        // handleOutlineWidth: 0, // the width of the handle outline in pixels
-        // handleNodes: 'node', // selector/filter function for whether edges can be made from a given node
-        // handlePosition: 'middle top', // sets the position of the handle in the format of "X-AXIS Y-AXIS" such as "left top", "middle top"
-        // hoverDelay: 100, // time spend over a target node before it is considered a target selection
-        // cxt: false, // whether cxt events trigger edgehandles (useful on touch)
-        // enabled: true, // whether to start the plugin in the enabled state
-        // toggleOffOnLeave: false, // whether an edge is cancelled by leaving a node (true), or whether you need to go over again to cancel (false; allows multiple edges in one pass)
-        preview: true, // whether to show added edges preview before releasing selection
-        hoverDelay: 150, // time spent hovering over a target node before it is considered selected
-        handleNodes: 'node', // selector/filter function for whether edges can be made from a given node
-        handlePosition: 'middle top', // sets the position of the handle in the format of "X-AXIS Y-AXIS" such as "left top", "middle top"
-        handleInDrawMode: false, // whether to show the handle in draw mode
-        edgeType: (sourceNode, targetNode) => {
-            // can return 'flat' for flat edges between nodes or 'node' for intermediate node between them
-            // returning null/undefined means an edge can't be added between the two nodes
-            return 'flat';
-        },
-        loopAllowed: (node) => {
-            // for the specified node, return whether edges from itself to itself are allowed
-            return true;
-        },
-        nodeLoopOffset: -50, // offset for edgeType: 'node' loops
-        nodeParams: (sourceNode, targetNode) => {
-            // for edges between the specified source and target
-            // return element object to be passed to cy.add() for intermediary node
-            return {};
-        },
-        edgeParams: (sourceNode, targetNode, i) => {
-            // for edges between the specified source and target
-            // return element object to be passed to cy.add() for edge
-            // NB: i indicates edge index in case of edgeType: 'node'
-            let id_pre = sourceNode.data('id') + '-' + targetNode.data('id') + '-';
-            let x = 0;
-            while (cy.$id(id_pre + x).length !== 0)
-                x += 1;
-            return {
-                data: {
-                    id: id_pre + x,
-                    source: sourceNode.data('id'),
-                    target: targetNode.data('id'),
-                    weight: parseInt(weight_input.value)
-                }
-            };
-        },
-        complete: (sourceNode, targetNodes, addedEntities) => {
-            // fired when edgehandles is done and entities are added
-            if (auto_refresh.checked)
-                cyReLayout();
-            addedEntities.forEach((ele) => {
-                if (ele.isEdge()) {
-                    ele.animate({
-                        style: {lineColor: 'red', width: 5},
-                        duration: 100
-                    }).animate({
-                        style: {lineColor: '#ccc', width: 2},
-                        duration: 500
-                    });
-                }
-            });
-        },
-    });
+    // cy.edgehandles({
+    //     // preview: true, // whether to show added edges preview before releasing selection
+    //     // stackOrder: 4, // Controls stack order of edgehandles canvas element by setting it's z-index
+    //     // handleSize: 10, // the size of the edge handle put on nodes
+    //     // handleHitThreshold: 6, // a threshold for hit detection that makes it easier to grab the handle
+    //     // handleIcon: false, // an image to put on the handle
+    //     // handleColor: '#ff0000', // the colour of the handle and the line drawn from it
+    //     // handleLineType: 'ghost', // can be 'ghost' for real edge, 'straight' for a straight line, or 'draw' for a draw-as-you-go line
+    //     // handleLineWidth: 3, // width of handle line in pixels
+    //     // handleOutlineColor: '#000000', // the colour of the handle outline
+    //     // handleOutlineWidth: 0, // the width of the handle outline in pixels
+    //     // handleNodes: 'node', // selector/filter function for whether edges can be made from a given node
+    //     // handlePosition: 'middle top', // sets the position of the handle in the format of "X-AXIS Y-AXIS" such as "left top", "middle top"
+    //     // hoverDelay: 100, // time spend over a target node before it is considered a target selection
+    //     // cxt: false, // whether cxt events trigger edgehandles (useful on touch)
+    //     // enabled: true, // whether to start the plugin in the enabled state
+    //     // toggleOffOnLeave: false, // whether an edge is cancelled by leaving a node (true), or whether you need to go over again to cancel (false; allows multiple edges in one pass)
+    //     preview: true, // whether to show added edges preview before releasing selection
+    //     hoverDelay: 150, // time spent hovering over a target node before it is considered selected
+    //     handleNodes: 'node', // selector/filter function for whether edges can be made from a given node
+    //     handlePosition: 'middle top', // sets the position of the handle in the format of "X-AXIS Y-AXIS" such as "left top", "middle top"
+    //     handleInDrawMode: false, // whether to show the handle in draw mode
+    //     edgeType: (sourceNode, targetNode) => {
+    //         // can return 'flat' for flat edges between nodes or 'node' for intermediate node between them
+    //         // returning null/undefined means an edge can't be added between the two nodes
+    //         return 'flat';
+    //     },
+    //     loopAllowed: (node) => {
+    //         // for the specified node, return whether edges from itself to itself are allowed
+    //         return true;
+    //     },
+    //     nodeLoopOffset: -50, // offset for edgeType: 'node' loops
+    //     nodeParams: (sourceNode, targetNode) => {
+    //         // for edges between the specified source and target
+    //         // return element object to be passed to cy.add() for intermediary node
+    //         return {};
+    //     },
+    //     edgeParams: (sourceNode, targetNode, i) => {
+    //         // for edges between the specified source and target
+    //         // return element object to be passed to cy.add() for edge
+    //         // NB: i indicates edge index in case of edgeType: 'node'
+    //         let id_pre = sourceNode.data('id') + '-' + targetNode.data('id') + '-';
+    //         let x = 0;
+    //         while (cy.$id(id_pre + x).length !== 0)
+    //             x += 1;
+    //         return {
+    //             data: {
+    //                 id: id_pre + x,
+    //                 source: sourceNode.data('id'),
+    //                 target: targetNode.data('id'),
+    //                 weight: parseInt(weight_input.value)
+    //             }
+    //         };
+    //     },
+    //     complete: (sourceNode, targetNodes, addedEntities) => {
+    //         // fired when edgehandles is done and entities are added
+    //         if (auto_refresh.checked)
+    //             cyReLayout();
+    //         addedEntities.forEach((ele) => {
+    //             if (ele.isEdge()) {
+    //                 ele.animate({
+    //                     style: {lineColor: 'red', width: 5},
+    //                     duration: 100
+    //                 }).animate({
+    //                     style: {lineColor: '#ccc', width: 2},
+    //                     duration: 500
+    //                 });
+    //             }
+    //         });
+    //     },
+    // });
 
     //add key bindings
     document.addEventListener("keydown", (e) => {
@@ -623,7 +623,7 @@ function initCircularMenu(c) {
             {
                 content: '<i class="fa fa-trash fa-2x" aria-hidden="true"></i>',
                 select: () => {
-                    cy.remove(cy.elements(':selected'))
+                    cy.remove(cy.elements(':selected'));
                 }
             },
             {
@@ -797,6 +797,10 @@ function cyReLayout() {
     if (layoutname === '')
         return;
     CyLayout = cy.layout(layout_options[layoutname]);
+    CyLayout.on('layoutstop', (e)=>{
+        cy.edges().hide();
+        cy.edges().show();
+    });
     CyLayout.run();
 }
 /**
@@ -815,6 +819,10 @@ function caReLayout() {
     if (layoutname === '')
         return;
     CaLayout = ca.layout(layout_options[layoutname]);
+    CaLayout.on('layoutstop', (e)=>{
+        cy.edges().hide();
+        cy.edges().show();
+    });
     CaLayout.run();
 }
 /**
@@ -1045,22 +1053,15 @@ function createFromAM(m) {
     let numOfNodes = m.length;
     cy.startBatch();
     // add all nodes
-    if (layoutname === '')
-        for (let i = 1; i <= numOfNodes; i++)
-            cy.add({
-                group: 'nodes',
-                data: {id: i},
-                position: {
-                    x: (Math.random() * 250 + 25),
-                    y: (Math.random() * 250 + 25)
-                }
-            });
-    else
-        for (let i = 1; i <= numOfNodes; i++)
-            cy.add({
-                group: 'nodes',
-                data: {id: i}
-            });
+    for (let i = 1; i <= numOfNodes; i++)
+        cy.add({
+            group: 'nodes',
+            data: {id: i},
+            position: {
+                x: (Math.random() * 250 + 25),
+                y: (Math.random() * 250 + 25)
+            }
+        });
 
     for (let i = 0; i < numOfNodes; i++)
         for (let j = i; j < numOfNodes; j++)
@@ -1088,22 +1089,16 @@ function createFromWM(m) {
     clearSource();
     let numOfNodes = m.length;
     cy.startBatch();
-    if (layoutname === '')
-        for (let i = 1; i <= numOfNodes; i++)
-            cy.add({
-                group: 'nodes',
-                data: {id: i},
-                position: {
-                    x: (Math.random() * 250 + 25),
-                    y: (Math.random() * 250 + 25)
-                }
-            });
-    else
-        for (let i = 1; i <= numOfNodes; i++)
-            cy.add({
-                group: 'nodes',
-                data: {id: i}
-            });
+    for (let i = 1; i <= numOfNodes; i++)
+        cy.add({
+            group: 'nodes',
+            data: {id: i},
+            position: {
+                x: (Math.random() * 250 + 25),
+                y: (Math.random() * 250 + 25)
+            }
+        });
+
     for (let i = 0; i < numOfNodes; i++)
         for (let j = i; j < numOfNodes; j++)
             if (m[i][j] > 0)
@@ -2447,7 +2442,7 @@ function minimalWeightMatchingMultiThread(weightMatrix, numOfThreads, callback) 
         for (let i = 0; i < numOfThreads; i++)
             if (minWeights[i] < minWeight) {
                 minWeight = minWeights[i];
-                minPairing = minPairings[i]
+                minPairing = minPairings[i];
             }
         perform_button.disabled = false;
         callback(minPairing);
