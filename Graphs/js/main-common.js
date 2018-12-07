@@ -1,4 +1,5 @@
 'use strict';
+
 /**
  * @function
  * @public
@@ -6,21 +7,32 @@
  * @return void
  * */
 function hideResult(c) {
-    let cy_div = $('#cy');
-    let ca_div = $('#ca_tab');
+    const cy_div = $('#cy');
+    const ca_div = $('#ca_tab');
     if (c.checked) {
         ca_div.hide(300, () => {
-            cy_div.animate({width: '1170px'}, 500, () => {
-                cyReLayout();
-            });
+            cy_div.animate(
+                {
+                    width: '1170px'
+                },
+                500,
+                () => {
+                    cyReLayout();
+                }
+            );
         });
-    }
-    else {
-        cy_div.animate({width: '580px'}, 300, () => {
-            ca_div.show(500, () => {
-                reLayout();
-            });
-        });
+    } else {
+        cy_div.animate(
+            {
+                width: '580px'
+            },
+            300,
+            () => {
+                ca_div.show(500, () => {
+                    reLayout();
+                });
+            }
+        );
     }
 }
 /**
@@ -30,7 +42,7 @@ function hideResult(c) {
  * @return void
  * */
 function hideWeight(isSimple) {
-    let a = $('#weighted');
+    const a = $('#weighted');
     if (isSimple.checked) {
         a.show(500);
         $('#wlabel').show(500);
@@ -46,11 +58,9 @@ function hideWeight(isSimple) {
  * @return void
  */
 function hideDuration(cb) {
-    let d = $('#label-duration');
-    if (cb.checked)
-        d.show(400);
-    else
-        d.hide(400);
+    const d = $('#label-duration');
+    if (cb.checked) d.show(400);
+    else d.hide(400);
 }
 /**
  * @public
@@ -58,7 +68,7 @@ function hideDuration(cb) {
  * @return void
  * */
 function callToAlgorithms() {
-    let algo = document.getElementById('algorithms');
+    const algo = document.getElementById('algorithms');
     eval(algo.options[algo.selectedIndex].value);
 }
 /**
@@ -77,7 +87,7 @@ let ca;
 /**
  * @type {string}
  * */
-let layoutName = "spread";
+let layoutName = 'spread';
 /**
  * @type {object}
  * */
@@ -128,7 +138,7 @@ const perform_button = document.getElementById('perform');
  * @const
  * @type {object}
  * */
-const animation = document.getElementById('animation');
+const animation_check = document.getElementById('animation');
 /**
  * animation duration
  * @const
@@ -136,186 +146,19 @@ const animation = document.getElementById('animation');
  * */
 const duration = document.getElementById('duration');
 
-function getAllNodes(c){
-    return c.nodes(":grabbable");
+function getAllNodes(c) {
+    return c.nodes(':grabbable');
 }
-
-// initialization function
-$(() => {
-    cy = initializeCytoscapeObjects("cy");
-    ca = initializeCytoscapeObjects("ca");
-    clearCyStyle();
-    clearCaStyle();
-    initCircularMenu(cy);
-
-    cy.graphml({layoutBy: 'circle'});
-    ca.graphml({layoutBy: 'circle'});
-    
-    cy.edgehandles({
-        preview: true, // whether to show added edges preview before releasing selection
-        hoverDelay: 150, // time spent hovering over a target node before it is considered selected
-        handleNodes: 'node', // selector/filter function for whether edges can be made from a given node
-        snap: false, // when enabled, the edge can be drawn by just moving close to a target node (can be confusing on compound graphs)
-        snapThreshold: 50, // the target node must be less than or equal to this many pixels away from the cursor/finger
-        snapFrequency: 15, // the number of times per second (Hz) that snap checks done (lower is less expensive)
-        noEdgeEventsInDraw: false, // set events:no to edges during draws, prevents mouseouts on compounds
-        disableBrowserGestures: true, // during an edge drawing gesture, disable browser gestures such as two-finger trackpad swipe and pinch-to-zoom
-        handlePosition: function( node ){
-          return 'middle top'; // sets the position of the handle in the format of "X-AXIS Y-AXIS" such as "left top", "middle top"
-        },
-        handleInDrawMode: false, // whether to show the handle in draw mode
-        edgeType: function( sourceNode, targetNode ){
-          // can return 'flat' for flat edges between nodes or 'node' for intermediate node between them
-          // returning null/undefined means an edge can't be added between the two nodes
-          return 'flat';
-        },
-        loopAllowed: function( node ){
-          // for the specified node, return whether edges from itself to itself are allowed
-          return true;
-        },
-        nodeLoopOffset: -50, // offset for edgeType: 'node' loops
-        nodeParams: function( sourceNode, targetNode ){
-          // for edges between the specified source and target
-          // return element object to be passed to cy.add() for intermediary node
-          return {};
-        },
-        ghostEdgeParams: function(){
-          // return element object to be passed to cy.add() for the ghost edge
-          // (default classes are always added for you)
-          return {};
-        },
-        show: function( sourceNode ){
-          // fired when handle is shown
-        },
-        hide: function( sourceNode ){
-          // fired when the handle is hidden
-        },
-        start: function( sourceNode ){
-          // fired when edgehandles interaction starts (drag on handle)
-        },
-        complete: function( sourceNode, targetNode, addedEles ){
-          // fired when edgehandles is done and elements are added
-        },
-        stop: function( sourceNode ){
-          // fired when edgehandles interaction is stopped (either complete with added edges or incomplete)
-        },
-        cancel: function( sourceNode, cancelledTargets ){
-          // fired when edgehandles are cancelled (incomplete gesture)
-        },
-        hoverover: function( sourceNode, targetNode ){
-          // fired when a target is hovered
-        },
-        hoverout: function( sourceNode, targetNode ){
-          // fired when a target isn't hovered anymore
-        },
-        previewon: function( sourceNode, targetNode, previewEles ){
-          // fired when preview is shown
-        },
-        previewoff: function( sourceNode, targetNode, previewEles ){
-          // fired when preview is hidden
-        },
-        drawon: function(){
-          // fired when draw mode enabled
-        },
-        drawoff: function(){
-          // fired when draw mode disabled
-        },
-
-        edgeParams: (sourceNode, targetNode, i) => {
-            // for edges between the specified source and target
-            // return element object to be passed to cy.add() for edge
-            // NB: i indicates edge index in case of edgeType: 'node'
-            let id_pre = sourceNode.data('id') + '-' + targetNode.data('id') + '-';
-            let x = 0;
-            while (cy.$id(id_pre + x).length !== 0)
-                x += 1;
-            return {
-                data: {
-                    id: id_pre + x,
-                    source: sourceNode.data('id'),
-                    target: targetNode.data('id'),
-                    weight: parseInt(weight_input.value)
-                }
-            };
-        },
-        complete: (sourceNode, targetNodes, addedEntities) => {
-            // fired when edgehandles is done and entities are added
-            if (auto_refresh.checked)
-                cyReLayout();
-            addedEntities.forEach((ele) => {
-                if (ele.isEdge()) {
-                    ele.animate({
-                        style: {lineColor: 'red', width: 5},
-                        duration: 100
-                    }).animate({
-                        style: {lineColor: '#ccc', width: 2},
-                        duration: 500
-                    });
-                }
-            });
-        },
-    });
-
-    //add key bindings
-    document.addEventListener("keydown", (e) => {
-        e = e || event;
-        let which = e.which || e.keyCode || e.charCode;
-
-        if (e.altKey) {
-            // alt + c
-            if (which == 67)
-                addEdgeBetweenSelected();
-
-            // alt + a
-            else if (which == 65)
-                addNode(true, null);
-
-            // alt + f
-            else if (which == 70)
-                reLayout();
-
-            // alt + s
-            else if (which == 83)
-                clearSource();
-
-            // alt + r
-            else if (which == 82)
-                clearResult();
-
-        }
-        else if (e.ctrlKey) {
-            // ctrl + c
-            if (which == 67)
-                copy(cy.$(':selected'));
-
-            // ctrl + v
-            else if (which == 86)
-                paste();
-
-            // ctrl + s
-            else if (which == 83)
-                stopAnimation();
-
-            // ctrl + a
-            else if (which == 65)
-                cy.elements(":grabbable").select();
-
-            // ctrl + r
-            else if (which == 82)
-                clearCaStyle();
-
-            // ctrl + f
-            else if (which == 70)
-                clearCyStyle();
-        }
-        // the delete key
-        else {
-            if (which == 46)
-                removeSelected();
-        }
-    });
-    reLayout();
-});
+/**
+ * @function
+ * @public
+ * @return void
+ * */
+function stopAnimation() {
+    cy.elements(':grabbable').stop();
+    ca.elements(':grabbable').stop();
+    animationFlag = false;
+}
 /**
  * restore the default style of cy elements
  * @function
@@ -323,8 +166,11 @@ $(() => {
  * @return void
  * */
 function clearCyStyle() {
-    cy.elements(":grabbable").removeStyle();
-    cy.style().resetToDefault().fromJson(defaultStyle).update();
+    cy.elements(':grabbable').removeStyle();
+    cy.style()
+        .resetToDefault()
+        .fromJson(defaultStyle)
+        .update();
     cy.$(':selected').select();
 }
 /**
@@ -333,8 +179,11 @@ function clearCyStyle() {
  * @return void
  * */
 function clearCaStyle() {
-    ca.elements(":grabbable").removeStyle();
-    ca.style().resetToDefault().fromJson(defaultStyle).update();
+    ca.elements(':grabbable').removeStyle();
+    ca.style()
+        .resetToDefault()
+        .fromJson(defaultStyle)
+        .update();
     ca.$(':selected').select();
 }
 /**
@@ -354,13 +203,12 @@ function copy(eles) {
  * @return void
  * */
 function paste() {
-    if (copiedEles === undefined)
-        return;
-    let idMap = {};
-    cy.elements(":grabbable").unselect();
-    copiedEles.forEach((ele) => {
+    if (copiedEles === undefined) return;
+    const idMap = {};
+    cy.elements(':grabbable').unselect();
+    copiedEles.forEach(ele => {
         if (ele.isNode()) {
-            let addedNode = addOneNode(false, {
+            const addedNode = addOneNode(false, {
                 x: ele.position('x') + 25,
                 y: ele.position('y') + 25
             });
@@ -368,10 +216,14 @@ function paste() {
             idMap[ele.data('id')] = addedNode.data('id');
         }
     });
-    copiedEles.forEach((ele) => {
+    copiedEles.forEach(ele => {
         if (ele.isEdge()) {
             if (idMap[ele.data('source')] !== undefined && idMap[ele.data('target')] !== undefined)
-                addEdgeBwt(idMap[ele.data('source')], idMap[ele.data('target')], ele.data('weight')).select();
+                addEdgeBwt(
+                    idMap[ele.data('source')],
+                    idMap[ele.data('target')],
+                    ele.data('weight')
+                ).select();
         }
     });
 }
@@ -383,15 +235,21 @@ function paste() {
  * @return {object}
  * */
 function initializeCytoscapeObjects(div_name) {
-    let c = cytoscape({
+    const c = cytoscape({
         container: document.getElementById(div_name),
         style: defaultStyle
     });
-    c.on('select', (event) => {
-        event.target.style({'background-color': 'green', 'line-color': 'green'});
+    c.on('select', event => {
+        event.target.style({
+            'background-color': 'green',
+            'line-color': 'green'
+        });
     });
-    c.on('unselect', (event) => {
-        event.target.style({'background-color': '#666', 'line-color': '#ccc'});
+    c.on('unselect', event => {
+        event.target.style({
+            'background-color': '#666',
+            'line-color': '#ccc'
+        });
     });
     c.panzoom({
         zoomDelay: 20,
@@ -415,11 +273,9 @@ function initializeCytoscapeObjects(div_name) {
  * @return void
  * */
 function selectAllOfTheSameType(ele) {
-    cy.elements(":grabbable").unselect();
-    if (ele.isNode())
-        getAllNodes(cy).select();
-    else if (ele.isEdge())
-        cy.edges().select();
+    cy.elements(':grabbable').unselect();
+    if (ele.isNode()) getAllNodes(cy).select();
+    else if (ele.isEdge()) cy.edges().select();
 }
 
 /**
@@ -437,8 +293,8 @@ function initConventionalMenu(c) {
                 content: 'remove',
                 tooltipText: 'remove this element only',
                 selector: 'node, edge',
-                onClickFunction: (event) => {
-                    let target = event.target || event.cyTarget;
+                onClickFunction: event => {
+                    const target = event.target || event.cyTarget;
                     target.remove();
                 }
             },
@@ -447,7 +303,7 @@ function initConventionalMenu(c) {
                 content: 'duplicate edge',
                 tooltipText: 'duplicate this edge',
                 selector: 'edge',
-                onClickFunction: (event) => {
+                onClickFunction: event => {
                     duplicateEdge(event.target, cy);
                 }
             },
@@ -456,12 +312,10 @@ function initConventionalMenu(c) {
                 content: 'change weight',
                 tooltipText: 'set a new weight for this edge',
                 selector: 'edge',
-                onClickFunction: (event) => {
-                    let weight = parseInt(prompt('Please enter a weight for this edge.', '1'));
-                    if (!isNaN(weight))
-                        event.target.data('weight', weight);
-                    else
-                        event.target.data('weight', '');
+                onClickFunction: event => {
+                    const weight = parseInt(prompt('Please enter a weight for this edge.', '1'));
+                    if (!isNaN(weight)) event.target.data('weight', weight);
+                    else event.target.data('weight', '');
                 }
             },
             {
@@ -469,8 +323,8 @@ function initConventionalMenu(c) {
                 content: 'add node',
                 tooltipText: 'add node',
                 coreAsWell: true,
-                onClickFunction: (event) => {
-                    let pos = event.position || event.cyPosition;
+                onClickFunction: event => {
+                    const pos = event.position || event.cyPosition;
                     addNode(false, {
                         x: pos.x,
                         y: pos.y
@@ -482,7 +336,7 @@ function initConventionalMenu(c) {
                 content: 'add edge',
                 tooltipText: 'add edge(s) between selected nodes',
                 selector: 'node',
-                onClickFunction: (event) => {
+                onClickFunction: event => {
                     addEdgeBetweenSelected();
                 }
             },
@@ -492,7 +346,7 @@ function initConventionalMenu(c) {
                 tooltipText: 'remove selected elements',
                 selector: 'node, edge',
                 coreAsWell: true,
-                onClickFunction: (event) => {
+                onClickFunction: event => {
                     removeSelected();
                 },
                 hasTrailingDivider: true
@@ -502,7 +356,7 @@ function initConventionalMenu(c) {
                 content: 'select all nodes',
                 tooltipText: 'select all nodes',
                 selector: 'node',
-                onClickFunction: (event) => {
+                onClickFunction: event => {
                     selectAllOfTheSameType(event.target || event.cyTarget);
                 },
                 hasTrailingDivider: true
@@ -512,7 +366,7 @@ function initConventionalMenu(c) {
                 content: 'select all edges',
                 tooltipText: 'select all edges',
                 selector: 'edge',
-                onClickFunction: (event) => {
+                onClickFunction: event => {
                     selectAllOfTheSameType(event.target || event.cyTarget);
                 },
                 hasTrailingDivider: true
@@ -522,9 +376,9 @@ function initConventionalMenu(c) {
                 content: 'start BFS',
                 tooltipText: 'start breadth first search at this node',
                 selector: 'node',
-                onClickFunction: (event) => {
-                    cy.elements(":grabbable").unselect();
-                    let tg = event.target || event.cyTarget;
+                onClickFunction: event => {
+                    cy.elements(':grabbable').unselect();
+                    const tg = event.target || event.cyTarget;
                     tg.select();
                     breadthFirstSearch();
                 }
@@ -534,9 +388,9 @@ function initConventionalMenu(c) {
                 content: 'start DFS',
                 tooltipText: 'start depth first search at this node',
                 selector: 'node',
-                onClickFunction: (event) => {
-                    cy.elements(":grabbable").unselect();
-                    let tg = event.target || event.cyTarget;
+                onClickFunction: event => {
+                    cy.elements(':grabbable').unselect();
+                    const tg = event.target || event.cyTarget;
                     tg.select();
                     depthFirstSearch();
                 }
@@ -558,31 +412,30 @@ function initCircularMenu(c) {
         commands: [
             {
                 content: '<i class="fa fa-road fa-2x" aria-hidden="true"></i>',
-                select: (ele) => {
+                select: ele => {
                     ele.select();
                     addEdgeBetweenSelected();
                 }
             },
             {
                 content: '<i class="fa fa-trash fa-2x" aria-hidden="true"></i>',
-                select: (ele) => {
+                select: ele => {
                     cy.remove(ele);
-                    if (auto_refresh.checked)
-                        cyReLayout();
+                    if (auto_refresh.checked) cyReLayout();
                 }
             },
             {
                 content: 'BFS',
-                select: (ele) => {
-                    cy.elements(":grabbable").unselect();
+                select: ele => {
+                    cy.elements(':grabbable').unselect();
                     ele.select();
                     breadthFirstSearch();
                 }
             },
             {
                 content: 'DFS',
-                select: (ele) => {
-                    cy.elements(":grabbable").unselect();
+                select: ele => {
+                    cy.elements(':grabbable').unselect();
                     ele.select();
                     depthFirstSearch();
                 }
@@ -596,26 +449,23 @@ function initCircularMenu(c) {
         commands: [
             {
                 content: '<i class="fa fa-trash fa-2x" aria-hidden="true"></i>',
-                select: (ele) => {
+                select: ele => {
                     cy.remove(ele);
-                    if (auto_refresh.checked)
-                        cyReLayout();
+                    if (auto_refresh.checked) cyReLayout();
                 }
             },
             {
                 content: '<i class="fa fa-plus fa-2x" aria-hidden="true"></i>',
-                select: (ele) => {
+                select: ele => {
                     duplicateEdge(ele, cy);
                 }
             },
             {
                 content: '<i class="fa fa-tag fa-2x" aria-hidden="true"></i>',
-                select: (ele) => {
-                    let weight = parseInt(prompt("Please enter a weight for this edge.", "1"));
-                    if (!isNaN(weight))
-                        ele.data('weight', weight);
-                    else
-                        ele.data('weight', '');
+                select: ele => {
+                    const weight = parseInt(prompt('Please enter a weight for this edge.', '1'));
+                    if (!isNaN(weight)) ele.data('weight', weight);
+                    else ele.data('weight', '');
                 }
             }
         ]
@@ -640,7 +490,7 @@ function initCircularMenu(c) {
             {
                 content: '<i class="fa fa-crosshairs fa-2x" aria-hidden="true"></i>',
                 select: () => {
-                    cy.elements(":grabbable").select();
+                    cy.elements(':grabbable').select();
                 }
             },
             {
@@ -652,10 +502,8 @@ function initCircularMenu(c) {
             {
                 content: '<i class="fa fa-external-link fa-2x" aria-hidden="true"></i>',
                 select: () => {
-                    if (drawOn)
-                        c.edgehandles('drawoff');
-                    else
-                        c.edgehandles('drawon');
+                    if (drawOn) c.edgehandles('drawoff');
+                    else c.edgehandles('drawon');
                     drawOn = !drawOn;
                 }
             }
@@ -672,13 +520,11 @@ function initCircularMenu(c) {
  * */
 function addNode(random, position) {
     stopAnimation();
-    let t = document.getElementById('nid');
+    const t = document.getElementById('nid');
     let num = parseInt(t.value);
     num = isNaN(num) ? 1 : num < 1 ? 1 : num;
-    for (let i = 0; i < num; i++)
-        addOneNode(random, position);
-    if (auto_refresh.checked)
-        cyReLayout();
+    for (let i = 0; i < num; i++) addOneNode(random, position);
+    if (auto_refresh.checked) cyReLayout();
 }
 
 /**
@@ -690,29 +536,33 @@ function addNode(random, position) {
  * */
 function addOneNode(random, position) {
     let v = 1;
-    while (cy.$id(v + '').length !== 0)
-        v += 1;
+    while (cy.$id(`${v}`).length !== 0) v += 1;
     if (random)
         return cy.add({
             group: 'nodes',
-            data: {id: v},
+            data: {
+                id: v
+            },
             position: {
-                x: parseInt(Math.random() * 500 + 25), y: parseInt(Math.random() * 500 + 25)
+                x: parseInt(Math.random() * 500 + 25),
+                y: parseInt(Math.random() * 500 + 25)
             }
         });
-    else {
-        if (position === null)
-            return cy.add({
-                group: 'nodes',
-                data: {id: v}
-            });
-        else
-            return cy.add({
-                group: 'nodes',
-                data: {id: v},
-                position: position
-            });
-    }
+
+    if (position === null)
+        return cy.add({
+            group: 'nodes',
+            data: {
+                id: v
+            }
+        });
+    return cy.add({
+        group: 'nodes',
+        data: {
+            id: v
+        },
+        position
+    });
 }
 /**
  * @function
@@ -721,18 +571,17 @@ function addOneNode(random, position) {
  * */
 function addEdge() {
     stopAnimation();
-    let src_tg = document.getElementById('src_tg');
-    let s = src_tg.value;
-    let ns = s.split('-');
-    let n1 = ns[0];
-    let n2 = ns[1];
-    let num = ns[2] === undefined ? 1 : (isNaN(parseInt(ns[2])) ? 1 : parseInt(ns[2]));
+    const src_tg = document.getElementById('src_tg');
+    const s = src_tg.value;
+    const ns = s.split('-');
+    const n1 = ns[0];
+    const n2 = ns[1];
+    let num = ns[2] === undefined ? 1 : isNaN(parseInt(ns[2])) ? 1 : parseInt(ns[2]);
     if (num < 1) num = 1;
     let v = 0;
-    let id_pre = n1 + '-' + n2 + '-';
+    const id_pre = `${n1}-${n2}-`;
     for (let i = 0; i < num; i++) {
-        while (cy.$id(id_pre + v).length !== 0)
-            v += 1;
+        while (cy.$id(id_pre + v).length !== 0) v += 1;
         cy.add({
             group: 'edges',
             data: {
@@ -743,8 +592,7 @@ function addEdge() {
             }
         });
     }
-    if (auto_refresh.checked)
-        cyReLayout();
+    if (auto_refresh.checked) cyReLayout();
 }
 /**
  * @function
@@ -757,8 +605,7 @@ function snapToGrid(c, flag) {
     if (flag) {
         c.snapToGrid('snapOn');
         c.snapToGrid('gridOn');
-    }
-    else {
+    } else {
         c.snapToGrid('snapOff');
         c.snapToGrid('gridOff');
     }
@@ -770,13 +617,12 @@ function snapToGrid(c, flag) {
  * @return void
  * */
 function changeLayout(idx) {
-    let name = document.getElementById('layout').options[idx].value;
+    const name = document.getElementById('layout').options[idx].value;
     if (name === 'snapToGrid') {
         snapToGrid(cy, true);
         snapToGrid(ca, true);
         layoutName = '';
-    }
-    else {
+    } else {
         snapToGrid(cy, false);
         snapToGrid(ca, false);
         layoutName = name;
@@ -800,15 +646,12 @@ function reLayout() {
  * */
 function cyReLayout() {
     let totalWeight = 0;
-    for (let i = 0; i < cy.edges().length; i++)
-        totalWeight += getWeight(cy.edges()[i]);
+    for (let i = 0; i < cy.edges().length; i++) totalWeight += getWeight(cy.edges()[i]);
     document.getElementById('cy_weight').innerHTML = totalWeight.toString();
-    if (CyLayout !== undefined)
-        CyLayout.stop();
-    if (layoutName === '')
-        return;
+    if (CyLayout !== undefined) CyLayout.stop();
+    if (layoutName === '') return;
     CyLayout = cy.layout(layout_options[layoutName]);
-    CyLayout.on('layoutstop', (e)=>{
+    CyLayout.on('layoutstop', e => {
         cy.edges().hide();
         cy.edges().show();
     });
@@ -822,17 +665,14 @@ function cyReLayout() {
  * */
 function caReLayout() {
     let totalWeight = 0;
-    for (let i = 0; i < ca.edges().length; i++)
-        totalWeight += getWeight(ca.edges()[i]);
+    for (let i = 0; i < ca.edges().length; i++) totalWeight += getWeight(ca.edges()[i]);
     document.getElementById('ca_weight').innerHTML = totalWeight.toString();
-    if (CaLayout !== undefined)
-        CaLayout.stop();
-    if (layoutName === '')
-        return;
+    if (CaLayout !== undefined) CaLayout.stop();
+    if (layoutName === '') return;
     CaLayout = ca.layout(layout_options[layoutName]);
-    CaLayout.on('layoutstop', (e)=>{
-        cy.edges().hide();
-        cy.edges().show();
+    CaLayout.on('layoutstop', e => {
+        ca.edges().hide();
+        ca.edges().show();
     });
     CaLayout.run();
 }
@@ -843,27 +683,22 @@ function caReLayout() {
  * */
 function removeNode() {
     stopAnimation();
-    let n_id = document.getElementById('nodeid');
-    let v = n_id.value;
-    let ids = v.split(',');
+    const n_id = document.getElementById('nodeid');
+    const v = n_id.value;
+    const ids = v.split(',');
     if (ids.length === 1) {
-        let range = v.split('-');
-        if (range.length === 1)
-            cy.remove(getAllNodes(cy).$id(v));
+        const range = v.split('-');
+        if (range.length === 1) cy.remove(getAllNodes(cy).$id(v));
         else {
-            let lower = parseInt(range[0]);
-            let upper = parseInt(range[1]);
-            for (let v = lower; v <= upper; v++)
-                cy.remove(cy.$id(v));
+            const lower = parseInt(range[0]);
+            const upper = parseInt(range[1]);
+            for (let i = lower; i <= upper; i++) cy.remove(cy.$id(i));
         }
+    } else {
+        for (let i = 0; i < ids.length; i++) cy.remove(cy.$id(parseInt(ids[i])));
     }
-    else {
-        for (let v = 0; v < ids.length; v++)
-            cy.remove(cy.$id(parseInt(ids[v])));
-    }
-    n_id.value = "";
-    if (auto_refresh.checked)
-        cyReLayout();
+    n_id.value = '';
+    if (auto_refresh.checked) cyReLayout();
 }
 /**
  * @function
@@ -872,17 +707,15 @@ function removeNode() {
  * */
 function removeEdge() {
     stopAnimation();
-    let rid = document.getElementById('r_src_tg');
-    let v = rid.value;
-    let n = v.split('-');
+    const rid = document.getElementById('r_src_tg');
+    const v = rid.value;
+    const n = v.split('-');
     if (n[1] === undefined) return;
-    let l = n[2] === undefined ? 1 : parseInt(n[2]);
-    let eles = cy.edges("[id ^='" + n[0] + '-' + n[1] + "-']").union(cy.edges("[id ^='" + n[1] + '-' + n[0] + "-']"));
-    let numToRemove = l > eles.length ? eles.length : l;
-    for (let i = 0; i < numToRemove; i++)
-        cy.remove(eles[i]);
-    if (auto_refresh.checked)
-        cyReLayout();
+    const l = n[2] === undefined ? 1 : parseInt(n[2]);
+    const eles = cy.edges(`[id ^='${n[0]}-${n[1]}-']`).union(cy.edges(`[id ^='${n[1]}-${n[0]}-']`));
+    const numToRemove = l > eles.length ? eles.length : l;
+    for (let i = 0; i < numToRemove; i++) cy.remove(eles[i]);
+    if (auto_refresh.checked) cyReLayout();
 }
 /**
  * @public
@@ -892,17 +725,16 @@ function removeEdge() {
  * @return {object}
  * */
 function duplicateEdge(edge, c) {
-    let temp = edge.data('id').split('-');
+    const temp = edge.data('id').split('-');
     let last = 0;
 
     // make sure that the id of an edge is not duplicated
-    while (c.$id(temp[0] + '-' + temp[1] + '-' + last).length !== 0)
-        last += 1;
+    while (c.$id(`${temp[0]}-${temp[1]}-${last}`).length !== 0) last += 1;
 
     return c.add({
         group: 'edges',
         data: {
-            id: temp[0] + '-' + temp[1] + '-' + last,
+            id: `${temp[0]}-${temp[1]}-${last}`,
             source: temp[0],
             target: temp[1],
             weight: edge.data('weight')
@@ -917,8 +749,7 @@ function duplicateEdge(edge, c) {
 function removeSelected() {
     stopAnimation();
     cy.remove(cy.$(':selected'));
-    if (auto_refresh.checked)
-        cyReLayout();
+    if (auto_refresh.checked) cyReLayout();
 }
 /**
  * @function
@@ -927,17 +758,15 @@ function removeSelected() {
  * */
 function addEdgeBetweenSelected() {
     stopAnimation();
-    let nodes = cy.nodes(':selected');
-    let weight = parseInt(weight_input.value);
-    let x = nodes.length;
+    const nodes = cy.nodes(':selected');
+    const weight = parseInt(weight_input.value);
+    const x = nodes.length;
     if (x > 1)
         for (let i = 0; i < nodes.length; i++)
             for (let j = i + 1; j < nodes.length; j++)
                 addEdgeBwt(nodes[i].data('id'), nodes[j].data('id'), weight);
-    else if (x === 1)
-        addEdgeBwt(nodes[0].data('id'), nodes[0].data('id'), weight);
-    if (auto_refresh.checked)
-        cyReLayout();
+    else if (x === 1) addEdgeBwt(nodes[0].data('id'), nodes[0].data('id'), weight);
+    if (auto_refresh.checked) cyReLayout();
 }
 /**
  * @function
@@ -948,11 +777,18 @@ function addEdgeBetweenSelected() {
  * @return {object} the edge added
  * */
 function addEdgeBwt(src, tg, w) {
-    let id_pre = src + '-' + tg + '-';
+    const id_pre = `${src}-${tg}-`;
     let x = 0;
-    while (cy.$id(id_pre + x).length !== 0)
-        x += 1;
-    return cy.add({group: 'edges', data: {id: id_pre + x, source: src, target: tg, weight: w}});
+    while (cy.$id(id_pre + x).length !== 0) x += 1;
+    return cy.add({
+        group: 'edges',
+        data: {
+            id: id_pre + x,
+            source: src,
+            target: tg,
+            weight: w
+        }
+    });
 }
 /**
  * @function
@@ -961,7 +797,7 @@ function addEdgeBwt(src, tg, w) {
  * @return {int} weight
  * */
 function getWeight(edge) {
-    let weight = edge.data('weight');
+    const weight = edge.data('weight');
     return isNaN(weight) ? 1 : weight;
 }
 /**
@@ -975,10 +811,8 @@ function getWeight(edge) {
  * */
 function getTarget(node, edge) {
     let targetNode;
-    if (edge.data('source') === node.data('id'))
-        targetNode = cy.$id(edge.data('target'));
-    else
-        targetNode = cy.$id(edge.data('source'));
+    if (edge.data('source') === node.data('id')) targetNode = cy.$id(edge.data('target'));
+    else targetNode = cy.$id(edge.data('source'));
     return targetNode;
 }
 /**
@@ -990,10 +824,8 @@ function getTarget(node, edge) {
  * */
 function getCaTarget(node, edge) {
     let targetNode;
-    if (edge.data('source') === node.data('id'))
-        targetNode = ca.$id(edge.data('target'));
-    else
-        targetNode = ca.$id(edge.data('source'));
+    if (edge.data('source') === node.data('id')) targetNode = ca.$id(edge.data('target'));
+    else targetNode = ca.$id(edge.data('source'));
     return targetNode;
 }
 /**
@@ -1003,7 +835,7 @@ function getCaTarget(node, edge) {
  * */
 function clearSource() {
     stopAnimation();
-    cy.remove(cy.elements(":grabbable"));
+    cy.remove(cy.elements(':grabbable'));
     document.getElementById('cy_weight').innerHTML = '';
 }
 /**
@@ -1013,19 +845,9 @@ function clearSource() {
  * */
 function clearResult() {
     stopAnimation();
-    ca.remove(ca.elements(":grabbable"));
+    ca.remove(ca.elements(':grabbable'));
     document.getElementById('ca_weight').innerHTML = '';
     document.getElementById('path').innerHTML = '';
-}
-/**
- * @function
- * @public
- * @return void
- * */
-function stopAnimation() {
-    cy.elements(":grabbable").stop();
-    ca.elements(":grabbable").stop();
-    animationFlag = false;
 }
 /**
  * @function
@@ -1057,12 +879,22 @@ function getCyStartNode(prompt_text, default_value) {
     let root = cy.nodes(':selected');
     if (root.length <= 0) {
         root = cy.$id(prompt(prompt_text, default_value));
-        if (root.length <= 0)
-            return undefined;
-    }
-    else
-        root = root[0];
+        if (root.length <= 0) return undefined;
+    } else root = root[0];
     return root;
+}
+/**
+ * Concert a two dimensional matrix to string
+ * @function
+ * @public
+ * @param {Array} m
+ * @return {string}
+ * */
+function matrixToString(m) {
+    let s = `[[${m[0].toString()}],\n`;
+    for (let i = 1; i < m.length - 1; i++) s += ` [${m[i].toString()}],\n`;
+    s += ` [${m[m.length - 1].toString()}]]`;
+    return s;
 }
 /**
  * Get the adjacency matrix
@@ -1073,32 +905,28 @@ function getCyStartNode(prompt_text, default_value) {
  * @return {Array}
  * */
 function getAM(c, output) {
-    let i, j;
-    let nodes = nodes();
-    let numOfNodes = nodes.length;
-    let matrix = new Array(numOfNodes);
-    let id_index = {};
-    for (i = 0; i < numOfNodes; i++) {
+    const nodes = getAllNodes(c);
+    const numOfNodes = nodes.length;
+    const matrix = new Array(numOfNodes);
+    const id_index = {};
+    for (let i = 0; i < numOfNodes; i++) {
         matrix[i] = new Array(numOfNodes);
 
         // match the id of nodes with the index, an continuous integer
         // in case where the some of the nodes are deleted
         id_index[nodes[i].data('id')] = i;
-        for (j = 0; j < numOfNodes; j++)
-            matrix[i][j] = 0;
+        for (let j = 0; j < numOfNodes; j++) matrix[i][j] = 0;
     }
 
     // record the number of edges
     // matrix[i][j] denotes the number of edges connecting node i and node j
-    c.edges().forEach((ele) => {
-        i = id_index[ele.data('source')];
-        j = id_index[ele.data('target')];
+    c.edges().forEach(ele => {
+        const i = id_index[ele.data('source')];
+        const j = id_index[ele.data('target')];
         matrix[i][j] += 1;
-        if (i !== j)
-            matrix[j][i] += 1;
+        if (i !== j) matrix[j][i] += 1;
     });
-    if (output)
-        matrix_input.value = matrixToString(matrix);
+    if (output) matrix_input.value = matrixToString(matrix);
     return matrix;
 }
 /**
@@ -1110,46 +938,25 @@ function getAM(c, output) {
  * @return {Array}
  * */
 function getWM(c, output) {
-    let i, j, w;
-    let nodes = getAllNodes(c);
-    let numOfNodes = nodes.length;
-    let matrix = new Array(numOfNodes);
-    let id_index = {};
-    for (i = 0; i < numOfNodes; i++) {
+    const nodes = getAllNodes(c);
+    const numOfNodes = nodes.length;
+    const matrix = new Array(numOfNodes);
+    const id_index = {};
+    for (let i = 0; i < numOfNodes; i++) {
         matrix[i] = new Array(numOfNodes);
         id_index[nodes[i].data('id')] = i;
-        for (j = 0; j < numOfNodes; j++)
-            matrix[i][j] = 0;
+        for (let j = 0; j < numOfNodes; j++) matrix[i][j] = 0;
     }
-    c.edges().forEach((ele) => {
-        i = id_index[ele.data('source')];
-        j = id_index[ele.data('target')];
-        w = getWeight(ele);
-        if (matrix[i][j] === 0)
-            matrix[i][j] = w;
-        else {
-            if (w < matrix[i][j])
-                matrix[i][j] = w;
-        }
+    c.edges().forEach(ele => {
+        const i = id_index[ele.data('source')];
+        const j = id_index[ele.data('target')];
+        const w = getWeight(ele);
+        if (matrix[i][j] === 0) matrix[i][j] = w;
+        else if (w < matrix[i][j]) matrix[i][j] = w;
         matrix[j][i] = matrix[i][j];
     });
-    if (output)
-        matrix_input.value = matrixToString(matrix);
+    if (output) matrix_input.value = matrixToString(matrix);
     return matrix;
-}
-/**
- * Concert a two dimensional matrix to string
- * @function
- * @public
- * @param {Array} m
- * @return {string}
- * */
-function matrixToString(m) {
-    let s = '[[' + m[0].toString() + '],\n';
-    for (let i = 1; i < m.length - 1; i++)
-        s += ' [' + m[i].toString() + '],\n';
-    s += ' [' + m[m.length - 1].toString() + ']]';
-    return s;
 }
 
 /**
@@ -1204,8 +1011,7 @@ class LinkedList {
      * */
     getTail() {
         let currentNode = this.head;
-        while (currentNode.next !== null)
-            currentNode = currentNode.next;
+        while (currentNode.next !== null) currentNode = currentNode.next;
         return currentNode;
     }
 
@@ -1216,10 +1022,8 @@ class LinkedList {
      * add a cargo
      * */
     add(cargo) {
-        if (this.length === 0)
-            this.head = new LinkedListNode(cargo, null);
-        else
-            this.getTail().next = new LinkedListNode(cargo, null);
+        if (this.length === 0) this.head = new LinkedListNode(cargo, null);
+        else this.getTail().next = new LinkedListNode(cargo, null);
         this.length += 1;
     }
 
@@ -1230,10 +1034,8 @@ class LinkedList {
      * @public
      * */
     addNode(node) {
-        if (this.length === 0)
-            this.head = node;
-        else
-            this.getTail().next = node;
+        if (this.length === 0) this.head = node;
+        else this.getTail().next = node;
         this.length += 1;
     }
 
@@ -1246,8 +1048,7 @@ class LinkedList {
     search(func) {
         let currentNode = this.head;
         while (currentNode !== null) {
-            if (func(currentNode.cargo))
-                return currentNode;
+            if (func(currentNode.cargo)) return currentNode;
             currentNode = currentNode.next;
         }
         return null;
@@ -1269,11 +1070,12 @@ class LinkedList {
         if (trace) {
             let path_string = '';
             while (currentNode !== null) {
-                let currentElement = currentNode.cargo;
+                const currentElement = currentNode.cargo;
                 if (currentElement.isNode())
-                    path_string += '<span class="normal" id="n' + counter + '">' + currentElement.data('id') + '</span>';
-                else
-                    path_string += '<span class="normal" id="n' + counter + '"> → </span>';
+                    path_string += `<span class="normal" id="n${counter}">${currentElement.data(
+                        'id'
+                    )}</span>`;
+                else path_string += `<span class="normal" id="n${counter}"> → </span>`;
                 counter += 1;
                 currentNode = currentNode.next;
             }
@@ -1289,67 +1091,194 @@ class LinkedList {
              * @private
              * @param {LinkedListNode} node
              * */
-            let animation = (node) => {
+            const animation = node => {
                 if (node.cargo.isNode()) {
-                    node.cargo.animate({
-                        style: {backgroundColor: '#00f1f1', width: '30px', height: '30px'},
-                        duration: Math.round(+duration.value * 0.1)
-                    }).animate({
-                        style: {backgroundColor: '#de4400', width: '20px', height: '20px'},
-                        duration: Math.round(+duration.value * 0.4),
-                        complete: () => {
+                    node.cargo
+                        .animate({
+                            style: {
+                                backgroundColor: '#00f1f1',
+                                width: '30px',
+                                height: '30px'
+                            },
+                            duration: Math.round(+duration.value * 0.1)
+                        })
+                        .animate({
+                            style: {
+                                backgroundColor: '#de4400',
+                                width: '20px',
+                                height: '20px'
+                            },
+                            duration: Math.round(+duration.value * 0.4),
+                            complete: () => {
+                                // if the global flag is set to false
+                                // stop the animation
+                                if (!animationFlag) return;
 
-                            // if the global flag is set to false
-                            // stop the animation
-                            if (!animationFlag)
-                                return;
+                                // animate next node if it exists
+                                if (node.next !== null) {
+                                    if (trace) {
+                                        // update the tracer
+                                        // track the animation by applying additional CSS to elements
+                                        document.getElementById(`n${counter}`).className =
+                                            'current';
+                                        document.getElementById(`n${counter - 1}`).className =
+                                            'normal';
+                                        counter += 1;
+                                    }
+                                    animation(node.next);
+                                }
+                            }
+                        });
+                } else {
+                    node.cargo
+                        .animate({
+                            style: {
+                                lineColor: '#00f1f1',
+                                width: '6'
+                            },
+                            duration: Math.round(+duration.value * 0.2)
+                        })
+                        .animate({
+                            style: {
+                                lineColor: '#de4400',
+                                width: '3'
+                            },
+                            duration: Math.round(+duration.value * 0.8),
+                            complete: () => {
+                                // if the global flag is set to false
+                                // stop the animation
+                                if (!animationFlag) return;
 
-                            // animate next node if it exists
-                            if (node.next !== null) {
-                                if (trace) {
+                                // animate next node if it exists
+                                if (node.next !== null) {
                                     // update the tracer
-                                    // track the animation by applying additional CSS to elements
-                                    document.getElementById('n' + counter).className = 'current';
-                                    document.getElementById('n' + (counter - 1)).className = 'normal';
-                                    counter += 1;
+                                    if (trace) {
+                                        document.getElementById(`n${counter}`).className =
+                                            'current';
+                                        document.getElementById(`n${counter - 1}`).className =
+                                            'normal';
+                                        counter += 1;
+                                    }
+                                    animation(node.next);
                                 }
-                                animation(node.next);
                             }
-                        }
-                    });
-                }
-                else {
-                    node.cargo.animate({
-                        style: {lineColor: '#00f1f1', width: '6'},
-                        duration: Math.round(+duration.value * 0.2)
-                    }).animate({
-                        style: {lineColor: '#de4400', width: '3'},
-                        duration: Math.round(+duration.value * 0.8),
-                        complete: () => {
-
-                            // if the global flag is set to false
-                            // stop the animation
-                            if (!animationFlag)
-                                return;
-
-                            // animate next node if it exists
-                            if (node.next !== null) {
-
-                                // update the tracer
-                                if (trace) {
-                                    document.getElementById('n' + counter).className = 'current';
-                                    document.getElementById('n' + (counter - 1)).className = 'normal';
-                                    counter += 1;
-                                }
-                                animation(node.next);
-                            }
-                        }
-                    });
+                        });
                 }
             };
-            if (trace)
-                document.getElementById('n0').className = 'current';
+            if (trace) document.getElementById('n0').className = 'current';
             animation(currentNode);
         }
     }
 }
+
+// initialization function
+$(() => {
+    cy = initializeCytoscapeObjects('cy');
+    ca = initializeCytoscapeObjects('ca');
+    clearCyStyle();
+    clearCaStyle();
+    initCircularMenu(cy);
+
+    cy.graphml({
+        layoutBy: 'circle'
+    });
+    ca.graphml({
+        layoutBy: 'circle'
+    });
+
+    cy.edgehandles({
+        preview: true, // whether to show added edges preview before releasing selection
+        hoverDelay: 150, // time spent hovering over a target node before it is considered selected
+        handleNodes: 'node', // selector/filter function for whether edges can be made from a given node
+        snap: false, // when enabled, the edge can be drawn by just moving close to a target node (can be confusing on compound graphs)
+        snapThreshold: 50, // the target node must be less than or equal to this many pixels away from the cursor/finger
+        snapFrequency: 15, // the number of times per second (Hz) that snap checks done (lower is less expensive)
+        noEdgeEventsInDraw: false, // set events:no to edges during draws, prevents mouseouts on compounds
+        disableBrowserGestures: true, // during an edge drawing gesture, disable browser gestures such as two-finger trackpad swipe and pinch-to-zoom
+        handlePosition(node) {
+            return 'middle top'; // sets the position of the handle in the format of "X-AXIS Y-AXIS" such as "left top", "middle top"
+        },
+        handleInDrawMode: false, // whether to show the handle in draw mode
+        edgeType(sourceNode, targetNode) {
+            // can return 'flat' for flat edges between nodes or 'node' for intermediate node between them
+            // returning null/undefined means an edge can't be added between the two nodes
+            return 'flat';
+        },
+        loopAllowed(node) {
+            // for the specified node, return whether edges from itself to itself are allowed
+            return true;
+        },
+        edgeParams: (sourceNode, targetNode, i) => {
+            // for edges between the specified source and target
+            // return element object to be passed to cy.add() for edge
+            // NB: i indicates edge index in case of edgeType: 'node'
+            const id_pre = `${sourceNode.data('id')}-${targetNode.data('id')}-`;
+            let x = 0;
+            while (cy.$id(id_pre + x).length !== 0) x += 1;
+            return {
+                data: {
+                    id: id_pre + x,
+                    source: sourceNode.data('id'),
+                    target: targetNode.data('id'),
+                    weight: parseInt(weight_input.value)
+                }
+            };
+        },
+        complete: (sourceNode, targetNodes, addedEntities) => {
+            // fired when edgehandles is done and entities are added
+            if (auto_refresh.checked) cyReLayout();
+            addedEntities.forEach(ele => {
+                if (ele.isEdge()) {
+                    ele.animate({
+                        style: {
+                            lineColor: 'red',
+                            width: 5
+                        },
+                        duration: 100
+                    }).animate({
+                        style: {
+                            lineColor: '#ccc',
+                            width: 2
+                        },
+                        duration: 500
+                    });
+                }
+            });
+        }
+    });
+
+    // add key bindings
+    document.addEventListener('keydown', e => {
+        e = e || event;
+        const which = e.which || e.keyCode || e.charCode;
+
+        if (e.altKey) {
+            // alt + c
+            if (which == 67) addEdgeBetweenSelected();
+            // alt + a
+            else if (which == 65) addNode(true, null);
+            // alt + f
+            else if (which == 70) reLayout();
+            // alt + s
+            else if (which == 83) clearSource();
+            // alt + r
+            else if (which == 82) clearResult();
+        } else if (e.ctrlKey) {
+            // ctrl + c
+            if (which == 67) copy(cy.$(':selected'));
+            // ctrl + v
+            else if (which == 86) paste();
+            // ctrl + s
+            else if (which == 83) stopAnimation();
+            // ctrl + a
+            else if (which == 65) cy.elements(':grabbable').select();
+            // ctrl + r
+            else if (which == 82) clearCaStyle();
+            // ctrl + f
+            else if (which == 70) clearCyStyle();
+        }
+        // the delete key
+        else if (which == 46) removeSelected();
+    });
+    reLayout();
+});

@@ -1,3 +1,8 @@
+'use strict';
+
+const processDiv = document.getElementById('process');
+
+hideResult(document.getElementById('hide_result'));
 /**
  * create graph from an adjacency matrix
  * @function
@@ -10,20 +15,21 @@ function createFromAM(m) {
     stopAnimation();
 
     // this must be a square matrix...
-    if (m.length !== m[0].length)
-        return;
+    if (m.length !== m[0].length) return;
 
     clearSource();
-    let numOfNodes = m.length;
+    const numOfNodes = m.length;
     cy.startBatch();
     // add all nodes
     for (let i = 1; i <= numOfNodes; i++)
         cy.add({
             group: 'nodes',
-            data: {id: i},
+            data: {
+                id: i
+            },
             position: {
-                x: (Math.random() * 250 + 25),
-                y: (Math.random() * 250 + 25)
+                x: Math.random() * 250 + 25,
+                y: Math.random() * 250 + 25
             }
         });
 
@@ -33,7 +39,11 @@ function createFromAM(m) {
             for (let x = 0; x < m[i][j]; x++)
                 cy.add({
                     group: 'edges',
-                    data: {id: (i + 1) + '-' + (j + 1) + '-' + x, source: i + 1, target: j + 1}
+                    data: {
+                        id: `${i + 1}-${j + 1}-${x}`,
+                        source: i + 1,
+                        target: j + 1
+                    }
                 });
     cy.endBatch();
     cyReLayout();
@@ -50,15 +60,17 @@ function createFromWM(m) {
     stopAnimation();
     if (m.length !== m[0].length) return;
     clearSource();
-    let numOfNodes = m.length;
+    const numOfNodes = m.length;
     cy.startBatch();
     for (let i = 1; i <= numOfNodes; i++)
         cy.add({
             group: 'nodes',
-            data: {id: i},
+            data: {
+                id: i
+            },
             position: {
-                x: (Math.random() * 250 + 25),
-                y: (Math.random() * 250 + 25)
+                x: Math.random() * 250 + 25,
+                y: Math.random() * 250 + 25
             }
         });
 
@@ -67,7 +79,12 @@ function createFromWM(m) {
             if (m[i][j] > 0)
                 cy.add({
                     group: 'edges',
-                    data: {id: (i + 1) + '-' + (j + 1) + '-0', source: i + 1, target: j + 1, weight: m[i][j]}
+                    data: {
+                        id: `${i + 1}-${j + 1}-0`,
+                        source: i + 1,
+                        target: j + 1,
+                        weight: m[i][j]
+                    }
                 });
     cy.endBatch();
     cyReLayout();
@@ -81,62 +98,63 @@ function createFromWM(m) {
 function generateGraph() {
     stopAnimation();
     clearCyStyle();
-    let simple = document.getElementById('simple').checked;
-    let weighted = document.getElementById('weighted').checked;
-    let numOfNodes = parseInt(prompt("Please enter the number of nodes", "6"));
-    let matrix = new Array(numOfNodes);
-    for (let i = 0; i < matrix.length; i++)
-        matrix[i] = new Array(numOfNodes);
+    const simple = document.getElementById('simple').checked;
+    const weighted = document.getElementById('weighted').checked;
+    const numOfNodes = parseInt(prompt('Please enter the number of nodes', '6'));
+    const matrix = new Array(numOfNodes);
+    for (let i = 0; i < matrix.length; i++) matrix[i] = new Array(numOfNodes);
     if (simple) {
-        let pConnected = parseFloat(prompt("Please specify the propability that two nodes are connected.\nRange: 0 to 1", "0.5"));
+        const pConnected = parseFloat(
+            prompt(
+                'Please specify the propability that two nodes are connected.\nRange: 0 to 1',
+                '0.5'
+            )
+        );
         if (weighted) {
-            let weightRange = prompt("Please specify the weight range.\nExample: 1-5 represents range from 1 to 5.\n Lower limit must be greater than 0.", "1-4");
-            let temp = weightRange.split('-');
-            let lower = parseInt(temp[0]) > 0 ? parseInt(temp[0]) : 1;
-            let range = parseInt(temp[1]) >= lower ? parseInt(temp[1]) - lower + 1 : lower + 4;
+            const weightRange = prompt(
+                'Please specify the weight range.\nExample: 1-5 represents range from 1 to 5.\n Lower limit must be greater than 0.',
+                '1-4'
+            );
+            const temp = weightRange.split('-');
+            const lower = parseInt(temp[0]) > 0 ? parseInt(temp[0]) : 1;
+            const range = parseInt(temp[1]) >= lower ? parseInt(temp[1]) - lower + 1 : lower + 4;
             for (let i = 0; i < numOfNodes; i++)
                 for (let j = 0; j < numOfNodes; j++) {
-                    if (i !== j){
+                    if (i !== j) {
                         if (Math.random() < pConnected)
                             matrix[i][j] = Math.floor(Math.random() * range + lower);
-                        else
-                            matrix[i][j] = 0;
+                        else matrix[i][j] = 0;
                     }
                 }
             createFromWM(matrix);
-        }
-        else {
+        } else {
             for (let i = 0; i < numOfNodes; i++)
                 for (let j = 0; j < numOfNodes; j++) {
-                    if (Math.random() < pConnected)
-                        matrix[i][j] = 1;
-                    else
-                        matrix[i][j] = 0;
+                    if (Math.random() < pConnected) matrix[i][j] = 1;
+                    else matrix[i][j] = 0;
                 }
             createFromAM(matrix);
         }
-    }
-    else {
-        let nMultiple = parseInt(prompt("Please specify the max number of edges connecting two nodes.\nRange: 2 to infinity", "2"));
-        let pMultiple = parseFloat(prompt("Please specify the the probability of having multiple edges", "0.25"));
+    } else {
+        const nMultiple = parseInt(
+            prompt(
+                'Please specify the max number of edges connecting two nodes.\nRange: 2 to infinity',
+                '2'
+            )
+        );
+        const pMultiple = parseFloat(
+            prompt('Please specify the the probability of having multiple edges', '0.25')
+        );
         for (let i = 0; i < numOfNodes; i++) {
             for (let j = 0; j < numOfNodes; j++) {
                 if (i === j) {
                     if (Math.random() < pMultiple / 2)
                         matrix[i][j] = Math.floor((Math.random() * nMultiple + 1) / 2);
-                }
-                else {
-                    if (Math.random() < pMultiple)
-                        matrix[i][j] = Math.floor(Math.random() * nMultiple + 1);
-                    else {
-                        if (Math.random() > (1 / nMultiple))
-                            matrix[i][j] = 1;
-                        else
-                            matrix[i][j] = 0;
-                    }
-                }
+                } else if (Math.random() < pMultiple)
+                    matrix[i][j] = Math.floor(Math.random() * nMultiple + 1);
+                else if (Math.random() > 1 / nMultiple) matrix[i][j] = 1;
+                else matrix[i][j] = 0;
             }
-
         }
         createFromAM(matrix);
     }
@@ -150,31 +168,29 @@ function generateGraph() {
 function Kn() {
     stopAnimation();
     clearSource();
-    let numOfNodes = parseInt(prompt("Please enter the number of vertices", "5"));
-    let weightRange = prompt("Please specify the weight range.\nLeave this blank if you want an unweighted graph.\nExample: 1-5 represents range from 1 to 5.\nLower limit must be greater than 0.", "");
-    let matrix = new Array(numOfNodes);
+    const numOfNodes = parseInt(prompt('Please enter the number of vertices', '5'));
+    const weightRange = prompt(
+        'Please specify the weight range.\nLeave this blank if you want an unweighted graph.\nExample: 1-5 represents range from 1 to 5.\nLower limit must be greater than 0.',
+        ''
+    );
+    const matrix = new Array(numOfNodes);
     if (weightRange.length > 0) {
-        let temp = weightRange.split('-');
-        let lower = parseInt(temp[0]) > 0 ? parseInt(temp[0]) : 1;
-        let range = parseInt(temp[1]) > lower ? parseInt(temp[1]) - lower + 1 : lower + 4;
+        const temp = weightRange.split('-');
+        const lower = parseInt(temp[0]) > 0 ? parseInt(temp[0]) : 1;
+        const range = parseInt(temp[1]) > lower ? parseInt(temp[1]) - lower + 1 : lower + 4;
 
         // fill in the half above the major diagonal (exclude major diagonal) with random weights in the give range
         for (let i = 0; i < numOfNodes; i++) {
             matrix[i] = new Array(numOfNodes);
             for (let j = 0; j < numOfNodes; j++)
-                if (i !== j) 
-                    matrix[i][j] = parseInt(Math.random() * range + lower);
+                if (i !== j) matrix[i][j] = parseInt(Math.random() * range + lower);
         }
         createFromWM(matrix);
-    }
-    else {
-
+    } else {
         // fill in the half above the major diagonal (exclude major diagonal) with 1
         for (let i = 0; i < numOfNodes; i++) {
             matrix[i] = new Array(numOfNodes);
-            for (let j = 0; j < numOfNodes; j++)
-                if (i !== j)
-                    matrix[i][j] = 1;
+            for (let j = 0; j < numOfNodes; j++) if (i !== j) matrix[i][j] = 1;
         }
         createFromAM(matrix);
     }
@@ -228,74 +244,34 @@ function Kn() {
 function Kn() {
     stopAnimation();
     clearSource();
-    let numOfNodes = parseInt(prompt("Please enter the number of vertices", "5"));
-    let weightRange = prompt("Please specify the weight range.\nLeave this blank if you want an unweighted graph.\nExample: 1-5 represents range from 1 to 5.\nLower limit must be greater than 0.", "");
-    let matrix = new Array(numOfNodes);
+    const numOfNodes = parseInt(prompt('Please enter the number of vertices', '5'));
+    const weightRange = prompt(
+        'Please specify the weight range.\nLeave this blank if you want an unweighted graph.\nExample: 1-5 represents range from 1 to 5.\nLower limit must be greater than 0.',
+        ''
+    );
+    const matrix = new Array(numOfNodes);
     if (weightRange.length > 0) {
-        let temp = weightRange.split('-');
-        let lower = parseInt(temp[0]) > 0 ? parseInt(temp[0]) : 1;
-        let range = parseInt(temp[1]) > lower ? parseInt(temp[1]) - lower + 1 : lower + 4;
+        const temp = weightRange.split('-');
+        const lower = parseInt(temp[0]) > 0 ? parseInt(temp[0]) : 1;
+        const range = parseInt(temp[1]) > lower ? parseInt(temp[1]) - lower + 1 : lower + 4;
 
         // fill in the half above the major diagonal (exclude major diagonal) with random weights in the give range
         for (let i = 0; i < numOfNodes; i++) {
             matrix[i] = new Array(numOfNodes);
             for (let j = 0; j < numOfNodes; j++)
-                if (i !== j)
-                    matrix[i][j] = parseInt(Math.random() * range + lower);
+                if (i !== j) matrix[i][j] = parseInt(Math.random() * range + lower);
         }
         createFromWM(matrix);
-    }
-    else {
-
+    } else {
         // fill in the half above the major diagonal (exclude major diagonal) with 1
         for (let i = 0; i < numOfNodes; i++) {
             matrix[i] = new Array(numOfNodes);
-            for (let j = 0; j < numOfNodes; j++)
-                if (i !== j)
-                    matrix[i][j] = 1;
+            for (let j = 0; j < numOfNodes; j++) if (i !== j) matrix[i][j] = 1;
         }
         createFromAM(matrix);
     }
 }
 
-// /**
-//  * generate a complete bipartile graph by first generating its adjacency matrix
-//  * @function
-//  * @public
-//  * @return void
-//  * */
-// function Kn_n() {
-//     stopAnimation();
-//     let n = prompt("Please enter n,n.\nExample: 3,3 represents K3,3", "3,3");
-//     n = n.split(',');
-//     let n1 = parseInt(n[0]);
-//     let n2 = parseInt(n[1]);
-//     let numOfNodes = n1 + n2;
-//     let matrix = new Array(numOfNodes);
-//     for (let i = 0; i < numOfNodes; i++)
-//         matrix[i] = new Array(numOfNodes);
-//
-//     let weightRange = prompt("Please specify the weight range.\nLeave this blank if you want an unweighted graph.\nExample: 1-5 represents range from 1 to 5.\nLower limit must be greater than 0.", "");
-//     if (weightRange.length > 0) {
-//         let temp = weightRange.split('-');
-//         let lower = parseInt(temp[0]) > 0 ? parseInt(temp[0]) : 1;
-//
-//         // upper bound must be greater than the lower bound...
-//         let range = parseInt(temp[1]) > lower ? parseInt(temp[1]) : lower + 4;
-//
-//         // I think you can understand this
-//         for (let i = 0; i < n1; i++)
-//             for (let j = n1; j < numOfNodes; j++)
-//                 matrix[i][j] = parseInt(Math.random() * range + lower);
-//         createFromWM(matrix);
-//     }
-//     else {
-//         for (let i = 0; i < n1; i++)
-//             for (let j = n1; j < numOfNodes; j++)
-//                 matrix[i][j] = 1;
-//         createFromAM(matrix);
-//     }
-// }
 /**
  * @public
  * @function
@@ -307,11 +283,8 @@ function getCyStartNode(prompt_text, default_value) {
     let root = cy.nodes(':selected');
     if (root.length <= 0) {
         root = cy.$id(prompt(prompt_text, default_value));
-        if (root.length <= 0)
-            return undefined;
-    }
-    else
-        root = root[0];
+        if (root.length <= 0) return undefined;
+    } else root = root[0];
     return root;
 }
 
@@ -323,21 +296,23 @@ function getCyStartNode(prompt_text, default_value) {
  * */
 function breadthFirstSearch() {
     stopAnimation();
-    let root = getCyStartNode("Please enter the id of the starting node", "1");
-    if (root === undefined)
-        return;
+    const root = getCyStartNode('Please enter the id of the starting node', '1');
+    if (root === undefined) return;
     clearCyStyle();
-    cy.elements(":grabbable").unselect();
-    let path = cy.elements(":grabbable").bfs({root: root, directed: true}).path;
+    cy.elements(':grabbable').unselect();
+    const path = cy.elements(':grabbable').bfs({
+        root,
+        directed: true
+    }).path;
     clearResult();
-    let pathList = new LinkedList();
+    const pathList = new LinkedList();
     path.select();
     ca.add(path);
-    path.forEach((ele) => {
+    path.forEach(ele => {
         pathList.add(ele);
     });
     caReLayout();
-    pathList.traverse(animation.checked, true);
+    pathList.traverse(animation_check.checked, true);
 }
 
 /**
@@ -348,21 +323,23 @@ function breadthFirstSearch() {
  * */
 function depthFirstSearch() {
     stopAnimation();
-    let root = getCyStartNode("Please enter the id of the starting node", "1");
-    if (root === undefined)
-        return;
+    const root = getCyStartNode('Please enter the id of the starting node', '1');
+    if (root === undefined) return;
     clearCyStyle();
-    cy.elements(":grabbable").unselect();
-    let path = cy.elements(":grabbable").dfs({root: root, directed: true}).path;
+    cy.elements(':grabbable').unselect();
+    const path = cy.elements(':grabbable').dfs({
+        root,
+        directed: true
+    }).path;
     clearResult();
-    let pathList = new LinkedList();
+    const pathList = new LinkedList();
     path.select();
     ca.add(path);
-    path.forEach((ele) => {
+    path.forEach(ele => {
         pathList.add(ele);
     });
     caReLayout();
-    pathList.traverse(animation.checked, true);
+    pathList.traverse(animation_check.checked, true);
 }
 
 // /**
@@ -396,7 +373,7 @@ function depthFirstSearch() {
 //             }
 //         }
 //     });
-//     pathList.traverse(animation.checked, false);
+//     pathList.traverse(animation_check.checked, false);
 // }
 /**
  * Dijkstra is implemented in the library
@@ -406,22 +383,30 @@ function depthFirstSearch() {
  * */
 function performDijkstra() {
     stopAnimation();
-    let nodes = cy.nodes(':selected');
+    const nodes = cy.nodes(':selected');
     let path;
     if (nodes.length >= 2) {
-        path = cy.elements(":grabbable").dijkstra({
-            root: nodes[0],
-            weight: getWeight,
-            directed: true
-        }).pathTo(nodes[1]);
+        path = cy
+            .elements(':grabbable')
+            .dijkstra({
+                root: nodes[0],
+                weight: getWeight,
+                directed: true
+            })
+            .pathTo(nodes[1]);
+    } else {
+        const p = prompt(
+            'Please enter the id of source and target nodes, src-tg.\nExample: 1-2',
+            ''
+        );
+        const pt = p.split('-');
+        path = cy
+            .elements(':grabbable')
+            .dijkstra(`#${pt[0]}`, getWeight, true)
+            .pathTo(`#${pt[1]}`);
     }
-    else {
-        let p = prompt("Please enter the id of source and target nodes, src-tg.\nExample: 1-2", "");
-        let pt = p.split('-');
-        path = cy.elements(":grabbable").dijkstra('#' + pt[0], getWeight, true).pathTo('#' + pt[1]);
-    }
-    let pathList = new LinkedList();
-    path.forEach((ele) => {
+    const pathList = new LinkedList();
+    path.forEach(ele => {
         pathList.add(ele);
     });
     clearCyStyle();
@@ -429,7 +414,7 @@ function performDijkstra() {
     ca.add(path);
     caReLayout();
     path.select();
-    pathList.traverse(animation.checked, true);
+    pathList.traverse(animation_check.checked, true);
 }
 
 /**
@@ -440,17 +425,147 @@ function performDijkstra() {
  * @return string
  * */
 function colorRGB2Hex(color) {
-    let r = color[0];
-    let g = color[1];
-    let b = color[2];
-    return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+    const r = color[0];
+    const g = color[1];
+    const b = color[2];
+    return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
 }
 
 /**
  * Jet colormap from Matlab
  * */
-const jetMap = [[0, 0, 143], [0, 0, 159], [0, 0, 175], [0, 0, 191], [0, 0, 207], [0, 0, 223], [0, 0, 239], [0, 0, 255], [0, 16, 255], [0, 32, 255], [0, 48, 255], [0, 64, 255], [0, 80, 255], [0, 96, 255], [0, 112, 255], [0, 128, 255], [0, 143, 255], [0, 159, 255], [0, 175, 255], [0, 191, 255], [0, 207, 255], [0, 223, 255], [0, 239, 255], [0, 255, 255], [16, 255, 239], [32, 255, 223], [48, 255, 207], [64, 255, 191], [80, 255, 175], [96, 255, 159], [112, 255, 143], [128, 255, 128], [143, 255, 112], [159, 255, 96], [175, 255, 80], [191, 255, 64], [207, 255, 48], [223, 255, 32], [239, 255, 16], [255, 255, 0], [255, 239, 0], [255, 223, 0], [255, 207, 0], [255, 191, 0], [255, 175, 0], [255, 159, 0], [255, 143, 0], [255, 128, 0], [255, 112, 0], [255, 96, 0], [255, 80, 0], [255, 64, 0], [255, 48, 0], [255, 32, 0], [255, 16, 0], [255, 0, 0], [239, 0, 0], [223, 0, 0], [207, 0, 0], [191, 0, 0], [175, 0, 0], [159, 0, 0], [143, 0, 0], [128, 0, 0]];
-const jetMapHex = ['#00008f', '#00009f', '#0000af', '#0000bf', '#0000cf', '#0000df', '#0000ef', '#0000ff', '#0010ff', '#0020ff', '#0030ff', '#0040ff', '#0050ff', '#0060ff', '#0070ff', '#0080ff', '#008fff', '#009fff', '#00afff', '#00bfff', '#00cfff', '#00dfff', '#00efff', '#00ffff', '#10ffef', '#20ffdf', '#30ffcf', '#40ffbf', '#50ffaf', '#60ff9f', '#70ff8f', '#80ff80', '#8fff70', '#9fff60', '#afff50', '#bfff40', '#cfff30', '#dfff20', '#efff10', '#ffff00', '#ffef00', '#ffdf00', '#ffcf00', '#ffbf00', '#ffaf00', '#ff9f00', '#ff8f00', '#ff8000', '#ff7000', '#ff6000', '#ff5000', '#ff4000', '#ff3000', '#ff2000', '#ff1000', '#ff0000', '#ef0000', '#df0000', '#cf0000', '#bf0000', '#af0000', '#9f0000', '#8f0000', '#800000'];
+const jetMap = [
+    [0, 0, 143],
+    [0, 0, 159],
+    [0, 0, 175],
+    [0, 0, 191],
+    [0, 0, 207],
+    [0, 0, 223],
+    [0, 0, 239],
+    [0, 0, 255],
+    [0, 16, 255],
+    [0, 32, 255],
+    [0, 48, 255],
+    [0, 64, 255],
+    [0, 80, 255],
+    [0, 96, 255],
+    [0, 112, 255],
+    [0, 128, 255],
+    [0, 143, 255],
+    [0, 159, 255],
+    [0, 175, 255],
+    [0, 191, 255],
+    [0, 207, 255],
+    [0, 223, 255],
+    [0, 239, 255],
+    [0, 255, 255],
+    [16, 255, 239],
+    [32, 255, 223],
+    [48, 255, 207],
+    [64, 255, 191],
+    [80, 255, 175],
+    [96, 255, 159],
+    [112, 255, 143],
+    [128, 255, 128],
+    [143, 255, 112],
+    [159, 255, 96],
+    [175, 255, 80],
+    [191, 255, 64],
+    [207, 255, 48],
+    [223, 255, 32],
+    [239, 255, 16],
+    [255, 255, 0],
+    [255, 239, 0],
+    [255, 223, 0],
+    [255, 207, 0],
+    [255, 191, 0],
+    [255, 175, 0],
+    [255, 159, 0],
+    [255, 143, 0],
+    [255, 128, 0],
+    [255, 112, 0],
+    [255, 96, 0],
+    [255, 80, 0],
+    [255, 64, 0],
+    [255, 48, 0],
+    [255, 32, 0],
+    [255, 16, 0],
+    [255, 0, 0],
+    [239, 0, 0],
+    [223, 0, 0],
+    [207, 0, 0],
+    [191, 0, 0],
+    [175, 0, 0],
+    [159, 0, 0],
+    [143, 0, 0],
+    [128, 0, 0]
+];
+const jetMapHex = [
+    '#00008f',
+    '#00009f',
+    '#0000af',
+    '#0000bf',
+    '#0000cf',
+    '#0000df',
+    '#0000ef',
+    '#0000ff',
+    '#0010ff',
+    '#0020ff',
+    '#0030ff',
+    '#0040ff',
+    '#0050ff',
+    '#0060ff',
+    '#0070ff',
+    '#0080ff',
+    '#008fff',
+    '#009fff',
+    '#00afff',
+    '#00bfff',
+    '#00cfff',
+    '#00dfff',
+    '#00efff',
+    '#00ffff',
+    '#10ffef',
+    '#20ffdf',
+    '#30ffcf',
+    '#40ffbf',
+    '#50ffaf',
+    '#60ff9f',
+    '#70ff8f',
+    '#80ff80',
+    '#8fff70',
+    '#9fff60',
+    '#afff50',
+    '#bfff40',
+    '#cfff30',
+    '#dfff20',
+    '#efff10',
+    '#ffff00',
+    '#ffef00',
+    '#ffdf00',
+    '#ffcf00',
+    '#ffbf00',
+    '#ffaf00',
+    '#ff9f00',
+    '#ff8f00',
+    '#ff8000',
+    '#ff7000',
+    '#ff6000',
+    '#ff5000',
+    '#ff4000',
+    '#ff3000',
+    '#ff2000',
+    '#ff1000',
+    '#ff0000',
+    '#ef0000',
+    '#df0000',
+    '#cf0000',
+    '#bf0000',
+    '#af0000',
+    '#9f0000',
+    '#8f0000',
+    '#800000'
+];
 
 /**
  * perform page rank
@@ -462,33 +577,33 @@ function pageRank() {
     const len = cy.nodes().length;
     const basicSize = 250;
     const delSize = 15;
-    let rank = cy.elements(":grabbable").pageRank({
+    const rank = cy.elements(':grabbable').pageRank({
         dampingFactor: 0.85,
         precision: 1e-4
     });
-    let ranks = new Array(cy.nodes().length);
-    cy.nodes().forEach((n) => {
+    const ranks = new Array(cy.nodes().length);
+    cy.nodes().forEach(n => {
         ranks.push(rank.rank(n));
     });
-    let min = _.min(ranks);
-    let max = _.max(ranks);
-    let rg = max - min;
-    cy.nodes().forEach((n) => {
-        let r = rank.rank(n);
-        let size = Math.round((basicSize + delSize * len) * r);
+    const min = _.min(ranks);
+    const max = _.max(ranks);
+    const rg = max - min;
+    cy.nodes().forEach(n => {
+        const r = rank.rank(n);
+        const size = Math.round((basicSize + delSize * len) * r);
         n.animate({
             style: {
-                width: size + 'px',
-                height: size + 'px',
-                backgroundColor: jetMapHex[Math.floor((r - min) / rg * 63)]
+                width: `${size}px`,
+                height: `${size}px`,
+                backgroundColor: jetMapHex[Math.floor(((r - min) / rg) * 63)]
             },
             duration: 1000
         });
         n.style({
-            fontSize: 13 + Math.floor(Math.pow(size, 0.33)) + 'px',
+            fontSize: `${13 + Math.floor(size ** 0.33)}px`,
             label: n => `${n.data('id')}\n${(r * 100).toFixed(2)}%`,
             textWrap: 'wrap',
-            textValign: 'top',
+            textValign: 'top'
         });
     });
 }
@@ -508,7 +623,7 @@ function myPageRank() {
      * @type {Number} minimal difference ε
      * */
     const minimalDifference = 1e-4;
-    const nodes = cy.nodes();
+    const nodes = getAllNodes(cy);
     const len = nodes.length;
     const outEdgeStats = new Array(len);
     /**
@@ -543,8 +658,7 @@ function myPageRank() {
 
     // initial rankings
     let ranks = new Array(len);
-    for (let i = 0; i < len; i++)
-        ranks[i] = 1 / len;
+    for (let i = 0; i < len; i++) ranks[i] = 1 / len;
 
     /**
      * find the maximum and minimum anomg the vector of ranks
@@ -555,10 +669,8 @@ function myPageRank() {
         let min = Infinity;
         let max = 0;
         for (let i = 0; i < len; i++) {
-            if (ranks[i] < min)
-                min = ranks[i];
-            if (ranks[i] > max)
-                max = ranks[i];
+            if (ranks[i] < min) min = ranks[i];
+            if (ranks[i] > max) max = ranks[i];
         }
         return [min, max];
     }
@@ -570,8 +682,8 @@ function myPageRank() {
      * */
     function getAnimationStyle(size, color) {
         return {
-            width: size + 'px',
-            height: size + 'px',
+            width: `${size}px`,
+            height: `${size}px`,
             backgroundColor: color
         };
     }
@@ -582,7 +694,7 @@ function myPageRank() {
      * @return Object
      * */
     function getLabelStyle(size, rank) {
-        let fs = 13 + Math.floor(Math.pow(size, 0.33));
+        const fs = 13 + Math.floor(size ** 0.33);
         // let s = Math.ceil(size * 0.5 / fs);
         // let wp = '\n';
         // for (let i = 0; i < s; i++)
@@ -597,10 +709,10 @@ function myPageRank() {
         //     textMarginY: -(s - 1) * fs
         // };
         return {
-            fontSize: fs + 'px',
+            fontSize: `${fs}px`,
             label: n => `${n.data('id')}\n${(rank * 100).toFixed(2)}%`,
             textWrap: 'wrap',
-            textValign: 'top',
+            textValign: 'top'
         };
     }
 
@@ -609,17 +721,16 @@ function myPageRank() {
      * @param {int} duration
      * @param {function} callback
      * */
-    function animateNodes(ranks, duration, callback = () => {
-    }) {
+    function animateNodes(ranks, duration, callback = () => {}) {
         let [min, max] = findMinAndMax(ranks);
         min -= 0.00001;
-        let range = max - min;
+        const range = max - min;
         nodes.forEach((n, i) => {
-            let r = ranks[i];
-            let size = Math.round((basicSize + delSize * len) * r);
+            const r = ranks[i];
+            const size = Math.round((basicSize + delSize * len) * r);
             n.animate({
-                style: getAnimationStyle(size, jetMapHex[Math.floor((r - min) / range * 63)]),
-                duration: duration,
+                style: getAnimationStyle(size, jetMapHex[Math.floor(((r - min) / range) * 63)]),
+                duration,
                 complete: callback
             });
             n.style(getLabelStyle(size, r));
@@ -634,26 +745,27 @@ function myPageRank() {
      * */
     function call(t, i, cRanks, pRanks) {
         cy.edges().removeStyle();
+        cy.edges()
+            .hide()
+            .show();
         processDiv.innerHTML = `Iteration ${t}, Calculating PR for node ${i + 1}`;
         let del = 0;
-        let edges = undefined;
+        let edges;
         for (let j = 0; j < len; j++) {
             if (i !== j) {
-
                 // if outbounds from node j to i exist
                 if (adjacencyMatrix[j][i] > 0) {
-
                     // calculate the transferred page rank
                     // += PR(j) / L(p_j)
-                    let tpr = pRanks[j] * adjacencyMatrix[j][i] / outEdgeStats[j];
+                    const tpr = (pRanks[j] * adjacencyMatrix[j][i]) / outEdgeStats[j];
                     del += tpr;
 
                     // get the outbound edge of node j (pointing to node i)
-                    let es = cy.$('[id^="' + nodes[j].data('id') + '-' + nodes[i].data('id') + '-' + '"]');
-                    es.data('tpr', (tpr * 100).toFixed(1) + '%');
+                    const es = cy.$(`[id^="${nodes[j].data('id')}-${nodes[i].data('id')}-"]`);
+                    es.data('tpr', `${(tpr * 100).toFixed(1)}%`);
 
                     // collect these edges
-                    edges = (edges === undefined ? es : edges.union(es));
+                    edges = edges === undefined ? es : edges.union(es);
                 }
             }
         }
@@ -667,18 +779,25 @@ function myPageRank() {
                 fontWeight: 'bold'
             });
             // animate this edge
-            edges.animate({
-                style: {lineColor: '#00e3ff', width: '6'},
-                duration: Math.round(animationDuration * 0.8),
-            }).animate({
-                style: {lineColor: '#ccc', width: '2'},
-                duration: Math.round(animationDuration * 0.2),
-            });
+            edges
+                .animate({
+                    style: {
+                        lineColor: '#00e3ff',
+                        width: '6'
+                    },
+                    duration: Math.round(animationDuration * 0.8)
+                })
+                .animate({
+                    style: {
+                        lineColor: '#ccc',
+                        width: '2'
+                    },
+                    duration: Math.round(animationDuration * 0.2)
+                });
         }
         if (animationFlag) {
-
             // calculate the new PR value for node i
-            let r = del * dpFactor + tailNumber;
+            const r = del * dpFactor + tailNumber;
             cRanks[i] = r;
 
             // find min and max in current rank vector
@@ -688,14 +807,14 @@ function myPageRank() {
             min -= 0.0001;
 
             // calculate the range of PR value for mapping colors
-            let rg = max - min;
-            let size = Math.round((basicSize + delSize * len) * r);
+            const rg = max - min;
+            const size = Math.round((basicSize + delSize * len) * r);
 
             // animate this node (show its size increase/decrease)
             setTimeout(() => {
                 nodes[i].style(getLabelStyle(size, r));
                 nodes[i].animate({
-                    style: getAnimationStyle(size, jetMapHex[Math.floor((r - min) / rg * 63)]),
+                    style: getAnimationStyle(size, jetMapHex[Math.floor(((r - min) / rg) * 63)]),
                     duration: animationDuration,
                     complete: () => {
                         if (animationFlag) {
@@ -713,10 +832,13 @@ function myPageRank() {
                                     cy.edges().removeStyle();
                                     cRanks = normalize(cRanks);
                                     animateNodes(cRanks, animationDuration, () => {
-                                        cy.elements(":grabbable").stop();
+                                        cy.elements(':grabbable').stop();
                                         setTimeout(() => {
                                             // continue to iterate if not converged
-                                            if (math.norm(math.subtract(pRanks, cRanks)) > minimalDifference)
+                                            if (
+                                                math.norm(math.subtract(pRanks, cRanks)) >
+                                                minimalDifference
+                                            )
                                                 call(t + 1, 0, cRanks, cRanks.concat());
                                             else {
                                                 processDiv.innerHTML = 'Done!';
@@ -725,22 +847,22 @@ function myPageRank() {
                                     });
                                 }
                                 // normalize PR values after completion
+                                else if (
+                                    math.norm(math.subtract(pRanks, cRanks)) > minimalDifference
+                                )
+                                    call(t + 1, 0, cRanks, cRanks.concat());
                                 else {
-                                    if (math.norm(math.subtract(pRanks, cRanks)) > minimalDifference)
-                                        call(t + 1, 0, cRanks, cRanks.concat());
-                                    else {
-                                        processDiv.innerHTML = 'Normalizing PR values...';
-                                        animateNodes(normalize(cRanks), animationDuration, () => {
-                                            processDiv.innerHTML = 'Done!';
-                                            cy.edges().removeStyle();
-                                        });
-                                    }
+                                    processDiv.innerHTML = 'Normalizing PR values...';
+                                    animateNodes(normalize(cRanks), animationDuration, () => {
+                                        processDiv.innerHTML = 'Done!';
+                                        cy.edges().removeStyle();
+                                    });
                                 }
                             }
                         }
                     }
-                }, 10);
-            });
+                });
+            }, 10);
         }
     }
 
@@ -749,26 +871,24 @@ function myPageRank() {
      * @return Array|Object
      * */
     function normalize(v) {
-        let sum = math.sum(v);
+        const sum = math.sum(v);
         return v.map(val => val / sum);
     }
 
-    if (animation.checked) {
+    if (animation_check.checked) {
         nodes.forEach((n, i) => {
-            let r = 1 / len;
-            let size = Math.round((basicSize + delSize * len) * r);
+            const r = 1 / len;
+            const size = Math.round((basicSize + delSize * len) * r);
             n.style(getLabelStyle(size, r));
             n.animate({
                 style: getAnimationStyle(size, colorRGB2Hex([128, 255, 128])),
                 duration: animationDuration,
                 complete: () => {
-                    if (i === len - 1)
-                        call(1, 0, ranks, ranks.concat());
+                    if (i === len - 1) call(1, 0, ranks, ranks.concat());
                 }
             });
         });
-    }
-    else {
+    } else {
         /**
          * Iterative implementation
          * */
@@ -776,26 +896,22 @@ function myPageRank() {
             let pRanks; // previous ranks
             do {
                 pRanks = ranks;
-                let newRanks = ranks.concat();
+                const newRanks = ranks.concat();
                 for (let i = 0; i < len; i++) {
                     let sum = 0;
                     for (let j = 0; j < len; j++)
                         if (i !== j && adjacencyMatrix[j][i] > 0)
-                            sum += ranks[j] * adjacencyMatrix[j][i] / outEdgeStats[j];
+                            sum += (ranks[j] * adjacencyMatrix[j][i]) / outEdgeStats[j];
                     newRanks[i] = sum * dpFactor + tailNumber;
                 }
-                if (normalizeInMiddle)
-                    ranks = normalize(newRanks);
-                else
-                    ranks = newRanks;
-            }
-            while (math.norm(math.subtract(ranks, pRanks)) > minimalDifference);
+                if (normalizeInMiddle) ranks = normalize(newRanks);
+                else ranks = newRanks;
+            } while (math.norm(math.subtract(ranks, pRanks)) > minimalDifference);
             if (!normalizeInMiddle) ranks = normalize(ranks);
-        }
-        /**
-         * Matrix implementation
-         * */
-        else if (NACM === 2) {
+        } else if (NACM === 2) {
+            /**
+             * Matrix implementation
+             * */
             let rankVector = math.multiply(math.ones(len), 1 / len);
             let outMatrix = math.zeros(len, len);
             for (let i = 0; i < len; i++)
@@ -805,16 +921,17 @@ function myPageRank() {
             let pRankVector;
             do {
                 pRankVector = math.clone(rankVector);
-                rankVector = math.add(math.multiply(math.multiply(rankVector, outMatrix), dpFactor), tailNumber);
-            }
-            while (math.norm(math.subtract(rankVector, pRankVector)) > minimalDifference);
+                rankVector = math.add(
+                    math.multiply(math.multiply(rankVector, outMatrix), dpFactor),
+                    tailNumber
+                );
+            } while (math.norm(math.subtract(rankVector, pRankVector)) > minimalDifference);
             ranks = normalize(rankVector.toArray());
-        }
-        /**
-         * Algebraic implementation
-         * This one does not yield correct result
-         * */
-        else if (NACM === 3) {
+        } else if (NACM === 3) {
+            /**
+             * Algebraic implementation
+             * This one does not yield correct result
+             * */
             let outMatrix = math.zeros(len, len);
             for (let i = 0; i < len; i++)
                 for (let j = 0; j < len; j++)
@@ -823,1058 +940,17 @@ function myPageRank() {
             // let K = math.diag(math.matrix(outEdgeStats));
             // let outMatrix = math.transpose(math.multiply(math.inv(K), math.matrix(adjacencyMatrix)));
             // console.log(outMatrix);
-            ranks = normalize(math.multiply(math.inv(math.subtract(math.eye(len, len), math.multiply(dpFactor, outMatrix))), math.multiply(math.ones(len), tailNumber)).toArray());
+            ranks = normalize(
+                math
+                    .multiply(
+                        math.inv(
+                            math.subtract(math.eye(len, len), math.multiply(dpFactor, outMatrix))
+                        ),
+                        math.multiply(math.ones(len), tailNumber)
+                    )
+                    .toArray()
+            );
         }
         animateNodes(ranks, 1000);
     }
 }
-
-// /**
-//  * a detailed implementation of Dijkstra's algorithm, showing every step
-//  * @function
-//  * @public
-//  * @return void
-//  * */
-// function myDijkstra() {
-//     /**
-//      * @function
-//      * @private
-//      * @param {object} node
-//      * @callback
-//      * @param {function} callback
-//      * the function to execute after completion of animation
-//      * @return void
-//      * */
-//     function animateNode(node, callback) {
-//         if (node !== undefined && node.length > 0)
-//             node.animate({
-//                 style: {backgroundColor: '#f185dc', width: '30px', height: '30px'},
-//                 duration: Math.round(+duration.value * 0.1),
-//                 queue: true
-//             }).animate({
-//                 style: {backgroundColor: '#de4400', width: '20px', height: '20px'},
-//                 duration: Math.round(+duration.value * 0.4),
-//                 queue: true,
-//                 complete: callback
-//             });
-//         else
-//             callback();
-//     }
-//
-//     /**
-//      * @function
-//      * @private
-//      * @param {object} edge
-//      * @callback
-//      * @param {function} callback
-//      * the function to execute after completion of animation
-//      * @return void
-//      * */
-//     function animateEdge(edge, callback) {
-//         if (edge !== undefined && edge.length > 0)
-//             edge.animate({
-//                 style: {lineColor: '#f185dc', width: '6'},
-//                 duration: Math.round(+duration.value * 0.2),
-//                 queue: true
-//             }).animate({
-//                 style: {lineColor: '#de4400', width: '3'},
-//                 duration: Math.round(+duration.value * 0.8),
-//                 queue: true,
-//                 complete: callback
-//             });
-//         else
-//             callback();
-//     }
-//
-//     /**
-//      * @function
-//      * @private
-//      * @param {object} node
-//      * @callback
-//      * @param {function} callback
-//      * the function to execute after completion of animation
-//      * @return void
-//      * */
-//     function animateLabel(node, callback) {
-//         if (node !== undefined && node.length > 0)
-//             node.animate({
-//                 style: {textBackgroundColor: 'yellow', textBackgroundOpacity: 1},
-//                 duration: Math.round(+duration.value * 0.4),
-//                 queue: true
-//             }).delay(+duration.value * 0.2).animate({
-//                 style: {textBackgroundColor: 'yellow', textBackgroundOpacity: 0},
-//                 duration: Math.round(+duration.value * 0.4),
-//                 queue: true,
-//                 complete: callback
-//             });
-//         else
-//             callback();
-//     }
-//
-//     /**
-//      * @function
-//      * @private
-//      * @param {object} current
-//      * @return void
-//      * */
-//     function traceBack(current) {
-//         // animate current node
-//         current.animate({
-//             style: {backgroundColor: '#eae90f', width: '30px', height: '30px'},
-//             duration: Math.round(+duration.value * 0.15),
-//             queue: true
-//         }).animate({
-//             style: {backgroundColor: 'green', width: '20px', height: '20px'},
-//             duration: Math.round(+duration.value * 0.6),
-//             queue: true,
-//             complete: ()=> {
-//                 // select the current node
-//                 current.select();
-//
-//                 // acquire the previous node
-//                 let previous = current.data('previous');
-//
-//                 // if we haven't reached the starting node
-//                 if (previous !== undefined) {
-//                     previous = ns.$id(previous);
-//
-//                     // get the edge connecting these two nodes and animate it
-//                     let e = previous.edgesWith(current);
-//                     e.animate({
-//                         style: {lineColor: '#eae90f', width: '6'},
-//                         duration: Math.round(+duration.value * 0.2),
-//                         queue: true
-//                     }).animate({
-//                         style: {lineColor: 'green', width: '3'},
-//                         duration: Math.round(+duration.value * 0.8),
-//                         queue: true,
-//
-//                         // when the animation completes:
-//                         // select the edge and keep tracing backward
-//                         complete: ()=> {
-//                             e.select();
-//                             traceBack(previous);
-//                         }
-//                     });
-//                 }
-//                 else {
-//                     clearResult();
-//                     ca.add(cy.$(':selected'));
-//                     caReLayout();
-//                     ns.removeData('previous');
-//                 }
-//             }
-//         });
-//     }
-//
-//     /**
-//      * @function
-//      * @private
-//      * @param {object} currentNode
-//      * current node with a permanent label
-//      * @param {object} edges
-//      * all edges connect to n
-//      * @param {int} i
-//      * the index of the edge that we're up to
-//      * @return void
-//      * */
-//     function addNextLabel(currentNode, edges, i) {
-//         // get the value of the permanent label
-//         let weight = currentNode.data('permanent');
-//
-//         // if the index is out of bound, then...
-//         if (i >= edges.length) {
-//
-//             // get the minimum among all nodes with temporary labels but without permanent labels
-//             // the node with this minimal label will be assigned with a permanent label
-//             let minW = Infinity;
-//             let nextPermanent;
-//             ns.forEach((node)=> {
-//                 let tempLabels = node.data('temporary');
-//                 if (tempLabels.length > 0 && node.data('permanent') === undefined) {
-//                     if (tempLabels[tempLabels.length - 1] < minW || (tempLabels[tempLabels.length - 1] === minW && node.data('id') === target.data('id'))) {
-//                         minW = tempLabels[tempLabels.length - 1];
-//                         nextPermanent = node;
-//                     }
-//                 }
-//             });
-//
-//             // callbacks... and callbacks...
-//             // animate this node...
-//             animateNode(nextPermanent, ()=> {
-//
-//                 // assign a permanent label to this node
-//                 nextPermanent.data('permanent', minW);
-//                 nextPermanent.style({
-//                     textBorderOpacity: 1,
-//                     textBorderWidth: '1px',
-//                     textBorderStyle: 'dashed',
-//                     textBorderColor: 'green'
-//                 });
-//
-//                 // connect this node with the previous node with a permanent label
-//                 let edgeBetween = nextPermanent.edgesWith(cy.$id(nextPermanent.data('previous')));
-//
-//                 // animate the edge
-//                 animateEdge(edgeBetween, ()=> {
-//
-//                     // if the target node haven't got a permanent label
-//                     if (target.data('permanent') === undefined)
-//
-//                     // continue to label...
-//                         addNextLabel(nextPermanent, nextPermanent.connectedEdges(), 0);
-//
-//                     // else: now we can trace the walk, back from the target to the start
-//                     else {
-//                         traceBack(nextPermanent);
-//                     }
-//                 });
-//             });
-//         }
-//         else {
-//             // the current edge
-//             let edge = edges[i];
-//
-//             // get the weight of the target node
-//             let node = getTarget(currentNode, edge);
-//             let nodeWeight = getWeight(edge) + weight;
-//
-//             // if the target node is not yet permanently labeled
-//             if (node.data('permanent') === undefined) {
-//
-//                 // animate this edge
-//                 animateEdge(edge, ()=> {
-//
-//                     // if the target node doesn't have a temporary label,
-//                     // or the new weight is lower than the current label
-//                     // update the label
-//                     let tempLabels = node.data('temporary').concat();
-//                     if (tempLabels.length === 0 || tempLabels[tempLabels.length - 1] > nodeWeight) {
-//                         animateNode(node, ()=> {
-//                             tempLabels.push(nodeWeight);
-//                             node.data('temporary', tempLabels);
-//                             node.data('previous', currentNode.data('id'));
-//                         });
-//                         animateLabel(node, ()=> {
-//                             node.style({backgroundColor: '', width: '', height: ''});
-//                             edge.removeStyle();
-//
-//                             // keep labelling...
-//                             addNextLabel(currentNode, edges, i + 1);
-//
-//                         });
-//                     }
-//                     else {
-//                         edge.removeStyle();
-//                         addNextLabel(currentNode, edges, i + 1);
-//                     }
-//                 });
-//             }
-//             // skip this node if it has got a permanent label
-//             else {
-//                 addNextLabel(currentNode, edges, i + 1);
-//             }
-//         }
-//     }
-//
-//     if (!isConnected()) {
-//         alert("This graph is not connected!");
-//         return;
-//     }
-//     let root;
-//     let target;
-//     let ns = cy.nodes();
-//     let temp = cy.nodes(':selected');
-//     if (temp.length >= 2) {
-//         root = temp[0];
-//         target = temp[1];
-//     }
-//     else {
-//         temp = prompt("Please enter the id of source and target nodes, src-tg.\nExample: 1-2", "");
-//         let p = temp.split('-');
-//         root = cy.$id(p[0]);
-//         target = cy.$id(p[1]);
-//         if (root.length <= 0 || target.length <= 0)
-//             return;
-//     }
-//     clearCyStyle();
-//
-//     // set all labels to undefined
-//     ns.data('temporary', []);
-//     ns.removeData('permanent');
-//     ns.removeData('previous');
-//
-//     // set the label function
-//     // format: "id|temporary labels|permanent label"
-//     cy.style().selector('node').style({
-//         label: (n)=> {
-//             let temporary = n.data('temporary');
-//             let l = temporary.length - 1;
-//             let tempLabels = '';
-//             if (l > -1) {
-//                 tempLabels += '|';
-//                 for (let i = 0; i < l; i++)
-//                     tempLabels += temporary[i] + '>';
-//                 tempLabels += temporary[l];
-//             }
-//             return n.data('id') + tempLabels + (isNaN(n.data('permanent')) ? '' : '|' + n.data('permanent'));
-//         }
-//     });
-//
-//     // give the starting node a permanent label
-//     let currentNode = root;
-//     currentNode.data('permanent', 0);
-//     currentNode.data('temporary', [0]);
-//
-//     if (animation.checked) {
-//         currentNode.style({
-//             textBorderOpacity: 1,
-//             textBorderWidth: '1px',
-//             textBorderStyle: 'dashed',
-//             textBorderColor: 'green'
-//         });
-//         // start the whole algorithm
-//         animateNode(currentNode, ()=> {
-//             addNextLabel(currentNode, currentNode.connectedEdges(), 0);
-//         });
-//     }
-//     // same story as the above, but without animation
-//     // looks nicer, no awful callbacks
-//     else {
-//         while (target.data('permanent') === undefined) {
-//             let edges = currentNode.connectedEdges();
-//             let weight = currentNode.data('permanent');
-//             edges.forEach((edge)=> {
-//                 let node = getTarget(currentNode, edge);
-//                 let nodeWeight = getWeight(edge) + weight;
-//                 if (node.data('permanent') === undefined) {
-//                     let tempLabels = node.data('temporary').concat();
-//                     if (tempLabels.length === 0 || tempLabels[tempLabels.length - 1] > nodeWeight) {
-//                         tempLabels.push(nodeWeight);
-//                         node.data('temporary', tempLabels);
-//                         node.data('previous', currentNode.data('id'));
-//                     }
-//                 }
-//             });
-//             let minW = Infinity;
-//             let nextPermanent;
-//             ns.forEach((node)=> {
-//                 let tempLabels = node.data('temporary');
-//                 if (tempLabels.length > 0 && node.data('permanent') === undefined) {
-//                     if (tempLabels[tempLabels.length - 1] < minW || (tempLabels[tempLabels.length - 1] === minW && node.data('id') === target.data('id'))) {
-//                         minW = tempLabels[tempLabels.length - 1];
-//                         nextPermanent = node;
-//                     }
-//                 }
-//             });
-//             nextPermanent.data('permanent', minW);
-//             nextPermanent.style({
-//                 textBorderOpacity: 1,
-//                 textBorderWidth: '1px',
-//                 textBorderStyle: 'dashed',
-//                 textBorderColor: 'green'
-//             });
-//             currentNode = nextPermanent;
-//         }
-//         cy.startBatch();
-//         let previous = currentNode.data('previous');
-//         while (previous !== undefined) {
-//             currentNode.select();
-//             currentNode.edgesWith(cy.$id(previous)).select();
-//             currentNode = cy.$id(previous);
-//             previous = currentNode.data('previous');
-//         }
-//         currentNode.select();
-//         cy.endBatch();
-//         clearResult();
-//         ca.add(cy.$(':selected'));
-//         caReLayout();
-//         ns.removeData('previous');
-//     }
-// }
-// /**
-//  * @function
-//  * @public
-//  * @return void
-//  * */
-// function prim() {
-//     stopAnimation();
-//     clearCyStyle();
-//     let root = getCyStartNode("Please enter the id of the starting node", "1");
-//     if (root === undefined)
-//         root = cy.nodes()[0];
-//     cy.elements(":grabbable").unselect();
-//     root.select();
-//     /**
-//      * @function
-//      * @private
-//      * @return object
-//      * Get the edge of minimal weight connected to the selected nodes
-//      * */
-//     let getMinimalEdge = ()=> {
-//         let nodes = cy.nodes(":selected");
-//         let minWeight = Infinity;
-//         let minEdge;
-//         for (let i = 0; i < nodes.length; i++) {
-//
-//             // get all unused edges connected to this node
-//             let edges = nodes[i].connectedEdges(":unselected");
-//             for (let j = 0; j < edges.length; j++) {
-//
-//                 // its target node must not be in the tree
-//                 if (!getTarget(nodes[i], edges[j]).selected()) {
-//                     let w = getWeight(edges[j]);
-//                     if (w < minWeight) {
-//                         minWeight = w;
-//                         minEdge = edges[j];
-//                     }
-//                 }
-//             }
-//         }
-//         return minEdge;
-//     };
-//     let tree = new LinkedList();
-//
-//     //starting from a given node
-//     tree.add(root);
-//
-//     // if there're still nodes that are not in the tree
-//     while (cy.nodes(":unselected").length > 0) {
-//
-//         // Get the edge of minimal weight connected to the current tree
-//         let edge = getMinimalEdge();
-//         edge.select();
-//
-//         // add this edge to the tree
-//         tree.add(edge);
-//
-//         // add its target node to the tree
-//         if (edge.target().selected()) {
-//             edge.source().select();
-//             tree.add(edge.source());
-//         }
-//         else {
-//             edge.target().select();
-//             tree.add(edge.target());
-//         }
-//     }
-//     clearResult();
-//     ca.add(cy.$(":selected"));
-//     caReLayout();
-//     tree.traverse(animation.checked, true);
-// }
-// /**
-//  * @function
-//  * @public
-//  * @param {object} root
-//  * @return {Array}
-//  * */
-// function localMinimalWeightCycle(root) {
-//     let minWeight = Infinity;
-//     let path, lastEdge, current_node, weight, d, distance;
-//
-//     cy.startBatch();
-//     // Traverse the edges connected to this root node
-//     root.connectedEdges().forEach((edge)=> {
-//
-//         // Select an edge and get its weight and the node which it connected to
-//         current_node = getTarget(root, edge);
-//         weight = getWeight(edge);
-//
-//         // Remove it
-//         cy.remove(edge);
-//
-//         // Find the minimal weight connector connecting these two nodes
-//         // If found, then a cycle is established after adding the edge back
-//         // Dijkstra method:
-//         d = cy.elements(":grabbable").dijkstra(root, getWeight);
-//         distance = d.distanceTo(current_node) + weight;
-//
-//         // Find the minimal weight cycle starting from root node
-//         if (distance < minWeight) {
-//             minWeight = distance;
-//             path = d.pathTo(current_node);
-//             lastEdge = edge;
-//         }
-//         cy.add(edge);
-//     });
-//     cy.endBatch();
-//     return [minWeight, path, lastEdge];
-// }
-//
-// /**
-//  * Find the minimal weight cycle, either local or global
-//  * @function
-//  * @public
-//  * @return void
-//  * */
-// function minimalWeightCycle() {
-//     stopAnimation();
-//     let root = getCyStartNode("Please enter id of the starting node.\nIf you want apply this algorithm too all nodes and get the best one, leave it blank", "");
-//     let results;
-//     clearCyStyle();
-//     cy.elements(":grabbable").unselect();
-//     // the global minimal weight cycle
-//     if (root === undefined) {
-//         // Find the global minimal weight cycle
-//         let globalMinWeight = Infinity;
-//         let globalPath;
-//         let globalE;
-//
-//         // Traverse every node, finding the minimal weight cycle starting from each node
-//         // thus finding the minimal one from these local minimal cycles
-//         cy.nodes().forEach((root)=> {
-//             results = localMinimalWeightCycle(root);
-//             if (results[0] < globalMinWeight) {
-//                 globalMinWeight = results[0];
-//
-//                 // Record the path
-//                 globalPath = results[1];
-//                 globalE = results[2];
-//             }
-//         });
-//         clearResult();
-//
-//         // select the cycle
-//         globalPath.select();
-//         globalE.select();
-//         ca.add(globalPath);
-//         ca.add(globalE);
-//     }
-//     // The local one
-//     else {
-//         results = localMinimalWeightCycle(root);
-//         clearResult();
-//         results[1].select();
-//         results[2].select();
-//         ca.add(results[1]);
-//         ca.add(results[2]);
-//     }
-//     caReLayout();
-// }
-// /**
-//  * The global nearest neighbor algorithm
-//  * find that of minimal weight by performing the algorithm on every node
-//  * @function
-//  * @public
-//  * @return void
-//  * */
-// function nearestNeighbor() {
-//     stopAnimation();
-//     let root = getCyStartNode("Please enter id of the starting node.\nIf you want apply this algorithm too all nodes and get the best one, leave it blank", "");
-//     clearCyStyle();
-//     cy.elements(":grabbable").unselect();
-//     let results;
-//     if (root === undefined) {
-//         let minWeight = Infinity;
-//         let minElements;
-//         let minPath;
-//         cy.startBatch();
-//         cy.nodes().forEach((currentNode)=> {
-//             results = nearestNeighborAlgorithm(currentNode);
-//             let sumWeight = results[0];
-//             if (sumWeight <= minWeight) {
-//                 minElements = cy.$(':selected');
-//                 minWeight = sumWeight;
-//                 minPath = results[1];
-//             }
-//             cy.elements(":grabbable").unselect();
-//         });
-//         clearResult();
-//         ca.add(minElements);
-//         minElements.select();
-//         cy.endBatch();
-//         minPath.traverse(animation.checked, true);
-//     }
-//     else {
-//         results = nearestNeighborAlgorithm(root);
-//         clearResult();
-//         ca.add(cy.$(':selected'));
-//         results[1].traverse(animation.checked, true);
-//     }
-//     caReLayout();
-// }
-// /**
-//  * The nearest neighbor algorithm starting from a given node
-//  * @function
-//  * @public
-//  * @param {object} root
-//  * @return {Array}
-//  * */
-// function nearestNeighborAlgorithm(root) {
-//     let currentNode = root;
-//     cy.startBatch();
-//     /**
-//      * @function
-//      * @private
-//      * @param {object} node
-//      * @return {object} the edge of minimal weight connected to this node
-//      * */
-//     let getMinimalEdge = (node)=> {
-//         let minWeight = Infinity;
-//         let edge = undefined;
-//
-//         // Traverse all the adjacent edges whose target node is not selected and find the minimal weight one
-//         node.connectedEdges().forEach((e)=> {
-//             // Skip this edge if its target node have been already visited
-//             if (!getTarget(node, e).selected()) {
-//                 let weight = getWeight(e);
-//                 if (weight < minWeight) {
-//                     minWeight = weight;
-//                     edge = e;
-//                 }
-//             }
-//         });
-//         return edge;
-//     };
-//
-//     // Iteratively select the edge of minimal weight and the node which it connects
-//     let edge = getMinimalEdge(currentNode);
-//     let totalWeight = 0;
-//     let numOfNodes = 1;
-//     let path = new LinkedList();
-//     path.add(currentNode);
-//     currentNode.select();
-//
-//     // Doing until the number of connected unselected edges of the destination node is 0
-//     // which means we are stuck or we have visited all nodes
-//     while (edge !== undefined) {
-//         numOfNodes += 1;
-//         totalWeight += getWeight(edge);
-//         currentNode = getTarget(currentNode, edge);
-//         path.add(edge);
-//         path.add(currentNode);
-//         edge.select();
-//         currentNode.select();
-//         edge = getMinimalEdge(currentNode);
-//     }
-//
-//     // get the edge connecting the last node and the first node
-//     // Such edge must exist if the graph is complete
-//     let lastEdge = cy.edges("[id ^='" + root.data('id') + '-' + currentNode.data('id') + "-']")
-//         .union(cy.edges("[id ^='" + currentNode.data('id') + '-' + root.data('id') + "-']"));
-//
-//     // if it does not exist
-//     // apply a very high weight to this solution
-//     // in case other solution might be complete (therefore better than this one)
-//     if (lastEdge.length === 0)
-//         totalWeight += Math.pow(2, 32);
-//     else {
-//         lastEdge[0].select();
-//         path.add(lastEdge[0]);
-//     }
-//     path.add(root);
-//     cy.endBatch();
-//     // If not all nodes are visited, give this solution a very high weight
-//     return [totalWeight + (cy.nodes().length - numOfNodes) * Math.pow(2, 32), path];
-// }
-// /**
-//  * check whether the graph is connected by performing breadth first search
-//  * @function
-//  * @public
-//  * @return boolean
-//  * */
-// function isConnected() {
-//     let path = cy.elements(":grabbable").bfs(cy.nodes()[0]).path;
-//     return path.nodes().length === cy.nodes().length;
-// }
-
-// /**
-//  * @see traceEulerianCycle()
-//  * @function
-//  * @public
-//  * @return void
-//  * */
-// function eulerianCycle() {
-//
-//     // first check if this graph is connected
-//     stopAnimation();
-//     if (!isConnected())
-//         return alert('This graph is not connected');
-//
-//     // then check whether there're none or two vertices of odd degree
-//     let numOfOddDegrees = 0;
-//     cy.nodes().forEach((ele)=> {
-//         if (ele.degree() % 2 !== 0)
-//             numOfOddDegrees += 1;
-//     });
-//
-//     // stop if the conditions for Eulerian/semi-Eulerian graphs are not satisfied.
-//     if (numOfOddDegrees !== 0 && numOfOddDegrees !== 2)
-//         return alert('This graph is neither Eulerian nor semi-Eulerian');
-//     cy.elements(":grabbable").unselect();
-//     clearResult();
-//     ca.add(cy.elements(":grabbable"));
-//     caReLayout();
-//
-//     // starting Eulerian Cycle from node 1
-//     traceEulerianCycle(ca.nodes()[0], ca);
-// }
-// /**
-//  * Find an Eulerian cycle/trail in an Eulerian/semi-Eulerian graph, by Hierholzer's algorithm
-//  * @public
-//  * @function
-//  * the starting node
-//  * @param {object} start
-//  * the cytoscape object
-//  * @param {object} c
-//  * @return void
-//  * */
-// function traceEulerianCycle(start, c) {
-//     // establish a linked list and add first node into it
-//     let currentNode = start;
-//     let path = new LinkedList();
-//     path.add(currentNode);
-//
-//     // get the unselected edges which are connected to this node
-//     let connectedEdges = currentNode.connectedEdges(':unselected');
-//     let nextJourney = undefined;
-//     while (true) {
-//
-//         // if there are unvisited edges connecting to this node
-//         while (connectedEdges.length > 0) {
-//
-//             // select the first one
-//             let edge = connectedEdges[0];
-//             edge.select();
-//             path.add(edge);
-//
-//             // select its source node (equivalently, the last target node)
-//             currentNode.select();
-//             currentNode = getCaTarget(currentNode, edge);
-//
-//             // get the unselected edges which are connected to the target node
-//             connectedEdges = currentNode.connectedEdges(':unselected');
-//             path.add(currentNode);
-//         }
-//
-//         // if the above while loop breaks, that means we have returned to the starting point
-//         // Note: the conditions of an Eulerian/semi-Eulerian graph ensure that we will not be stuck
-//
-//         // select the last node
-//         currentNode.select();
-//
-//         // add the next half tour to the linked list
-//         if (nextJourney !== undefined)
-//             path.addNode(nextJourney);
-//
-//         // if there are still edges which remain unselected
-//         if (c.edges(':unselected').length !== 0) {
-//
-//             // find the node which still have unselected edges connected to it
-//             let node = path.search((element)=> {
-//                 if (element.isNode()) {
-//                     if (element.connectedEdges(':unselected').length > 0)
-//                         return true;
-//                 }
-//             });
-//
-//             // break the journey (node: the next half of the journey journey will be added back later)
-//             nextJourney = node.next;
-//             currentNode = node.cargo;
-//             node.next = null;
-//
-//             // start a new tour from this break point
-//             connectedEdges = currentNode.connectedEdges(':unselected');
-//         }
-//
-//         // if all edges are visited, exit the loop
-//         else
-//             break;
-//     }
-//     c.elements().unselect();
-//     path.traverse(animation.checked, true);
-// }
-// /**
-//  * the factorial function
-//  * @public
-//  * @function
-//  * @param {int} n
-//  * @return {int}
-//  * */
-// function f(n) {
-//     return (n <= 1) ? 1 : n * f(n - 1);
-// }
-// /**
-//  * @function
-//  * @public
-//  * @return void
-//  * */
-// function minimalWeightMatching() {
-//     stopAnimation();
-//     clearCyStyle();
-//     cy.elements(":grabbable").unselect();
-//     // precondition: the graph is connected
-//     if (!isConnected())
-//         return alert("Graph not connected!");
-//
-//     let len = cy.nodes().length;
-//     if (len > 14)
-//         if (!confirm("Warning! This graph has " + len + " nodes, at most " + (f(len) / (f(len / 2) * Math.pow(2, len / 2))) + " iterations are needed and it might take a long time！"))
-//             return;
-//     clearResult();
-//     /**
-//      * @function
-//      * @private
-//      * @param {Array} minPairing
-//      * @return void
-//      * */
-//     function displayPairings(minPairing) {
-//         /**
-//          * @function
-//          * @private
-//          * @param {object} node1
-//          * @param {object} node2
-//          * @return {object}
-//          * */
-//         function getCyEdge(node1, node2) {
-//             let e = cy.$id(node1.data('id') + '-' + node2.data('id') + '-0');
-//             return e.length === 0 ? cy.$id(node2.data('id') + '-' + node1.data('id') + '-0') : e;
-//         }
-//
-//         let nodes = cy.nodes();
-//         for (let i = 0; i < minPairing.length; i += 2) {
-//             let n1 = nodes[minPairing[i]];
-//             if (minPairing[i + 1] === undefined)
-//                 break;
-//             let n2 = nodes[minPairing[i + 1]];
-//             let e = getCyEdge(n1, n2);
-//             ca.add(n1);
-//             ca.add(n2);
-//             ca.add(e);
-//             n1.select();
-//             n2.select();
-//             e.select();
-//         }
-//         caReLayout();
-//     }
-//
-//     let weightMatrix = getWM(cy, false);
-//     minimalWeightMatchingMultiThread(weightMatrix, 4, displayPairings);
-// }
-// /**
-//  * @param {Array} weightMatrix
-//  * @param {int} numOfThreads
-//  * @param {function} callback
-//  * The callback function to be executed after completion of all threads
-//  * @return void
-//  * */
-// function minimalWeightMatchingMultiThread(weightMatrix, numOfThreads, callback) {
-//     // generator is used to merge the results from each thread
-//     function*join() {
-//         while (true) {
-//             yield null;
-//             let flag = workerFlags[0];
-//             for (let i = 1; i < numOfThreads; i++)
-//                 flag = flag && workerFlags[i];
-//             if (flag === true)
-//                 break;
-//         }
-//         let minWeight = Infinity;
-//         let minPairing = [];
-//         for (let i = 0; i < numOfThreads; i++)
-//             if (minWeights[i] < minWeight) {
-//                 minWeight = minWeights[i];
-//                 minPairing = minPairings[i]
-//             }
-//         perform_button.disabled = false;
-//         callback(minPairing);
-//     }
-//
-//     let joiner = join();
-//     let workerFlags = new Array(numOfThreads);
-//     let minWeights = new Array(numOfThreads);
-//     let minPairings = new Array(numOfThreads);
-//     let portion = Math.floor(weightMatrix.length / numOfThreads);
-//     let eles = _.range(0, weightMatrix.length);
-//     perform_button.disabled = true;
-//
-//     // distribute the workload to a number of independent threads
-//     for (let i = 0; i < numOfThreads; i++) {
-//         workerFlags[i] = false;
-//         minWeights[i] = Infinity;
-//         const x = i;
-//         const worker = new Worker("js/MWMMT.min.js");
-//         worker.onmessage = (message)=> {
-//             console.log(x + " is ready");
-//             minWeights[x] = message.data.minWeight;
-//             minPairings[x] = message.data.minPairing;
-//             workerFlags[x] = true;
-//             joiner.next();
-//             worker.terminate();
-//         };
-//         if (i === numOfThreads - 1)
-//             worker.postMessage({
-//                 weightMatrix: weightMatrix,
-//                 eles: eles,
-//                 start: x * portion,
-//                 end: weightMatrix.length
-//             });
-//         else
-//             worker.postMessage({
-//                 weightMatrix: weightMatrix,
-//                 eles: eles,
-//                 start: x * portion,
-//                 end: (x + 1) * portion
-//             });
-//         worker.onerror = (err)=> {
-//             console.log(err.message);
-//         };
-//     }
-// }
-//
-// /**
-//  * solve the Chinese postman problem
-//  * @function
-//  * @public
-//  * @return void
-//  * */
-// function CPP() {
-//     stopAnimation();
-//     clearCyStyle();
-//     cy.elements(":grabbable").unselect();
-//     // get the collection of odd nodes
-//     cy.nodes().forEach((ele)=> {
-//         if (ele.degree() % 2 !== 0)
-//             ele.select();
-//     });
-//     let nodes = cy.nodes(":selected");
-//     let n = nodes.length;
-//     if (n > 14)
-//         if (!confirm("Warning! This graph has " + n + " nodes of odd degree, at most " + (f(n) / (f(n / 2) * Math.pow(2, n / 2))) + " iterations are needed and it might take a long time！"))
-//             return;
-//
-//     // get the weight matrix of these nodes (a subgraph)
-//     let weightMatrix = new Array(n);
-//     let paths = new Array(n);
-//     for (let x = 0; x < n; x++) {
-//         paths[x] = cy.elements(":grabbable").dijkstra(nodes[x], getWeight);
-//         weightMatrix[x] = new Array(n);
-//         for (let y = x + 1; y < n; y++)
-//             weightMatrix[x][y] = paths[x].distanceTo(nodes[y]);
-//     }
-//     // get the minimal weight perfect matching
-//     minimalWeightMatchingMultiThread(weightMatrix, 4, displayResult);
-//
-//     function displayResult(minPairing) {
-//         clearResult();
-//         ca.add(cy.elements(":grabbable"));
-//         let addedEdges = undefined;
-//
-//         // Once the minimal weight perfect matching is found,
-//         // duplicated these edges, so the graph becomes Eulerian
-//         for (let x = 0; x < minPairing.length; x += 2) {
-//             paths[minPairing[x]].pathTo(nodes[minPairing[x + 1]]).forEach((ele)=> {
-//                 if (ele.isEdge()) {
-//                     ele.select();
-//                     let duplicatedEdge = duplicateEdge(ele, ca);
-//                     if (addedEdges === undefined)
-//                         addedEdges = duplicatedEdge;
-//                     else
-//                         addedEdges = addedEdges.union(duplicatedEdge);
-//                 }
-//             });
-//         }
-//         caReLayout();
-//         ca.elements(":grabbable").unselect();
-//
-//         // Eulerian Cycle. See function traceEulerianCycle
-//         // starting the Eulerian Cycle from the first node
-//         traceEulerianCycle(ca.nodes()[0], ca);
-//     }
-//
-// }
-// /**
-//  * find the maximal lower bound for TSP by performing the vertex deletion algorithm on every node
-//  * @function
-//  * @public
-//  * @return void
-//  * */
-// function TSPGlobalLowerBound() {
-//     stopAnimation();
-//     let root = getCyStartNode("Please enter id of the starting node.\nIf you want apply this algorithm too all nodes and get the highest lower bound, leave it blank", "");
-//     let results;
-//     clearCyStyle();
-//     cy.elements(":grabbable").unselect();
-//     if (root === undefined) {
-//         let maxWeight = 0;
-//         let maxResults, maxRoot, sumWeight;
-//         cy.nodes().forEach((currentNode)=> {
-//
-//             // Find the maximal lower bound...
-//             results = TSPLowerBound(currentNode);
-//             sumWeight = results[0];
-//             if (sumWeight > maxWeight) {
-//
-//                 // record the weight, results, and the node deleted
-//                 maxWeight = sumWeight;
-//                 maxResults = results;
-//                 maxRoot = currentNode;
-//             }
-//         });
-//         clearResult();
-//
-//         // select the node, the two deleted edges, and the minimal spanning tree
-//         maxResults[3].nodes().style({backgroundColor: '#eba300'});
-//         maxResults[3].edges().style({lineColor: '#eba300'});
-//         maxResults[2].select();
-//         maxResults[1].select();
-//
-//         //Order must be correct...
-//         ca.add(maxResults[3]);
-//         ca.elements(":grabbable").select();
-//         ca.add(maxRoot);
-//         ca.add(maxResults[2]);
-//         ca.add(maxResults[1]);
-//         caReLayout();
-//     }
-//
-//     // the lower bound at a given starting node
-//     else {
-//         results = TSPLowerBound(root);
-//         clearResult();
-//         results[3].nodes().style({backgroundColor: '#eba300'});
-//         results[3].edges().style({lineColor: '#eba300'});
-//         results[2].select();
-//         results[1].select();
-//         ca.add(results[3]);
-//         ca.elements(":grabbable").select();
-//         ca.add(root);
-//         ca.add(results[2]);
-//         ca.add(results[1]);
-//         caReLayout();
-//     }
-// }
-// /**
-//  * Get the lower bound for the travelling salesman problem by vertex deletion algorithm
-//  * @function
-//  * @public
-//  * @param {object} root
-//  * @return {Array}
-//  * */
-// function TSPLowerBound(root) {
-//     cy.startBatch();
-//     // starting from a given node
-//     // find two connected edges of minimal weight, record the sum of their weight
-//     let edges = root.connectedEdges().sort((e1, e2)=> {
-//         return getWeight(e1) - getWeight(e2);
-//     });
-//     let weight = getWeight(edges[0]) + getWeight(edges[1]);
-//
-//     // remove this node and all its adjacent edges
-//     cy.remove(root);
-//
-//     // find the minimal spanning tree of the remaining graph by kruskal
-//     let spanningTree = cy.elements(":grabbable").kruskal(getWeight);
-//
-//     // calculate the total weight of this tree
-//     spanningTree.edges().forEach((edge)=> {
-//         weight += getWeight(edge);
-//     });
-//
-//     // add back the removed stuffs
-//     cy.add(root);
-//     cy.add(edges);
-//     cy.endBatch();
-//     return [weight, edges[0], edges[1], spanningTree];
-// }
