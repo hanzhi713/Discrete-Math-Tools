@@ -1,5 +1,5 @@
 # Discrete Math Tools
-#### Please visit https://fm.rdfz-edu.org or https://hanzhi713.github.io/Discrete-Math-Tools for online demo
+#### Please visit https://hanzhi713.github.io/Discrete-Math-Tools for online demo
 
 ### How to Use
 For number theory part: Visit demo and you'll see
