@@ -77,7 +77,7 @@ let ca;
 /**
  * @type {string}
  * */
-let layoutname = "spread";
+let layoutName = "spread";
 /**
  * @type {object}
  * */
@@ -135,6 +135,10 @@ const animation = document.getElementById('animation');
  * @type {object}
  * */
 const duration = document.getElementById('duration');
+
+function getAllNodes(c){
+    return c.nodes(":grabbable");
+}
 
 // initialization function
 $(() => {
@@ -294,7 +298,7 @@ $(() => {
 
             // ctrl + a
             else if (which == 65)
-                cy.elements().select();
+                cy.elements(":grabbable").select();
 
             // ctrl + r
             else if (which == 82)
@@ -319,7 +323,7 @@ $(() => {
  * @return void
  * */
 function clearCyStyle() {
-    cy.elements().removeStyle();
+    cy.elements(":grabbable").removeStyle();
     cy.style().resetToDefault().fromJson(defaultStyle).update();
     cy.$(':selected').select();
 }
@@ -329,7 +333,7 @@ function clearCyStyle() {
  * @return void
  * */
 function clearCaStyle() {
-    ca.elements().removeStyle();
+    ca.elements(":grabbable").removeStyle();
     ca.style().resetToDefault().fromJson(defaultStyle).update();
     ca.$(':selected').select();
 }
@@ -353,7 +357,7 @@ function paste() {
     if (copiedEles === undefined)
         return;
     let idMap = {};
-    cy.elements().unselect();
+    cy.elements(":grabbable").unselect();
     copiedEles.forEach((ele) => {
         if (ele.isNode()) {
             let addedNode = addOneNode(false, {
@@ -411,9 +415,9 @@ function initializeCytoscapeObjects(div_name) {
  * @return void
  * */
 function selectAllOfTheSameType(ele) {
-    cy.elements().unselect();
+    cy.elements(":grabbable").unselect();
     if (ele.isNode())
-        cy.nodes().select();
+        getAllNodes(cy).select();
     else if (ele.isEdge())
         cy.edges().select();
 }
@@ -519,7 +523,7 @@ function initConventionalMenu(c) {
                 tooltipText: 'start breadth first search at this node',
                 selector: 'node',
                 onClickFunction: (event) => {
-                    cy.elements().unselect();
+                    cy.elements(":grabbable").unselect();
                     let tg = event.target || event.cyTarget;
                     tg.select();
                     breadthFirstSearch();
@@ -531,7 +535,7 @@ function initConventionalMenu(c) {
                 tooltipText: 'start depth first search at this node',
                 selector: 'node',
                 onClickFunction: (event) => {
-                    cy.elements().unselect();
+                    cy.elements(":grabbable").unselect();
                     let tg = event.target || event.cyTarget;
                     tg.select();
                     depthFirstSearch();
@@ -570,7 +574,7 @@ function initCircularMenu(c) {
             {
                 content: 'BFS',
                 select: (ele) => {
-                    cy.elements().unselect();
+                    cy.elements(":grabbable").unselect();
                     ele.select();
                     breadthFirstSearch();
                 }
@@ -578,7 +582,7 @@ function initCircularMenu(c) {
             {
                 content: 'DFS',
                 select: (ele) => {
-                    cy.elements().unselect();
+                    cy.elements(":grabbable").unselect();
                     ele.select();
                     depthFirstSearch();
                 }
@@ -636,7 +640,7 @@ function initCircularMenu(c) {
             {
                 content: '<i class="fa fa-crosshairs fa-2x" aria-hidden="true"></i>',
                 select: () => {
-                    cy.elements().select();
+                    cy.elements(":grabbable").select();
                 }
             },
             {
@@ -770,12 +774,12 @@ function changeLayout(idx) {
     if (name === 'snapToGrid') {
         snapToGrid(cy, true);
         snapToGrid(ca, true);
-        layoutname = '';
+        layoutName = '';
     }
     else {
         snapToGrid(cy, false);
         snapToGrid(ca, false);
-        layoutname = name;
+        layoutName = name;
     }
     reLayout();
 }
@@ -801,9 +805,9 @@ function cyReLayout() {
     document.getElementById('cy_weight').innerHTML = totalWeight.toString();
     if (CyLayout !== undefined)
         CyLayout.stop();
-    if (layoutname === '')
+    if (layoutName === '')
         return;
-    CyLayout = cy.layout(layout_options[layoutname]);
+    CyLayout = cy.layout(layout_options[layoutName]);
     CyLayout.on('layoutstop', (e)=>{
         cy.edges().hide();
         cy.edges().show();
@@ -823,9 +827,9 @@ function caReLayout() {
     document.getElementById('ca_weight').innerHTML = totalWeight.toString();
     if (CaLayout !== undefined)
         CaLayout.stop();
-    if (layoutname === '')
+    if (layoutName === '')
         return;
-    CaLayout = ca.layout(layout_options[layoutname]);
+    CaLayout = ca.layout(layout_options[layoutName]);
     CaLayout.on('layoutstop', (e)=>{
         cy.edges().hide();
         cy.edges().show();
@@ -845,7 +849,7 @@ function removeNode() {
     if (ids.length === 1) {
         let range = v.split('-');
         if (range.length === 1)
-            cy.remove(cy.nodes().$id(v));
+            cy.remove(getAllNodes(cy).$id(v));
         else {
             let lower = parseInt(range[0]);
             let upper = parseInt(range[1]);
@@ -999,7 +1003,7 @@ function getCaTarget(node, edge) {
  * */
 function clearSource() {
     stopAnimation();
-    cy.remove(cy.elements());
+    cy.remove(cy.elements(":grabbable"));
     document.getElementById('cy_weight').innerHTML = '';
 }
 /**
@@ -1009,7 +1013,7 @@ function clearSource() {
  * */
 function clearResult() {
     stopAnimation();
-    ca.remove(ca.elements());
+    ca.remove(ca.elements(":grabbable"));
     document.getElementById('ca_weight').innerHTML = '';
     document.getElementById('path').innerHTML = '';
 }
@@ -1019,8 +1023,8 @@ function clearResult() {
  * @return void
  * */
 function stopAnimation() {
-    cy.elements().stop();
-    ca.elements().stop();
+    cy.elements(":grabbable").stop();
+    ca.elements(":grabbable").stop();
     animationFlag = false;
 }
 /**
@@ -1070,7 +1074,7 @@ function getCyStartNode(prompt_text, default_value) {
  * */
 function getAM(c, output) {
     let i, j;
-    let nodes = c.nodes();
+    let nodes = nodes();
     let numOfNodes = nodes.length;
     let matrix = new Array(numOfNodes);
     let id_index = {};
@@ -1107,7 +1111,7 @@ function getAM(c, output) {
  * */
 function getWM(c, output) {
     let i, j, w;
-    let nodes = c.nodes();
+    let nodes = getAllNodes(c);
     let numOfNodes = nodes.length;
     let matrix = new Array(numOfNodes);
     let id_index = {};

@@ -327,8 +327,8 @@ function breadthFirstSearch() {
     if (root === undefined)
         return;
     clearCyStyle();
-    cy.elements().unselect();
-    let path = cy.elements().bfs({root: root, directed: true}).path;
+    cy.elements(":grabbable").unselect();
+    let path = cy.elements(":grabbable").bfs({root: root, directed: true}).path;
     clearResult();
     let pathList = new LinkedList();
     path.select();
@@ -352,8 +352,8 @@ function depthFirstSearch() {
     if (root === undefined)
         return;
     clearCyStyle();
-    cy.elements().unselect();
-    let path = cy.elements().dfs({root: root, directed: true}).path;
+    cy.elements(":grabbable").unselect();
+    let path = cy.elements(":grabbable").dfs({root: root, directed: true}).path;
     clearResult();
     let pathList = new LinkedList();
     path.select();
@@ -374,8 +374,8 @@ function depthFirstSearch() {
 // function performKruskal() {
 //     stopAnimation();
 //     clearCyStyle();
-//     cy.elements().unselect();
-//     let spanningTree = cy.elements().kruskal(getWeight);
+//     cy.elements(":grabbable").unselect();
+//     let spanningTree = cy.elements(":grabbable").kruskal(getWeight);
 //     clearResult();
 //     ca.add(spanningTree);
 //     spanningTree.select();
@@ -409,7 +409,7 @@ function performDijkstra() {
     let nodes = cy.nodes(':selected');
     let path;
     if (nodes.length >= 2) {
-        path = cy.elements().dijkstra({
+        path = cy.elements(":grabbable").dijkstra({
             root: nodes[0],
             weight: getWeight,
             directed: true
@@ -418,7 +418,7 @@ function performDijkstra() {
     else {
         let p = prompt("Please enter the id of source and target nodes, src-tg.\nExample: 1-2", "");
         let pt = p.split('-');
-        path = cy.elements().dijkstra('#' + pt[0], getWeight, true).pathTo('#' + pt[1]);
+        path = cy.elements(":grabbable").dijkstra('#' + pt[0], getWeight, true).pathTo('#' + pt[1]);
     }
     let pathList = new LinkedList();
     path.forEach((ele) => {
@@ -462,7 +462,7 @@ function pageRank() {
     const len = cy.nodes().length;
     const basicSize = 250;
     const delSize = 15;
-    let rank = cy.elements().pageRank({
+    let rank = cy.elements(":grabbable").pageRank({
         dampingFactor: 0.85,
         precision: 1e-4
     });
@@ -713,7 +713,7 @@ function myPageRank() {
                                     cy.edges().removeStyle();
                                     cRanks = normalize(cRanks);
                                     animateNodes(cRanks, animationDuration, () => {
-                                        cy.elements().stop();
+                                        cy.elements(":grabbable").stop();
                                         setTimeout(() => {
                                             // continue to iterate if not converged
                                             if (math.norm(math.subtract(pRanks, cRanks)) > minimalDifference)
@@ -1203,7 +1203,7 @@ function myPageRank() {
 //     let root = getCyStartNode("Please enter the id of the starting node", "1");
 //     if (root === undefined)
 //         root = cy.nodes()[0];
-//     cy.elements().unselect();
+//     cy.elements(":grabbable").unselect();
 //     root.select();
 //     /**
 //      * @function
@@ -1287,7 +1287,7 @@ function myPageRank() {
 //         // Find the minimal weight connector connecting these two nodes
 //         // If found, then a cycle is established after adding the edge back
 //         // Dijkstra method:
-//         d = cy.elements().dijkstra(root, getWeight);
+//         d = cy.elements(":grabbable").dijkstra(root, getWeight);
 //         distance = d.distanceTo(current_node) + weight;
 //
 //         // Find the minimal weight cycle starting from root node
@@ -1313,7 +1313,7 @@ function myPageRank() {
 //     let root = getCyStartNode("Please enter id of the starting node.\nIf you want apply this algorithm too all nodes and get the best one, leave it blank", "");
 //     let results;
 //     clearCyStyle();
-//     cy.elements().unselect();
+//     cy.elements(":grabbable").unselect();
 //     // the global minimal weight cycle
 //     if (root === undefined) {
 //         // Find the global minimal weight cycle
@@ -1363,7 +1363,7 @@ function myPageRank() {
 //     stopAnimation();
 //     let root = getCyStartNode("Please enter id of the starting node.\nIf you want apply this algorithm too all nodes and get the best one, leave it blank", "");
 //     clearCyStyle();
-//     cy.elements().unselect();
+//     cy.elements(":grabbable").unselect();
 //     let results;
 //     if (root === undefined) {
 //         let minWeight = Infinity;
@@ -1378,7 +1378,7 @@ function myPageRank() {
 //                 minWeight = sumWeight;
 //                 minPath = results[1];
 //             }
-//             cy.elements().unselect();
+//             cy.elements(":grabbable").unselect();
 //         });
 //         clearResult();
 //         ca.add(minElements);
@@ -1475,7 +1475,7 @@ function myPageRank() {
 //  * @return boolean
 //  * */
 // function isConnected() {
-//     let path = cy.elements().bfs(cy.nodes()[0]).path;
+//     let path = cy.elements(":grabbable").bfs(cy.nodes()[0]).path;
 //     return path.nodes().length === cy.nodes().length;
 // }
 
@@ -1502,9 +1502,9 @@ function myPageRank() {
 //     // stop if the conditions for Eulerian/semi-Eulerian graphs are not satisfied.
 //     if (numOfOddDegrees !== 0 && numOfOddDegrees !== 2)
 //         return alert('This graph is neither Eulerian nor semi-Eulerian');
-//     cy.elements().unselect();
+//     cy.elements(":grabbable").unselect();
 //     clearResult();
-//     ca.add(cy.elements());
+//     ca.add(cy.elements(":grabbable"));
 //     caReLayout();
 //
 //     // starting Eulerian Cycle from node 1
@@ -1603,7 +1603,7 @@ function myPageRank() {
 // function minimalWeightMatching() {
 //     stopAnimation();
 //     clearCyStyle();
-//     cy.elements().unselect();
+//     cy.elements(":grabbable").unselect();
 //     // precondition: the graph is connected
 //     if (!isConnected())
 //         return alert("Graph not connected!");
@@ -1732,7 +1732,7 @@ function myPageRank() {
 // function CPP() {
 //     stopAnimation();
 //     clearCyStyle();
-//     cy.elements().unselect();
+//     cy.elements(":grabbable").unselect();
 //     // get the collection of odd nodes
 //     cy.nodes().forEach((ele)=> {
 //         if (ele.degree() % 2 !== 0)
@@ -1748,7 +1748,7 @@ function myPageRank() {
 //     let weightMatrix = new Array(n);
 //     let paths = new Array(n);
 //     for (let x = 0; x < n; x++) {
-//         paths[x] = cy.elements().dijkstra(nodes[x], getWeight);
+//         paths[x] = cy.elements(":grabbable").dijkstra(nodes[x], getWeight);
 //         weightMatrix[x] = new Array(n);
 //         for (let y = x + 1; y < n; y++)
 //             weightMatrix[x][y] = paths[x].distanceTo(nodes[y]);
@@ -1758,7 +1758,7 @@ function myPageRank() {
 //
 //     function displayResult(minPairing) {
 //         clearResult();
-//         ca.add(cy.elements());
+//         ca.add(cy.elements(":grabbable"));
 //         let addedEdges = undefined;
 //
 //         // Once the minimal weight perfect matching is found,
@@ -1776,7 +1776,7 @@ function myPageRank() {
 //             });
 //         }
 //         caReLayout();
-//         ca.elements().unselect();
+//         ca.elements(":grabbable").unselect();
 //
 //         // Eulerian Cycle. See function traceEulerianCycle
 //         // starting the Eulerian Cycle from the first node
@@ -1795,7 +1795,7 @@ function myPageRank() {
 //     let root = getCyStartNode("Please enter id of the starting node.\nIf you want apply this algorithm too all nodes and get the highest lower bound, leave it blank", "");
 //     let results;
 //     clearCyStyle();
-//     cy.elements().unselect();
+//     cy.elements(":grabbable").unselect();
 //     if (root === undefined) {
 //         let maxWeight = 0;
 //         let maxResults, maxRoot, sumWeight;
@@ -1822,7 +1822,7 @@ function myPageRank() {
 //
 //         //Order must be correct...
 //         ca.add(maxResults[3]);
-//         ca.elements().select();
+//         ca.elements(":grabbable").select();
 //         ca.add(maxRoot);
 //         ca.add(maxResults[2]);
 //         ca.add(maxResults[1]);
@@ -1838,7 +1838,7 @@ function myPageRank() {
 //         results[2].select();
 //         results[1].select();
 //         ca.add(results[3]);
-//         ca.elements().select();
+//         ca.elements(":grabbable").select();
 //         ca.add(root);
 //         ca.add(results[2]);
 //         ca.add(results[1]);
@@ -1865,7 +1865,7 @@ function myPageRank() {
 //     cy.remove(root);
 //
 //     // find the minimal spanning tree of the remaining graph by kruskal
-//     let spanningTree = cy.elements().kruskal(getWeight);
+//     let spanningTree = cy.elements(":grabbable").kruskal(getWeight);
 //
 //     // calculate the total weight of this tree
 //     spanningTree.edges().forEach((edge)=> {
