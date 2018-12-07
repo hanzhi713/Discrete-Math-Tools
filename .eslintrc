@@ -1,0 +1,30 @@
+{
+    "parserOptions": {
+        "ecmaVersion": 7,
+        "sourceType": "script"
+    },
+    "rules": {
+        "semi": 2,
+        "prettier/prettier": "error",
+        "camelcase": 0,
+        "no-unused-vars": "warn",
+        "no-use-before-define": "warn",
+        "radix": "off",
+        "no-plusplus": "off",
+        "no-undef": "warn",
+        "no-nested-ternary": "off",
+        "strict": "off",
+        "no-eval": "off",
+        "no-restricted-globals": "warn",
+        "no-alert": "off",
+        "prefer-destructuring": "warn",
+        "no-lonely-if": "warn",
+        "no-bitwise": "off"
+    },
+    "env": {
+        "browser": true,
+        "jquery": true
+    },
+    "plugins": ["prettier"],
+    "extends": ["airbnb", "plugin:prettier/recommended"]
+}

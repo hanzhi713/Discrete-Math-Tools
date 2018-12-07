@@ -1,5 +1,3 @@
 .htaccess
 .babelrc
 node_modules
-.eslintrc
-.prettierrc
