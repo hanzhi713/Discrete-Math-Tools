@@ -1,4 +1,222 @@
 /**
+ * create graph from an adjacency matrix
+ * @function
+ * @public
+ * @param {Object|Array} m
+ * The adjacency matrix
+ * @return void
+ * */
+function createFromAM(m) {
+    stopAnimation();
+
+    // this must be a square matrix...
+    if (m.length !== m[0].length)
+        return;
+
+    clearSource();
+    let numOfNodes = m.length;
+    cy.startBatch();
+    // add all nodes
+    for (let i = 1; i <= numOfNodes; i++)
+        cy.add({
+            group: 'nodes',
+            data: {id: i},
+            position: {
+                x: (Math.random() * 250 + 25),
+                y: (Math.random() * 250 + 25)
+            }
+        });
+
+    for (let i = 0; i < numOfNodes; i++)
+        for (let j = i; j < numOfNodes; j++)
+
+            // add the correct number of edges connecting this two nodes
+            for (let x = 0; x < m[i][j]; x++)
+                cy.add({
+                    group: 'edges',
+                    data: {id: (i + 1) + '-' + (j + 1) + '-' + x, source: i + 1, target: j + 1}
+                });
+    cy.endBatch();
+    cyReLayout();
+}
+/**
+ * create the graph from a weight matrix
+ * @function
+ * @public
+ * @param {Object|Array} m
+ * The weight matrix
+ * @return void
+ * */
+function createFromWM(m) {
+    stopAnimation();
+    if (m.length !== m[0].length) return;
+    clearSource();
+    let numOfNodes = m.length;
+    cy.startBatch();
+    for (let i = 1; i <= numOfNodes; i++)
+        cy.add({
+            group: 'nodes',
+            data: {id: i},
+            position: {
+                x: (Math.random() * 250 + 25),
+                y: (Math.random() * 250 + 25)
+            }
+        });
+
+    for (let i = 0; i < numOfNodes; i++)
+        for (let j = i; j < numOfNodes; j++)
+            if (m[i][j] > 0)
+                cy.add({
+                    group: 'edges',
+                    data: {id: (i + 1) + '-' + (j + 1) + '-0', source: i + 1, target: j + 1, weight: m[i][j]}
+                });
+    cy.endBatch();
+    cyReLayout();
+}
+/**
+ * generate a random graph
+ * @function
+ * @public
+ * @return void
+ * */
+function generateGraph() {
+    stopAnimation();
+    clearCyStyle();
+    let simple = document.getElementById('simple').checked;
+    let weighted = document.getElementById('weighted').checked;
+    let numOfNodes = parseInt(prompt("Please enter the number of nodes", "6"));
+    let matrix = new Array(numOfNodes);
+    for (let i = 0; i < matrix.length; i++)
+        matrix[i] = new Array(numOfNodes);
+    if (simple) {
+        let pConnected = parseFloat(prompt("Please specify the propability that two nodes are connected.\nRange: 0 to 1", "0.5"));
+        if (weighted) {
+            let weightRange = prompt("Please specify the weight range.\nExample: 1-5 represents range from 1 to 5.\n Lower limit must be greater than 0.", "1-4");
+            let temp = weightRange.split('-');
+            let lower = parseInt(temp[0]) > 0 ? parseInt(temp[0]) : 1;
+            let range = parseInt(temp[1]) >= lower ? parseInt(temp[1]) - lower + 1 : lower + 4;
+            for (let i = 0; i < numOfNodes; i++)
+                for (let j = i + 1; j < numOfNodes; j++) {
+                    if (Math.random() < pConnected)
+                        matrix[i][j] = Math.floor(Math.random() * range + lower);
+                    else
+                        matrix[i][j] = 0;
+                }
+            createFromWM(matrix);
+        }
+        else {
+            for (let i = 0; i < numOfNodes; i++)
+                for (let j = i + 1; j < numOfNodes; j++) {
+                    if (Math.random() < pConnected)
+                        matrix[i][j] = 1;
+                    else
+                        matrix[i][j] = 0;
+                }
+            createFromAM(matrix);
+        }
+    }
+    else {
+        let nMultiple = parseInt(prompt("Please specify the max number of edges connecting two nodes.\nRange: 2 to infinity", "2"));
+        let pMultiple = parseFloat(prompt("Please specify the the probability of having multiple edges", "0.25"));
+        for (let i = 0; i < numOfNodes; i++) {
+            for (let j = i; j < numOfNodes; j++) {
+                if (i === j) {
+                    if (Math.random() < pMultiple / 2)
+                        matrix[i][j] = Math.floor((Math.random() * nMultiple + 1) / 2);
+                }
+                else {
+                    if (Math.random() < pMultiple)
+                        matrix[i][j] = Math.floor(Math.random() * nMultiple + 1);
+                    else {
+                        if (Math.random() > (1 / nMultiple))
+                            matrix[i][j] = 1;
+                        else
+                            matrix[i][j] = 0;
+                    }
+                }
+            }
+
+        }
+        createFromAM(matrix);
+    }
+}
+/**
+ * Generate a complete graph of n vertices by first generating its corresponding adjacency matrix
+ * @function
+ * @public
+ * @return void
+ * */
+function Kn() {
+    stopAnimation();
+    clearSource();
+    let numOfNodes = parseInt(prompt("Please enter the number of vertices", "5"));
+    let weightRange = prompt("Please specify the weight range.\nLeave this blank if you want an unweighted graph.\nExample: 1-5 represents range from 1 to 5.\nLower limit must be greater than 0.", "");
+    let matrix = new Array(numOfNodes);
+    if (weightRange.length > 0) {
+        let temp = weightRange.split('-');
+        let lower = parseInt(temp[0]) > 0 ? parseInt(temp[0]) : 1;
+        let range = parseInt(temp[1]) > lower ? parseInt(temp[1]) - lower + 1 : lower + 4;
+
+        // fill in the half above the major diagonal (exclude major diagonal) with random weights in the give range
+        for (let i = 0; i < numOfNodes; i++) {
+            matrix[i] = new Array(numOfNodes);
+            for (let j = i + 1; j < numOfNodes; j++)
+                matrix[i][j] = parseInt(Math.random() * range + lower);
+        }
+        createFromWM(matrix);
+    }
+    else {
+
+        // fill in the half above the major diagonal (exclude major diagonal) with 1
+        for (let i = 0; i < numOfNodes; i++) {
+            matrix[i] = new Array(numOfNodes);
+            for (let j = i + 1; j < numOfNodes; j++)
+                matrix[i][j] = 1;
+        }
+        createFromAM(matrix);
+    }
+}
+
+/**
+ * generate a complete bipartile graph by first generating its adjacency matrix
+ * @function
+ * @public
+ * @return void
+ * */
+function Kn_n() {
+    stopAnimation();
+    let n = prompt("Please enter n,n.\nExample: 3,3 represents K3,3", "3,3");
+    n = n.split(',');
+    let n1 = parseInt(n[0]);
+    let n2 = parseInt(n[1]);
+    let numOfNodes = n1 + n2;
+    let matrix = new Array(numOfNodes);
+    for (let i = 0; i < numOfNodes; i++)
+        matrix[i] = new Array(numOfNodes);
+
+    let weightRange = prompt("Please specify the weight range.\nLeave this blank if you want an unweighted graph.\nExample: 1-5 represents range from 1 to 5.\nLower limit must be greater than 0.", "");
+    if (weightRange.length > 0) {
+        let temp = weightRange.split('-');
+        let lower = parseInt(temp[0]) > 0 ? parseInt(temp[0]) : 1;
+
+        // upper bound must be greater than the lower bound...
+        let range = parseInt(temp[1]) > lower ? parseInt(temp[1]) : lower + 4;
+
+        // I think you can understand this
+        for (let i = 0; i < n1; i++)
+            for (let j = n1; j < numOfNodes; j++)
+                matrix[i][j] = parseInt(Math.random() * range + lower);
+        createFromWM(matrix);
+    }
+    else {
+        for (let i = 0; i < n1; i++)
+            for (let j = n1; j < numOfNodes; j++)
+                matrix[i][j] = 1;
+        createFromAM(matrix);
+    }
+}
+
+/**
  * Breadth first search is implemented in the library
  * @function
  * @public
@@ -771,209 +989,9 @@ function nearestNeighborAlgorithm(root) {
  * */
 function isConnected() {
     let path = cy.elements().bfs(cy.nodes()[0]).path;
-    return path.nodes().length === cy.nodes().length;
+    return path.nodes().length === cy.nodes(":grabbable").length;
 }
-/**
- * @typedef LinkedListNode
- * @type {object}
- * @property cargo
- * @property {LinkedListNode} next
- * */
-/**
- * js implementation of a single linked list
- * @typedef LinkedList
- * @type {object}
- * @property {LinkedListNode} head
- * @property {int} length
- * @property {function} getTail
- * @property {function} add
- * @property {function} addNode
- * @property {function} traverse
- * */
 
-class LinkedListNode {
-    constructor(cargo, next) {
-        /**
-         * @public
-         * */
-        this.cargo = cargo;
-        /**
-         * @public
-         * @type {LinkedListNode}
-         * */
-        this.next = next;
-    }
-}
-class LinkedList {
-    constructor() {
-        /**
-         * @type {LinkedListNode}
-         * @public
-         * */
-        this.head = null;
-        /**
-         * @type {int}
-         * @public
-         * */
-        this.length = 0;
-    }
-
-    /**
-     * Get the last node of the linked list
-     * @public
-     * @function
-     * */
-    getTail() {
-        let currentNode = this.head;
-        while (currentNode.next !== null)
-            currentNode = currentNode.next;
-        return currentNode;
-    }
-
-    /**
-     * @public
-     * @function
-     * @param cargo
-     * add a cargo
-     * */
-    add(cargo) {
-        if (this.length === 0)
-            this.head = new LinkedListNode(cargo, null);
-        else
-            this.getTail().next = new LinkedListNode(cargo, null);
-        this.length += 1;
-    }
-
-    /**
-     * add a node
-     * @function
-     * @param {LinkedListNode} node
-     * @public
-     * */
-    addNode(node) {
-        if (this.length === 0)
-            this.head = node;
-        else
-            this.getTail().next = node;
-        this.length += 1;
-    }
-
-    /**
-     * search a specific node using user defined function
-     * @public
-     * @function
-     * @param {function} func
-     * */
-    search(func) {
-        let currentNode = this.head;
-        while (currentNode !== null) {
-            if (func(currentNode.cargo))
-                return currentNode;
-            currentNode = currentNode.next;
-        }
-        return null;
-    }
-
-    /**
-     * traverse the linked list, with visualizations on the graph,
-     * assuming each cargo is either a node or an edge
-     * @public
-     * @function
-     * @param {boolean} animate
-     * whether or not to animate
-     * @param {boolean} trace
-     * whether or not to record the path
-     * */
-    traverse(animate, trace) {
-        let currentNode = this.head;
-        let counter = 0;
-        if (trace) {
-            let path_string = '';
-            while (currentNode !== null) {
-                let currentElement = currentNode.cargo;
-                if (currentElement.isNode())
-                    path_string += '<span class="normal" id="n' + counter + '">' + currentElement.data('id') + '</span>';
-                else
-                    path_string += '<span class="normal" id="n' + counter + '"> → </span>';
-                counter += 1;
-                currentNode = currentNode.next;
-            }
-            document.getElementById('path').innerHTML = path_string;
-        }
-        if (animate) {
-            animationFlag = true;
-            currentNode = this.head;
-            counter = 1;
-            /**
-             * animate nodes and edges by the order of addition into the linekd list
-             * @function
-             * @private
-             * @param {LinkedListNode} node
-             * */
-            let animation = (node) => {
-                if (node.cargo.isNode()) {
-                    node.cargo.animate({
-                        style: {backgroundColor: '#00f1f1', width: '30px', height: '30px'},
-                        duration: Math.round(+duration.value * 0.1)
-                    }).animate({
-                        style: {backgroundColor: '#de4400', width: '20px', height: '20px'},
-                        duration: Math.round(+duration.value * 0.4),
-                        complete: () => {
-
-                            // if the global flag is set to false
-                            // stop the animation
-                            if (!animationFlag)
-                                return;
-
-                            // animate next node if it exists
-                            if (node.next !== null) {
-                                if (trace) {
-                                    // update the tracer
-                                    // track the animation by applying additional CSS to elements
-                                    document.getElementById('n' + counter).className = 'current';
-                                    document.getElementById('n' + (counter - 1)).className = 'normal';
-                                    counter += 1;
-                                }
-                                animation(node.next);
-                            }
-                        }
-                    });
-                }
-                else {
-                    node.cargo.animate({
-                        style: {lineColor: '#00f1f1', width: '6'},
-                        duration: Math.round(+duration.value * 0.2)
-                    }).animate({
-                        style: {lineColor: '#de4400', width: '3'},
-                        duration: Math.round(+duration.value * 0.8),
-                        complete: () => {
-
-                            // if the global flag is set to false
-                            // stop the animation
-                            if (!animationFlag)
-                                return;
-
-                            // animate next node if it exists
-                            if (node.next !== null) {
-
-                                // update the tracer
-                                if (trace) {
-                                    document.getElementById('n' + counter).className = 'current';
-                                    document.getElementById('n' + (counter - 1)).className = 'normal';
-                                    counter += 1;
-                                }
-                                animation(node.next);
-                            }
-                        }
-                    });
-                }
-            };
-            if (trace)
-                document.getElementById('n0').className = 'current';
-            animation(currentNode);
-        }
-    }
-}
 /**
  * @see traceEulerianCycle()
  * @function
