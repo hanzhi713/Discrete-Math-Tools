@@ -20,7 +20,7 @@ function hideResult(c) {
         cy_div.animate({width: '580px'}, 300, () => {
             ca_div.show(500, () => {
                 reLayout();
-            })
+            });
         });
     }
 }
@@ -650,7 +650,7 @@ function initCircularMenu(c) {
             {
                 content: '<i class="fa fa-trash fa-2x" aria-hidden="true"></i>',
                 select: () => {
-                    cy.remove(cy.elements(':selected'))
+                    cy.remove(cy.elements(':selected'));
                 }
             },
             {
@@ -1505,7 +1505,7 @@ function pageRank() {
             label: n => `${n.data('id')}\n${(r * 100).toFixed(2)}%`,
             textWrap: 'wrap',
             textValign: 'top',
-        })
+        });
     });
 }
 
@@ -1617,7 +1617,7 @@ function myPageRank() {
             label: n => `${n.data('id')}\n${(rank * 100).toFixed(2)}%`,
             textWrap: 'wrap',
             textValign: 'top',
-        }
+        };
     }
 
     /**
@@ -1756,7 +1756,7 @@ function myPageRank() {
                         }
                     }
                 }, 10);
-            })
+            });
         }
     }
 

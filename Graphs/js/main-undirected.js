@@ -75,33 +75,6 @@ let cy;
  * */
 let ca;
 /**
- * default node style
- * @const
- * @type {JSON}
- * */
-const defaultNodeStyle = {
-    'background-color': '#666',
-    'label': 'data(id)',
-    'height': '25px',
-    'width': '25px',
-    'font-size': '20px'
-};
-/**
- * default edge style
- * @const
- * @type {JSON}
- * */
-const defaultEdgeStyle = {
-    'width': 2,
-    'line-color': '#ccc',
-    'curve-style': 'bezier',
-    'label': (edge) => {
-        return isNaN(edge.data('weight')) ? '' : edge.data('weight');
-    },
-    'color': 'red',
-    'font-size': '20px'
-};
-/**
  * @type {string}
  * */
 let layoutname = "spread";
@@ -173,78 +146,111 @@ $(() => {
 
     cy.graphml({layoutBy: 'circle'});
     ca.graphml({layoutBy: 'circle'});
+    
+    cy.edgehandles({
+        preview: true, // whether to show added edges preview before releasing selection
+        hoverDelay: 150, // time spent hovering over a target node before it is considered selected
+        handleNodes: 'node', // selector/filter function for whether edges can be made from a given node
+        snap: false, // when enabled, the edge can be drawn by just moving close to a target node (can be confusing on compound graphs)
+        snapThreshold: 50, // the target node must be less than or equal to this many pixels away from the cursor/finger
+        snapFrequency: 15, // the number of times per second (Hz) that snap checks done (lower is less expensive)
+        noEdgeEventsInDraw: false, // set events:no to edges during draws, prevents mouseouts on compounds
+        disableBrowserGestures: true, // during an edge drawing gesture, disable browser gestures such as two-finger trackpad swipe and pinch-to-zoom
+        handlePosition: function( node ){
+          return 'middle top'; // sets the position of the handle in the format of "X-AXIS Y-AXIS" such as "left top", "middle top"
+        },
+        handleInDrawMode: false, // whether to show the handle in draw mode
+        edgeType: function( sourceNode, targetNode ){
+          // can return 'flat' for flat edges between nodes or 'node' for intermediate node between them
+          // returning null/undefined means an edge can't be added between the two nodes
+          return 'flat';
+        },
+        loopAllowed: function( node ){
+          // for the specified node, return whether edges from itself to itself are allowed
+          return true;
+        },
+        nodeLoopOffset: -50, // offset for edgeType: 'node' loops
+        nodeParams: function( sourceNode, targetNode ){
+          // for edges between the specified source and target
+          // return element object to be passed to cy.add() for intermediary node
+          return {};
+        },
+        ghostEdgeParams: function(){
+          // return element object to be passed to cy.add() for the ghost edge
+          // (default classes are always added for you)
+          return {};
+        },
+        show: function( sourceNode ){
+          // fired when handle is shown
+        },
+        hide: function( sourceNode ){
+          // fired when the handle is hidden
+        },
+        start: function( sourceNode ){
+          // fired when edgehandles interaction starts (drag on handle)
+        },
+        complete: function( sourceNode, targetNode, addedEles ){
+          // fired when edgehandles is done and elements are added
+        },
+        stop: function( sourceNode ){
+          // fired when edgehandles interaction is stopped (either complete with added edges or incomplete)
+        },
+        cancel: function( sourceNode, cancelledTargets ){
+          // fired when edgehandles are cancelled (incomplete gesture)
+        },
+        hoverover: function( sourceNode, targetNode ){
+          // fired when a target is hovered
+        },
+        hoverout: function( sourceNode, targetNode ){
+          // fired when a target isn't hovered anymore
+        },
+        previewon: function( sourceNode, targetNode, previewEles ){
+          // fired when preview is shown
+        },
+        previewoff: function( sourceNode, targetNode, previewEles ){
+          // fired when preview is hidden
+        },
+        drawon: function(){
+          // fired when draw mode enabled
+        },
+        drawoff: function(){
+          // fired when draw mode disabled
+        },
 
-    // cy.edgehandles({
-    //     // preview: true, // whether to show added edges preview before releasing selection
-    //     // stackOrder: 4, // Controls stack order of edgehandles canvas element by setting it's z-index
-    //     // handleSize: 10, // the size of the edge handle put on nodes
-    //     // handleHitThreshold: 6, // a threshold for hit detection that makes it easier to grab the handle
-    //     // handleIcon: false, // an image to put on the handle
-    //     // handleColor: '#ff0000', // the colour of the handle and the line drawn from it
-    //     // handleLineType: 'ghost', // can be 'ghost' for real edge, 'straight' for a straight line, or 'draw' for a draw-as-you-go line
-    //     // handleLineWidth: 3, // width of handle line in pixels
-    //     // handleOutlineColor: '#000000', // the colour of the handle outline
-    //     // handleOutlineWidth: 0, // the width of the handle outline in pixels
-    //     // handleNodes: 'node', // selector/filter function for whether edges can be made from a given node
-    //     // handlePosition: 'middle top', // sets the position of the handle in the format of "X-AXIS Y-AXIS" such as "left top", "middle top"
-    //     // hoverDelay: 100, // time spend over a target node before it is considered a target selection
-    //     // cxt: false, // whether cxt events trigger edgehandles (useful on touch)
-    //     // enabled: true, // whether to start the plugin in the enabled state
-    //     // toggleOffOnLeave: false, // whether an edge is cancelled by leaving a node (true), or whether you need to go over again to cancel (false; allows multiple edges in one pass)
-    //     preview: true, // whether to show added edges preview before releasing selection
-    //     hoverDelay: 150, // time spent hovering over a target node before it is considered selected
-    //     handleNodes: 'node', // selector/filter function for whether edges can be made from a given node
-    //     handlePosition: 'middle top', // sets the position of the handle in the format of "X-AXIS Y-AXIS" such as "left top", "middle top"
-    //     handleInDrawMode: false, // whether to show the handle in draw mode
-    //     edgeType: (sourceNode, targetNode) => {
-    //         // can return 'flat' for flat edges between nodes or 'node' for intermediate node between them
-    //         // returning null/undefined means an edge can't be added between the two nodes
-    //         return 'flat';
-    //     },
-    //     loopAllowed: (node) => {
-    //         // for the specified node, return whether edges from itself to itself are allowed
-    //         return true;
-    //     },
-    //     nodeLoopOffset: -50, // offset for edgeType: 'node' loops
-    //     nodeParams: (sourceNode, targetNode) => {
-    //         // for edges between the specified source and target
-    //         // return element object to be passed to cy.add() for intermediary node
-    //         return {};
-    //     },
-    //     edgeParams: (sourceNode, targetNode, i) => {
-    //         // for edges between the specified source and target
-    //         // return element object to be passed to cy.add() for edge
-    //         // NB: i indicates edge index in case of edgeType: 'node'
-    //         let id_pre = sourceNode.data('id') + '-' + targetNode.data('id') + '-';
-    //         let x = 0;
-    //         while (cy.$id(id_pre + x).length !== 0)
-    //             x += 1;
-    //         return {
-    //             data: {
-    //                 id: id_pre + x,
-    //                 source: sourceNode.data('id'),
-    //                 target: targetNode.data('id'),
-    //                 weight: parseInt(weight_input.value)
-    //             }
-    //         };
-    //     },
-    //     complete: (sourceNode, targetNodes, addedEntities) => {
-    //         // fired when edgehandles is done and entities are added
-    //         if (auto_refresh.checked)
-    //             cyReLayout();
-    //         addedEntities.forEach((ele) => {
-    //             if (ele.isEdge()) {
-    //                 ele.animate({
-    //                     style: {lineColor: 'red', width: 5},
-    //                     duration: 100
-    //                 }).animate({
-    //                     style: {lineColor: '#ccc', width: 2},
-    //                     duration: 500
-    //                 });
-    //             }
-    //         });
-    //     },
-    // });
+        edgeParams: (sourceNode, targetNode, i) => {
+            // for edges between the specified source and target
+            // return element object to be passed to cy.add() for edge
+            // NB: i indicates edge index in case of edgeType: 'node'
+            let id_pre = sourceNode.data('id') + '-' + targetNode.data('id') + '-';
+            let x = 0;
+            while (cy.$id(id_pre + x).length !== 0)
+                x += 1;
+            return {
+                data: {
+                    id: id_pre + x,
+                    source: sourceNode.data('id'),
+                    target: targetNode.data('id'),
+                    weight: parseInt(weight_input.value)
+                }
+            };
+        },
+        complete: (sourceNode, targetNodes, addedEntities) => {
+            // fired when edgehandles is done and entities are added
+            if (auto_refresh.checked)
+                cyReLayout();
+            addedEntities.forEach((ele) => {
+                if (ele.isEdge()) {
+                    ele.animate({
+                        style: {lineColor: 'red', width: 5},
+                        duration: 100
+                    }).animate({
+                        style: {lineColor: '#ccc', width: 2},
+                        duration: 500
+                    });
+                }
+            });
+        },
+    });
 
     //add key bindings
     document.addEventListener("keydown", (e) => {
@@ -314,7 +320,7 @@ $(() => {
  * */
 function clearCyStyle() {
     cy.elements().removeStyle();
-    cy.style().resetToDefault().selector('node').style(defaultNodeStyle).selector('edge').style(defaultEdgeStyle).update();
+    cy.style().resetToDefault().fromJson(defaultStyle).update();
     cy.$(':selected').select();
 }
 /**
@@ -324,7 +330,7 @@ function clearCyStyle() {
  * */
 function clearCaStyle() {
     ca.elements().removeStyle();
-    ca.style().resetToDefault().selector('node').style(defaultNodeStyle).selector('edge').style(defaultEdgeStyle).update();
+    ca.style().resetToDefault().fromJson(defaultStyle).update();
     ca.$(':selected').select();
 }
 /**
@@ -374,7 +380,8 @@ function paste() {
  * */
 function initializeCytoscapeObjects(div_name) {
     let c = cytoscape({
-        container: document.getElementById(div_name)
+        container: document.getElementById(div_name),
+        style: defaultStyle
     });
     c.on('select', (event) => {
         event.target.style({'background-color': 'green', 'line-color': 'green'});
@@ -1269,6 +1276,94 @@ function getCyStartNode(prompt_text, default_value) {
         root = root[0];
     return root;
 }
+/**
+ * Get the adjacency matrix
+ * @function
+ * @public
+ * @param {object} c The Cytoscape object
+ * @param {boolean} output
+ * @return {Array}
+ * */
+function getAM(c, output) {
+    let i, j;
+    let nodes = c.nodes();
+    let numOfNodes = nodes.length;
+    let matrix = new Array(numOfNodes);
+    let id_index = {};
+    for (i = 0; i < numOfNodes; i++) {
+        matrix[i] = new Array(numOfNodes);
+
+        // match the id of nodes with the index, an continuous integer
+        // in case where the some of the nodes are deleted
+        id_index[nodes[i].data('id')] = i;
+        for (j = 0; j < numOfNodes; j++)
+            matrix[i][j] = 0;
+    }
+
+    // record the number of edges
+    // matrix[i][j] denotes the number of edges connecting node i and node j
+    c.edges().forEach((ele) => {
+        i = id_index[ele.data('source')];
+        j = id_index[ele.data('target')];
+        matrix[i][j] += 1;
+        if (i !== j)
+            matrix[j][i] += 1;
+    });
+    if (output)
+        matrix_input.value = matrixToString(matrix);
+    return matrix;
+}
+/**
+ * get the weight matrix
+ * @function
+ * @public
+ * @param {object} c The Cytoscape object
+ * @param {boolean} output
+ * @return {Array}
+ * */
+function getWM(c, output) {
+    let i, j, w;
+    let nodes = c.nodes();
+    let numOfNodes = nodes.length;
+    let matrix = new Array(numOfNodes);
+    let id_index = {};
+    for (i = 0; i < numOfNodes; i++) {
+        matrix[i] = new Array(numOfNodes);
+        id_index[nodes[i].data('id')] = i;
+        for (j = 0; j < numOfNodes; j++)
+            matrix[i][j] = 0;
+    }
+    c.edges().forEach((ele) => {
+        i = id_index[ele.data('source')];
+        j = id_index[ele.data('target')];
+        w = getWeight(ele);
+        if (matrix[i][j] === 0)
+            matrix[i][j] = w;
+        else {
+            if (w < matrix[i][j])
+                matrix[i][j] = w;
+        }
+        matrix[j][i] = matrix[i][j];
+    });
+    if (output)
+        matrix_input.value = matrixToString(matrix);
+    return matrix;
+}
+/**
+ * Concert a two dimensional matrix to string
+ * @function
+ * @public
+ * @param {Array} m
+ * @return {string}
+ * */
+function matrixToString(m) {
+    let s = '[[' + m[0].toString() + '],\n';
+    for (let i = 1; i < m.length - 1; i++)
+        s += ' [' + m[i].toString() + '],\n';
+    s += ' [' + m[m.length - 1].toString() + ']]';
+    return s;
+}
+
 /**
  * Breadth first search is implemented in the library
  * @function
@@ -2648,94 +2743,6 @@ function TSPLowerBound(root) {
     cy.endBatch();
     return [weight, edges[0], edges[1], spanningTree];
 }
-/**
- * Get the adjacency matrix
- * @function
- * @public
- * @param {object} c The Cytoscape object
- * @param {boolean} output
- * @return {Array}
- * */
-function getAM(c, output) {
-    let i, j;
-    let nodes = c.nodes();
-    let numOfNodes = nodes.length;
-    let matrix = new Array(numOfNodes);
-    let id_index = {};
-    for (i = 0; i < numOfNodes; i++) {
-        matrix[i] = new Array(numOfNodes);
-
-        // match the id of nodes with the index, an continuous integer
-        // in case where the some of the nodes are deleted
-        id_index[nodes[i].data('id')] = i;
-        for (j = 0; j < numOfNodes; j++)
-            matrix[i][j] = 0;
-    }
-
-    // record the number of edges
-    // matrix[i][j] denotes the number of edges connecting node i and node j
-    c.edges().forEach((ele) => {
-        i = id_index[ele.data('source')];
-        j = id_index[ele.data('target')];
-        matrix[i][j] += 1;
-        if (i !== j)
-            matrix[j][i] += 1;
-    });
-    if (output)
-        matrix_input.value = matrixToString(matrix);
-    return matrix;
-}
-/**
- * get the weight matrix
- * @function
- * @public
- * @param {object} c The Cytoscape object
- * @param {boolean} output
- * @return {Array}
- * */
-function getWM(c, output) {
-    let i, j, w;
-    let nodes = c.nodes();
-    let numOfNodes = nodes.length;
-    let matrix = new Array(numOfNodes);
-    let id_index = {};
-    for (i = 0; i < numOfNodes; i++) {
-        matrix[i] = new Array(numOfNodes);
-        id_index[nodes[i].data('id')] = i;
-        for (j = 0; j < numOfNodes; j++)
-            matrix[i][j] = 0;
-    }
-    c.edges().forEach((ele) => {
-        i = id_index[ele.data('source')];
-        j = id_index[ele.data('target')];
-        w = getWeight(ele);
-        if (matrix[i][j] === 0)
-            matrix[i][j] = w;
-        else {
-            if (w < matrix[i][j])
-                matrix[i][j] = w;
-        }
-        matrix[j][i] = matrix[i][j];
-    });
-    if (output)
-        matrix_input.value = matrixToString(matrix);
-    return matrix;
-}
-/**
- * Concert a two dimensional matrix to string
- * @function
- * @public
- * @param {Array} m
- * @return {string}
- * */
-function matrixToString(m) {
-    let s = '[[' + m[0].toString() + '],\n';
-    for (let i = 1; i < m.length - 1; i++)
-        s += ' [' + m[i].toString() + '],\n';
-    s += ' [' + m[m.length - 1].toString() + ']]';
-    return s;
-}
-
 /**
  * generate graphml from the graph
  * @function
