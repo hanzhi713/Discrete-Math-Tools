@@ -76,12 +76,12 @@ function callToAlgorithms() {
  * */
 /**
  * The cytoscape instance of the source
- * @type {object}
+ * @type {cytoscape.Core}
  * */
 let cy;
 /**
  * The cytoscape instance of the result
- * @type {object}
+ * @type {cytoscape.Core}
  * */
 let ca;
 /**
@@ -89,11 +89,11 @@ let ca;
  * */
 let layoutName = 'spread';
 /**
- * @type {object}
+ * @type {cytoscape.Layouts}
  * */
 let CyLayout;
 /**
- * @type {object}
+ * @type {cytoscape.Layouts}
  * */
 let CaLayout;
 /**
@@ -102,7 +102,7 @@ let CaLayout;
 let animationFlag = true;
 /**
  * Copied elements
- * @type {object}
+ * @type {cytoscape.Collection}
  * */
 let copiedEles;
 /**
@@ -111,44 +111,43 @@ let copiedEles;
 let drawOn = false;
 /**
  * weight_input text box
- * @const
- * @type {object}
+ * @type {HTMLElement}
  * */
 const weight_input = document.getElementById('weight');
 /**
  * matrix_input text box
- * @const
- * @type {object}
+ * @type {HTMLElement}
  * */
 const matrix_input = document.getElementById('matrix_input');
 /**
  * auto_refresh checkbox
- * @const
- * @type {object}
+ * @type {HTMLElement}
  * */
 const auto_refresh = document.getElementById('autorefresh');
 /**
  * "perform animation" button
- * @const
- * @type {object}
+ * @type {HTMLElement}
  * */
 const perform_button = document.getElementById('perform');
 /**
  * the animation checkbox
- * @const
- * @type {object}
+ * @type {HTMLElement}
  * */
 const animation_check = document.getElementById('animation');
 /**
  * animation duration
- * @const
- * @type {object}
+ * @type {HTMLElement}
  * */
 const duration = document.getElementById('duration');
 
+/**
+ * @param {cytoscape.Core} c
+ * @return {cytoscape.NodeCollection}
+ */
 function getAllNodes(c) {
     return c.nodes(':grabbable');
 }
+
 /**
  * @function
  * @public
@@ -189,7 +188,7 @@ function clearCaStyle() {
 /**
  * @function
  * @public
- * @param {object} eles
+ * @param {cytoscape.Collection} eles
  * @return void
  * */
 function copy(eles) {
@@ -232,7 +231,7 @@ function paste() {
  * @function
  * @param {string} div_name
  * @public
- * @return {object}
+ * @return {cytoscape.Core}
  * */
 function initializeCytoscapeObjects(div_name) {
     const c = cytoscape({
@@ -268,7 +267,7 @@ function initializeCytoscapeObjects(div_name) {
 
 /**
  * @function
- * @param {object} ele
+ * @param {cytoscape.Singular} ele
  * @public
  * @return void
  * */
@@ -281,7 +280,7 @@ function selectAllOfTheSameType(ele) {
 /**
  * initialize the conventional right-click menu
  * @function
- * @param {object} c
+ * @param {cytoscape.Core} c
  * @public
  * @return void
  * */
@@ -400,7 +399,7 @@ function initConventionalMenu(c) {
 }
 /**
  * @function
- * @param {object} c
+ * @param {cytoscape.Core} c
  * @public
  * @return void
  * */
@@ -532,7 +531,7 @@ function addNode(random, position) {
  * @param {boolean} random
  * @param {object} position
  * @public
- * @return {object} the added node
+ * @return {cytoscape.NodeSingular} the added node
  * */
 function addOneNode(random, position) {
     let v = 1;
@@ -597,7 +596,7 @@ function addEdge() {
 /**
  * @function
  * @public
- * @param {object} c
+ * @param {cytoscape.Core} c
  * @param {boolean} flag
  * @return void
  * */
@@ -650,7 +649,7 @@ function cyReLayout() {
     document.getElementById('cy_weight').innerHTML = totalWeight.toString();
     if (CyLayout !== undefined) CyLayout.stop();
     if (layoutName === '') return;
-    CyLayout = cy.layout(layout_options[layoutName]);
+    CyLayout = cy.layout(layoutOptions[layoutName]);
     CyLayout.on('layoutstop', e => {
         cy.edges().hide();
         cy.edges().show();
@@ -669,7 +668,7 @@ function caReLayout() {
     document.getElementById('ca_weight').innerHTML = totalWeight.toString();
     if (CaLayout !== undefined) CaLayout.stop();
     if (layoutName === '') return;
-    CaLayout = ca.layout(layout_options[layoutName]);
+    CaLayout = ca.layout(layoutOptions[layoutName]);
     CaLayout.on('layoutstop', e => {
         ca.edges().hide();
         ca.edges().show();
@@ -720,9 +719,9 @@ function removeEdge() {
 /**
  * @public
  * @function
- * @param {object} edge
- * @param {object} c
- * @return {object}
+ * @param {cytoscape.EdgeCollection} edge
+ * @param {cytoscape.Core} c
+ * @return {cytoscape.EdgeSingular}
  * */
 function duplicateEdge(edge, c) {
     const temp = edge.data('id').split('-');
@@ -774,7 +773,7 @@ function addEdgeBetweenSelected() {
  * @param {string} src
  * @param {string} tg
  * @param {int} w
- * @return {object} the edge added
+ * @return {cytoscape.EdgeSingular} the edge added
  * */
 function addEdgeBwt(src, tg, w) {
     const id_pre = `${src}-${tg}-`;
@@ -793,7 +792,7 @@ function addEdgeBwt(src, tg, w) {
 /**
  * @function
  * @public
- * @param {object} edge
+ * @param {cytoscape.EdgeSingular} edge
  * @return {int} weight
  * */
 function getWeight(edge) {
@@ -805,9 +804,9 @@ function getWeight(edge) {
  * get the other node
  * @function
  * @public
- * @param {object} node
- * @param {object} edge
- * @return {object} the target node
+ * @param {cytoscape.NodeSingular} node
+ * @param {cytoscape.EdgeSingular} edge
+ * @return {cytoscape.NodeSingular} the target node
  * */
 function getTarget(node, edge) {
     let targetNode;
@@ -818,9 +817,9 @@ function getTarget(node, edge) {
 /**
  * @function
  * @public
- * @param {object} node
- * @param {object} edge
- * @return {object} the target node
+ * @param {cytoscape.NodeSingular} node
+ * @param {cytoscape.EdgeSingular} edge
+ * @return {cytoscape.NodeSingular} the target node
  * */
 function getCaTarget(node, edge) {
     let targetNode;
@@ -900,7 +899,7 @@ function matrixToString(m) {
  * Get the adjacency matrix
  * @function
  * @public
- * @param {object} c The Cytoscape object
+ * @param {cytoscape.Core} c The Cytoscape object
  * @param {boolean} output
  * @return {Array}
  * */
@@ -933,7 +932,7 @@ function getAM(c, output) {
  * get the weight matrix
  * @function
  * @public
- * @param {object} c The Cytoscape object
+ * @param {cytoscape.Core} c The Cytoscape object
  * @param {boolean} output
  * @return {Array}
  * */

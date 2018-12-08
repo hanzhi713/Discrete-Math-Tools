@@ -351,7 +351,7 @@ function myDijkstra() {
     /**
      * @function
      * @private
-     * @param {object} node
+     * @param {cytoscape.NodeSingular} node
      * @callback
      * @param {function} callback
      * the function to execute after completion of animation
@@ -383,7 +383,7 @@ function myDijkstra() {
     /**
      * @function
      * @private
-     * @param {object} edge
+     * @param {cytoscape.EdgeSingular} edge
      * @callback
      * @param {function} callback
      * the function to execute after completion of animation
@@ -413,7 +413,7 @@ function myDijkstra() {
     /**
      * @function
      * @private
-     * @param {object} node
+     * @param {cytoscape.NodeSingular} node
      * @callback
      * @param {function} callback
      * the function to execute after completion of animation
@@ -445,7 +445,7 @@ function myDijkstra() {
     /**
      * @function
      * @private
-     * @param {object} current
+     * @param {cytoscape.NodeSingular} current
      * @return void
      * */
     function traceBack(current) {
@@ -519,9 +519,9 @@ function myDijkstra() {
     /**
      * @function
      * @private
-     * @param {object} currentNode
+     * @param {cytoscape.NodeSingular} currentNode
      * current node with a permanent label
-     * @param {object} edges
+     * @param {cytoscape.EdgeCollection} edges
      * all edges connect to n
      * @param {int} i
      * the index of the edge that we're up to
@@ -826,7 +826,7 @@ function prim() {
 /**
  * @function
  * @public
- * @param {object} root
+ * @param {cytoscape.NodeSingular} root
  * @return {Array}
  * */
 function localMinimalWeightCycle(root) {
@@ -967,7 +967,7 @@ function nearestNeighbor() {
  * The nearest neighbor algorithm starting from a given node
  * @function
  * @public
- * @param {object} root
+ * @param {cytoscape.NodeSingular} root
  * @return {Array}
  * */
 function nearestNeighborAlgorithm(root) {
@@ -1052,7 +1052,6 @@ function isConnected() {
  * @see traceEulerianCycle()
  * @function
  * @public
- * @return void
  * */
 function eulerianCycle() {
     // first check if this graph is connected
@@ -1061,29 +1060,46 @@ function eulerianCycle() {
 
     // then check whether there're none or two vertices of odd degree
     let numOfOddDegrees = 0;
+    const nodesOfOddDegrees = [];
     getAllNodes(cy).forEach(ele => {
-        if (ele.degree() % 2 !== 0) numOfOddDegrees += 1;
+        if (ele.degree() % 2 !== 0) {
+            numOfOddDegrees += 1;
+            nodesOfOddDegrees.push(ele);
+        }
     });
 
     // stop if the conditions for Eulerian/semi-Eulerian graphs are not satisfied.
     if (numOfOddDegrees !== 0 && numOfOddDegrees !== 2)
         return alert('This graph is neither Eulerian nor semi-Eulerian');
+
     cy.elements(':grabbable').unselect();
     clearResult();
     ca.add(cy.elements(':grabbable'));
     caReLayout();
 
-    // starting Eulerian Cycle from node 1
-    traceEulerianCycle(getAllNodes(ca)[0], ca);
+    if (numOfOddDegrees === 0) {
+        // starting Eulerian Cycle from node 1
+        traceEulerianCycle(getAllNodes(ca)[0], ca);
+    } else {
+        const caNodes = ca.nodes(':grabbable');
+        let oddNode;
+        for (let i = 0; i < caNodes.length; i++) {
+            if (caNodes[i].degree() % 2 !== 0) {
+                oddNode = caNodes[i];
+                break;
+            }
+        }
+        traceEulerianCycle(oddNode, ca);
+    }
 }
 /**
  * Find an Eulerian cycle/trail in an Eulerian/semi-Eulerian graph, by Hierholzer's algorithm
  * @public
  * @function
  * the starting node
- * @param {object} start
+ * @param {cytoscape.NodeSingular} start
  * the cytoscape object
- * @param {object} c
+ * @param {cytoscape.Core} c
  * @return void
  * */
 function traceEulerianCycle(start, c) {
@@ -1427,7 +1443,7 @@ function TSPGlobalLowerBound() {
  * Get the lower bound for the travelling salesman problem by vertex deletion algorithm
  * @function
  * @public
- * @param {object} root
+ * @param {cytoscape.NodeSingular} root
  * @return {Array}
  * */
 function TSPLowerBound(root) {
@@ -1458,7 +1474,7 @@ function TSPLowerBound(root) {
  * generate graphml from the graph
  * @function
  * @public
- * @param {Object} c
+ * @param {cytoscape.Core} c
  * @return void
  * */
 function getGraphML(c) {

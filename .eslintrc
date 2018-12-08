@@ -1,6 +1,6 @@
 {
     "parserOptions": {
-        "ecmaVersion": 6,
+        "ecmaVersion": 7,
         "sourceType": "script"
     },
     "rules": {
@@ -19,11 +19,17 @@
         "no-alert": "off",
         "prefer-destructuring": "warn",
         "no-lonely-if": "warn",
-        "no-bitwise": "off"
+        "no-bitwise": "off",
+        "no-param-reassign": "warn"
     },
     "env": {
         "browser": true,
         "jquery": true
+    },
+    "globals": {
+        "ctyoscape": false,
+        "layout_options": false,
+        "defaultStyle": false
     },
     "plugins": ["prettier"],
     "extends": ["airbnb", "plugin:prettier/recommended"]

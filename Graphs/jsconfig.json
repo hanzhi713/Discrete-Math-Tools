@@ -1,0 +1,14 @@
+{
+    "typeAcquisition": {
+        "include": [
+            "lodash",
+            "jQuery",
+            "cytoscape",
+            "mathjs",
+        ]
+    },
+    "exclude": [
+        "js/runtime.js",
+        "js/MWMMT.js"
+    ],
+}

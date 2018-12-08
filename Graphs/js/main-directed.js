@@ -277,7 +277,7 @@ function Kn() {
  * @function
  * @param {string} prompt_text
  * @param {string} default_value
- * @return {object|undefined} The first node (selected or entered)
+ * @return {cytoscape.NodeSingular|undefined} The first node (selected or entered)
  * */
 function getCyStartNode(prompt_text, default_value) {
     let root = cy.nodes(':selected');
@@ -663,7 +663,7 @@ function myPageRank() {
     /**
      * find the maximum and minimum anomg the vector of ranks
      * @param {Array} ranks
-     * @return Array
+     * @return {Array}
      * */
     function findMinAndMax(ranks) {
         let min = Infinity;
@@ -678,7 +678,7 @@ function myPageRank() {
     /**
      * @param {int} size
      * @param {string} color
-     * @return Object
+     * @return {Object}
      * */
     function getAnimationStyle(size, color) {
         return {
@@ -691,7 +691,7 @@ function myPageRank() {
     /**
      * @param {int} size
      * @param {Number} rank
-     * @return Object
+     * @return {Object}
      * */
     function getLabelStyle(size, rank) {
         const fs = 13 + Math.floor(size ** 0.33);
@@ -825,39 +825,35 @@ function myPageRank() {
                                 call(t, i, cRanks, pRanks);
                             }
                             // go to next iteration
+                            // normalize PR right after each iteration
+                            else if (normalizeInMiddle) {
+                                processDiv.innerHTML = 'Normalizing PR values...';
+                                cy.edges().removeStyle();
+                                cRanks = normalize(cRanks);
+                                animateNodes(cRanks, animationDuration, () => {
+                                    cy.elements(':grabbable').stop();
+                                    setTimeout(() => {
+                                        // continue to iterate if not converged
+                                        if (
+                                            math.norm(math.subtract(pRanks, cRanks)) >
+                                            minimalDifference
+                                        )
+                                            call(t + 1, 0, cRanks, cRanks.concat());
+                                        else {
+                                            processDiv.innerHTML = 'Done!';
+                                        }
+                                    }, 10);
+                                });
+                            }
+                            // normalize PR values after completion
+                            else if (math.norm(math.subtract(pRanks, cRanks)) > minimalDifference)
+                                call(t + 1, 0, cRanks, cRanks.concat());
                             else {
-                                // normalize PR right after each iteration
-                                if (normalizeInMiddle) {
-                                    processDiv.innerHTML = 'Normalizing PR values...';
+                                processDiv.innerHTML = 'Normalizing PR values...';
+                                animateNodes(normalize(cRanks), animationDuration, () => {
+                                    processDiv.innerHTML = 'Done!';
                                     cy.edges().removeStyle();
-                                    cRanks = normalize(cRanks);
-                                    animateNodes(cRanks, animationDuration, () => {
-                                        cy.elements(':grabbable').stop();
-                                        setTimeout(() => {
-                                            // continue to iterate if not converged
-                                            if (
-                                                math.norm(math.subtract(pRanks, cRanks)) >
-                                                minimalDifference
-                                            )
-                                                call(t + 1, 0, cRanks, cRanks.concat());
-                                            else {
-                                                processDiv.innerHTML = 'Done!';
-                                            }
-                                        }, 10);
-                                    });
-                                }
-                                // normalize PR values after completion
-                                else if (
-                                    math.norm(math.subtract(pRanks, cRanks)) > minimalDifference
-                                )
-                                    call(t + 1, 0, cRanks, cRanks.concat());
-                                else {
-                                    processDiv.innerHTML = 'Normalizing PR values...';
-                                    animateNodes(normalize(cRanks), animationDuration, () => {
-                                        processDiv.innerHTML = 'Done!';
-                                        cy.edges().removeStyle();
-                                    });
-                                }
+                                });
                             }
                         }
                     }
@@ -868,7 +864,7 @@ function myPageRank() {
 
     /**
      * @param {Array|Object} v
-     * @return Array|Object
+     * @return {Array|Object}
      * */
     function normalize(v) {
         const sum = math.sum(v);
