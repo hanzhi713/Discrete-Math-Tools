@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Roots of polynomials composite moduli</title>
+</head>
+<body style="text-align: center">
+
+<p>Composite moduli</p>
+
+<form id="frm" onsubmit="compModuli()">
+    <div id="input_polynomial">
+        (<input type="text" class="coeff">*x1 - <input type="text" class="root">) * (x2 - <input type="coeff" class="root">) = 0 (mod <input type="text" id="moduli">)<br>
+    </div>
+    <input type="submit" value="Submit">
+</form>
+
+<button onclick="addElement()">Add</button>
+    <script>
+    function compModuli(){
+        coefficients = document.getElementsByClassName("coeff")
+        roots = document.getElementsByClassName("root")
+        moduli = document.getElementById("moduli")
+        
+        prime_list = factorization(moduli)
+        
+        matches = [[]]
+        
+        level = prime_list.length
+        breadth = coefficients.length
+
+        ids = []
+        
+        for(i = 0; i < coefficients.length; i++){
+            ids.add(i)
+        }
+        
+        num_combination = 0
+        while(level != 0){
+            num_combination += breadth
+            breadth --
+        }
+
+        
+        
+    }
+    //return a 2d array  chooseFrom 
+    function permutation(choose_from, level, list){
+        if(level != 1){
+            lst = [[]]
+            
+            for(i = 0; i < choose_from.length; i++){
+                temp = list.append(choose_from[i])
+                lst.extend(permutation(choose_from.splice(i, 1), level - 1, temp))
+                
+            }
+            return lst
+        }
+        lst = [[]]
+        for(i = 0; i < choose_from; i++){
+            list = list.append(choose_from[i])
+            lst.add(list)
+        }
+        return lst
+    }
+
+    
+
+    function addElement(){
+        $( "#input_polynomial" ).prepend( "(<input type='text' class='coeff'>*x1 - <input type='text' class='root'>)" )
+    }
+
+    function factorization(num){
+        return []
+    }
+
+    function simultaneous_congruences(a, rs, ps){
+        
+    }
+
+    function gcd(){
+
+    }
+
+    function diophantine_equations(){
+
+    }
+    
+    </script>
+
+</body>
+</html>
