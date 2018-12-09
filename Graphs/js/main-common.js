@@ -5,6 +5,7 @@
  * @public
  * @param {object} c
  * @return void
+ * Hide the result canvas
  * */
 function hideResult(c) {
     const cy_div = $('#cy');
@@ -38,8 +39,9 @@ function hideResult(c) {
 /**
  * @function
  * @private
- * @param {object} isSimple
+ * @param {HTMLInputElement} isSimple
  * @return void
+ * Hide the weighted checkbox
  * */
 function hideWeight(isSimple) {
     const a = $('#weighted');
@@ -56,6 +58,7 @@ function hideWeight(isSimple) {
  * @function
  * @param {object} cb
  * @return void
+ * Hide the animation duration input box
  */
 function hideDuration(cb) {
     const d = $('#label-duration');
@@ -66,6 +69,7 @@ function hideDuration(cb) {
  * @public
  * @function
  * @return void
+ * Call the corresponding algorithm
  * */
 function callToAlgorithms() {
     const algo = document.getElementById('algorithms');
@@ -111,32 +115,32 @@ let copiedEles;
 let drawOn = false;
 /**
  * weight_input text box
- * @type {HTMLElement}
+ * @type {HTMLInputElement}
  * */
 const weight_input = document.getElementById('weight');
 /**
  * matrix_input text box
- * @type {HTMLElement}
+ * @type {HTMLTextAreaElement}
  * */
 const matrix_input = document.getElementById('matrix_input');
 /**
  * auto_refresh checkbox
- * @type {HTMLElement}
+ * @type {HTMLInputElement}
  * */
 const auto_refresh = document.getElementById('autorefresh');
 /**
  * "perform animation" button
- * @type {HTMLElement}
+ * @type {HTMLButtonElement}
  * */
 const perform_button = document.getElementById('perform');
 /**
  * the animation checkbox
- * @type {HTMLElement}
+ * @type {HTMLInputElement}
  * */
 const animation_check = document.getElementById('animation');
 /**
  * animation duration
- * @type {HTMLElement}
+ * @type {HTMLInputElement}
  * */
 const duration = document.getElementById('duration');
 
@@ -872,7 +876,7 @@ function readWM() {
  * @function
  * @param {string} prompt_text
  * @param {string} default_value
- * @return {object|undefined} The first node (selected or entered)
+ * @return {cytoscape.NodeSingular|undefined} The first node (selected or entered)
  * */
 function getCyStartNode(prompt_text, default_value) {
     let root = cy.nodes(':selected');
@@ -886,7 +890,7 @@ function getCyStartNode(prompt_text, default_value) {
  * Concert a two dimensional matrix to string
  * @function
  * @public
- * @param {Array} m
+ * @param {Array<number>} m
  * @return {string}
  * */
 function matrixToString(m) {
@@ -901,7 +905,7 @@ function matrixToString(m) {
  * @public
  * @param {cytoscape.Core} c The Cytoscape object
  * @param {boolean} output
- * @return {Array}
+ * @return {Array<number>}
  * */
 function getAM(c, output) {
     const nodes = getAllNodes(c);
@@ -934,7 +938,7 @@ function getAM(c, output) {
  * @public
  * @param {cytoscape.Core} c The Cytoscape object
  * @param {boolean} output
- * @return {Array}
+ * @return {Array<number>}
  * */
 function getWM(c, output) {
     const nodes = getAllNodes(c);

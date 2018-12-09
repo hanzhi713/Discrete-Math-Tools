@@ -7,7 +7,7 @@
         "semi": 2,
         "prettier/prettier": "error",
         "camelcase": 0,
-        "no-unused-vars": "warn",
+        "no-unused-vars": "off",
         "no-use-before-define": "warn",
         "radix": "off",
         "no-plusplus": "off",
@@ -15,12 +15,13 @@
         "no-nested-ternary": "off",
         "strict": "off",
         "no-eval": "off",
-        "no-restricted-globals": "warn",
+        "no-restricted-globals": "off",
         "no-alert": "off",
         "prefer-destructuring": "warn",
         "no-lonely-if": "warn",
         "no-bitwise": "off",
-        "no-param-reassign": "warn"
+        "no-param-reassign": "warn",
+        "no-console": "off"
     },
     "env": {
         "browser": true,

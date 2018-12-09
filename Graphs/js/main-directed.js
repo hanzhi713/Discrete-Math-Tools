@@ -1,3 +1,5 @@
+/* global _, addEdge, addEdgeBetweenSelected, addEdgeBwt, addNode, addOneNode, animation_check, animationFlag, auto_refresh, ca, CaLayout, callToAlgorithms, caReLayout, changeLayout, clearCaStyle, clearCyStyle, clearResult, clearSource, copiedEles, copy, cy, CyLayout, cyReLayout, drawOn, duplicateEdge, duration, getAM, getAllNodes, getCaTarget, getCyStartNode, getTarget, getWeight, getWM, hideDuration, hideResult, hideWeight, initCircularMenu, initConventionalMenu, initializeCytoscapeObjects, layoutName, LinkedList, LinkedListNode, math, matrixToString, paste, perform_bottom, readAM, readWM, reLayout, removeEdge, removeNode, removeSelected, selectAllOfTheSameType, snapToGrid, stopAnimation, weight_input */
+
 'use strict';
 
 const processDiv = document.getElementById('process');
@@ -236,43 +238,6 @@ function Kn() {
 // }
 
 /**
- * Generate a complete graph of n vertices by first generating its corresponding adjacency matrix
- * @function
- * @public
- * @return void
- * */
-function Kn() {
-    stopAnimation();
-    clearSource();
-    const numOfNodes = parseInt(prompt('Please enter the number of vertices', '5'));
-    const weightRange = prompt(
-        'Please specify the weight range.\nLeave this blank if you want an unweighted graph.\nExample: 1-5 represents range from 1 to 5.\nLower limit must be greater than 0.',
-        ''
-    );
-    const matrix = new Array(numOfNodes);
-    if (weightRange.length > 0) {
-        const temp = weightRange.split('-');
-        const lower = parseInt(temp[0]) > 0 ? parseInt(temp[0]) : 1;
-        const range = parseInt(temp[1]) > lower ? parseInt(temp[1]) - lower + 1 : lower + 4;
-
-        // fill in the half above the major diagonal (exclude major diagonal) with random weights in the give range
-        for (let i = 0; i < numOfNodes; i++) {
-            matrix[i] = new Array(numOfNodes);
-            for (let j = 0; j < numOfNodes; j++)
-                if (i !== j) matrix[i][j] = parseInt(Math.random() * range + lower);
-        }
-        createFromWM(matrix);
-    } else {
-        // fill in the half above the major diagonal (exclude major diagonal) with 1
-        for (let i = 0; i < numOfNodes; i++) {
-            matrix[i] = new Array(numOfNodes);
-            for (let j = 0; j < numOfNodes; j++) if (i !== j) matrix[i][j] = 1;
-        }
-        createFromAM(matrix);
-    }
-}
-
-/**
  * @public
  * @function
  * @param {string} prompt_text
@@ -300,10 +265,10 @@ function breadthFirstSearch() {
     if (root === undefined) return;
     clearCyStyle();
     cy.elements(':grabbable').unselect();
-    const path = cy.elements(':grabbable').bfs({
+    const { path } = cy.elements(':grabbable').bfs({
         root,
         directed: true
-    }).path;
+    });
     clearResult();
     const pathList = new LinkedList();
     path.select();
@@ -327,10 +292,10 @@ function depthFirstSearch() {
     if (root === undefined) return;
     clearCyStyle();
     cy.elements(':grabbable').unselect();
-    const path = cy.elements(':grabbable').dfs({
+    const { path } = cy.elements(':grabbable').dfs({
         root,
         directed: true
-    }).path;
+    });
     clearResult();
     const pathList = new LinkedList();
     path.select();
@@ -738,6 +703,15 @@ function myPageRank() {
     }
 
     /**
+     * @param {Array|Object} v
+     * @return {Array|Object}
+     * */
+    function normalize(v) {
+        const sum = math.sum(v);
+        return v.map(val => val / sum);
+    }
+
+    /**
      * @param {int} i index of current node
      * @param {Array} cRanks current PR
      * @param {Array} pRanks previous PR
@@ -860,15 +834,6 @@ function myPageRank() {
                 });
             }, 10);
         }
-    }
-
-    /**
-     * @param {Array|Object} v
-     * @return {Array|Object}
-     * */
-    function normalize(v) {
-        const sum = math.sum(v);
-        return v.map(val => val / sum);
     }
 
     if (animation_check.checked) {
