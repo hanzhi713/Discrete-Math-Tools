@@ -17,155 +17,167 @@
 <button onclick="addElement()">Add</button>
     <script>
     function compModuli(){
-        var coefficients = document.getElementsByClassName("coeff");
-        var remainders = document.getElementsByClassName("root");
-        var moduli = document.getElementById("moduli");
-        
-        var divisors = factorization(moduli)
-        
-        var matches = [[]]
-        
-        var level = divisors.length
+    var coefficients = [1, 1];
+    var remainders = [1, -1];
+    var moduli = 77;
+    
+    var divisors_set = factorization(moduli)
 
-        var id = []
-        
-        for(i = 0; i < coefficients.length; i++){
-            id.push(i);
-        }
-        
-        ids = permutation(id, level, []);
-        
-        var solution_list = [];
+    var divisors = [];
+    divisors_set.forEach(v => divisors.push(v));
 
-        for(i = 0; i < ids.length; i++){
-            var c = [];
-            var r = [];
-            for(j = 0; j < ids[i].length; j++){
-                c.push(coefficients[ids[i]]);
-                r.push(remainders[ids[i]]);
-                
+    var level = divisors.length
+
+    var id = [];
+
+    for(i = 0; i < coefficients.length; i++){
+        id.push(i);
+    }
+    
+    var ids = permutation(id, level, []);
+    
+    var solution_list = [];
+
+    for(var i = 0; i < ids.length; i++){
+        var c = [];
+        var r = [];
+        
+        for(var j = 0; j < ids[i].length; j++){
+            c.push(coefficients[ids[i][j]]);
+
+            temp = remainders[ids[i][j]];
+            
+            while(temp < 0){
+                temp += divisors[j];
             }
             
-            var decoeff_r = []
-
-            for(j = 0; j < r.length; j++){
-                decoeff_r[j] = de_coefficient(c[j], r[j], divisors[j]);
-            }
-
-            solution_list.push.apply(simultaneous_congruences(decoeff_r, divisors));
-
+            r.push(temp);
         }
 
+        var decoeff_r = []
+
+        for(var k = 0; k < r.length; k++){
+
+            decoeff_r[k] = de_coefficient(c[k], r[k], divisors[k]);
+            
+        }
+
+        solution_list.push(simultaneous_congruences(decoeff_r, divisors));
+        
     }
 
-    //return a 2d array  chooseFrom 
-    function permutation(choose_from, level, list){
-        if(level !== 1){
-            var lst = [];
-            for(var i = 0; i < choose_from.length; i++){
-                var temp = list.concat();
-                temp.push(choose_from[i]);
+    console.log(solution_list);
 
-                var temp_choose_from = [];
+}
 
-                for(var k = 0; k < choose_from.length; k++){
-                    if(k != i){
-                        temp_choose_from.push(choose_from[k]);
-                    }
-                }
-
-                lst.push.apply(lst, permutation(temp_choose_from, level - 1, temp));
-            }
-            
-            return lst;
-
-        }
+//return a 2d array  chooseFrom 
+function permutation(choose_from, level, list){
+    if(level !== 1){
         var lst = [];
         for(var i = 0; i < choose_from.length; i++){
             var temp = list.concat();
             temp.push(choose_from[i]);
-            lst.push(temp);
+
+            var temp_choose_from = [];
+
+            for(var k = 0; k < choose_from.length; k++){
+                if(k != i){
+                    temp_choose_from.push(choose_from[k]);
+                }
+            }
+
+            lst.push.apply(lst, permutation(temp_choose_from, level - 1, temp));
         }
+        
         return lst;
-    }
 
+    }
+    var lst = [];
+    for(var i = 0; i < choose_from.length; i++){
+        var temp = list.concat();
+        temp.push(choose_from[i]);
+        lst.push(temp);
+    }
+    return lst;
+}
+
+
+
+function addElement(){
+    $( "#input_polynomial" ).prepend( "(<input type='text' class='coeff'>*x1 - <input type='text' class='root'>)" );
+}
+
+function factorization(num){
+    var f = 2;
+    var a = new Set([]);
     
-
-    function addElement(){
-        $( "#input_polynomial" ).prepend( "(<input type='text' class='coeff'>*x1 - <input type='text' class='root'>)" );
+    while(num % 2 == 0){
+        a.add(2);
+        num /= 2;
     }
 
-    function factorization(num){
-        var f = 2;
-        var a = new Set([]);
-        
-        while(num % 2 == 0){
-            a.add(2);
-            num /= 2;
+    f = 3;
+    
+    while(f * f < num){
+        while(num % f == 0){
+            a.add(f);
+            num /= f;
         }
-
-        f = 3;
-        
-        while(f * f < num){
-            while(num % f == 0){
-                a.add(f);
-                num /= f;
-            }
-            f += 2;
-        }
-
-        if(num != 0){
-            a.add(num);
-        }
-        
-        return a;
+        f += 2;
     }
 
-    function simultaneous_congruences(remainders, modulus){
-        var product = 1;
-        for(i = 0; i < modulus.length; i++){
-            product *= modulus[i];
-        }
-        
-        var multipliers = []
-
-        for(i = 0; i < remainders.length; i++){
-            var prod = product / modulus[i];
-            multipliers[i] = 1;
-            while((multipliers[i] * prod) % modulus[i] != remainders[i]){
-                multipliers[i] = multipliers[i] + 1;
-            }
-        }
-        
-        var con = 0;
-
-        for(i = 0; i < multipliers.length; i++){
-            con += multipliers[i] * (product / modulus[i]);
-        }
-
-        return [con, product];
+    if(num != 0){
+        a.add(num);
     }
+    
+    return a;
+}
 
-    function gcd(a, b){
+function simultaneous_congruences(remainders, modulus){
+    var product = 1;
+    for(var i = 0; i < modulus.length; i++){
+        product *= modulus[i];
+    }
+    
+    var multipliers = []
 
-        while (true) {
-            if(a > b){
-                a %= b;
-            }else{
-                b %= a;
-            }
-            if(a == 0 || b == 0){
-                 return (a == 0) ? b : a;
-            }
+    for(var i = 0; i < remainders.length; i++){
+        var prod = product / modulus[i];
+        multipliers[i] = 1;
+        while((multipliers[i] * prod) % modulus[i] != remainders[i]){
+            multipliers[i] = multipliers[i] + 1;
         }
     }
+    
+    var con = 0;
 
-    function de_coefficient(coef, remainder, divisor){
-        while(remainder % coef != 0){
-            remainder += divisor;
-        }
-        return remainder / coef;
+    for(var i = 0; i < multipliers.length; i++){
+        con += multipliers[i] * (product / modulus[i]);
     }
+
+    return [con, product];
+}
+
+function gcd(a, b){
+
+    while (true) {
+        if(a > b){
+            a %= b;
+        }else{
+            b %= a;
+        }
+        if(a == 0 || b == 0){
+             return (a == 0) ? b : a;
+        }
+    }
+}
+
+function de_coefficient(coef, remainder, divisor){
+    while(remainder % coef != 0){
+        remainder += divisor;
+    }
+    return remainder / coef;
+}
     
     </script>
 
