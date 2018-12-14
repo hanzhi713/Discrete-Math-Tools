@@ -9,7 +9,7 @@
 
 <form id="frm" onsubmit="compModuli()">
     <div id="input_polynomial">
-        (<input type="text" class="coeff">*x1 - <input type="text" class="root">) * (x2 - <input type="coeff" class="root">) = 0 (mod <input type="text" id="moduli">)<br>
+        (<input type="text" class="coeff">*x2 - <input type="text" class="root">) * (x1 - <input type="coeff" class="root">) = 0 (mod <input type="text" id="moduli">)<br>
     </div>
     <input type="submit" value="Submit">
 </form>
@@ -17,23 +17,45 @@
 <button onclick="addElement()">Add</button>
     <script>
     function compModuli(){
-        coefficients = document.getElementsByClassName("coeff")
-        roots = document.getElementsByClassName("root")
-        moduli = document.getElementById("moduli")
+        var coefficients = document.getElementsByClassName("coeff");
+        var remainders = document.getElementsByClassName("root");
+        var moduli = document.getElementById("moduli");
         
-        prime_list = factorization(moduli)
+        var divisors = factorization(moduli)
         
-        matches = [[]]
+        var matches = [[]]
         
-        level = prime_list.length
-        breadth = coefficients.length
+        var level = divisors.length
 
-        ids = []
+        var id = []
         
         for(i = 0; i < coefficients.length; i++){
-            ids.add(i)
+            id.push(i);
         }
         
+        ids = permutation(id, level, []);
+        
+        var solution_list = [];
+
+        for(i = 0; i < ids.length; i++){
+            var c = [];
+            var r = [];
+            for(j = 0; j < ids[i].length; j++){
+                c.push(coefficients[ids[i]]);
+                r.push(remainders[ids[i]]);
+                
+            }
+            
+            var decoeff_r = []
+
+            for(j = 0; j < r.length; j++){
+                decoeff_r[j] = de_coefficient(c[j], r[j], divisors[j]);
+            }
+
+            solution_list.push.apply(simultaneous_congruences(decoeff_r, divisors));
+
+        }
+
     }
 
     //return a 2d array  chooseFrom 
@@ -70,7 +92,7 @@
     
 
     function addElement(){
-        $( "#input_polynomial" ).prepend( "(<input type='text' class='coeff'>*x1 - <input type='text' class='root'>)" )
+        $( "#input_polynomial" ).prepend( "(<input type='text' class='coeff'>*x1 - <input type='text' class='root'>)" );
     }
 
     function factorization(num){
@@ -138,8 +160,11 @@
         }
     }
 
-    function diophantine_equations(){
-
+    function de_coefficient(coef, remainder, divisor){
+        while(remainder % coef != 0){
+            remainder += divisor;
+        }
+        return remainder / coef;
     }
     
     </script>
