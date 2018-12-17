@@ -255,13 +255,10 @@ function cyReLayout() {
     for (let i = 0; i < cy.edges().length; i++) totalWeight += getWeight(cy.edges()[i]);
     document.getElementById('cy_weight').innerHTML = totalWeight.toString();
     if (CyLayout !== undefined) CyLayout.stop();
-    if (layoutName === '') return;
-    CyLayout = cy.layout(layoutOptions[layoutName]);
-    CyLayout.on('layoutstop', e => {
-        cy.edges().hide();
-        cy.edges().show();
-    });
-    CyLayout.run();
+    if (layoutName !== '') {
+        CyLayout = cy.layout(layoutOptions[layoutName]);
+        CyLayout.run();
+    }
 }
 /**
  * Rerun the layout for the graph and recalculate its total weight
@@ -274,13 +271,10 @@ function caReLayout() {
     for (let i = 0; i < ca.edges().length; i++) totalWeight += getWeight(ca.edges()[i]);
     document.getElementById('ca_weight').innerHTML = totalWeight.toString();
     if (CaLayout !== undefined) CaLayout.stop();
-    if (layoutName === '') return;
-    CaLayout = ca.layout(layoutOptions[layoutName]);
-    CaLayout.on('layoutstop', e => {
-        ca.edges().hide();
-        ca.edges().show();
-    });
-    CaLayout.run();
+    if (layoutName !== '') {
+        CaLayout = ca.layout(layoutOptions[layoutName]);
+        CaLayout.run();
+    }
 }
 /**
  * @function

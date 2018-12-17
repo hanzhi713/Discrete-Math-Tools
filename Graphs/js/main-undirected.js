@@ -1078,7 +1078,7 @@ function traceEulerianCycle(start, c) {
      * @return {boolean}
      */
     function hasUnselEdges(ele) {
-        return ele.isNode() && ele.connectedEdges(':unselected') > 0;
+        return ele.isNode() && ele.connectedEdges(':unselected').length > 0;
     }
 
     while (true) {
@@ -1314,6 +1314,8 @@ function CPP() {
     stopAnimation();
     clearCyStyle();
     cy.elements(':grabbable').unselect();
+
+    if (!isConnected()) return alert('This graph is not connected!');
 
     // get the collection of odd nodes
     getAllNodes(cy).forEach(ele => {
