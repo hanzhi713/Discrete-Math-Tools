@@ -2,7 +2,7 @@
     "typeAcquisition": {
         "include": [
             "lodash",
-            "jQuery",
+            "jquery",
             "cytoscape",
             "mathjs",
         ]
