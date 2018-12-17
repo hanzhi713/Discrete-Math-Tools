@@ -547,36 +547,30 @@ function pageRank() {
  * @return {void}
  * */
 function myPageRank() {
-    /**
-     * @type {Number} damping factor d
-     * */
+    // damping factor d
     const dpFactor = 0.85;
-    /**
-     * @type {Number} minimal difference ε
-     * */
+    // minimal difference ε
     const minimalDifference = 1e-4;
     const nodes = getAllNodes(cy);
     const len = nodes.length;
-    const outEdgeStats = new Array(len);
     /**
-     * @type {Array} adjacency matrix
-     * */
+     * @type {Array<number>}
+     */
+    const outEdgeStats = new Array(len);
     const adjacencyMatrix = getAM(cy, false);
     /**
-     * @type {int} basic size of nodes in pixels
+     * @type {number} basic size of nodes in pixels
      * */
     const basicSize = 250;
     const delSize = 15;
 
-    /**
-     * @type {Number} (1 - d) / N
-     * */
+    // (1 - d) / N
     const tailNumber = (1 - dpFactor) / len;
     const animationDuration = Math.round(+duration.value);
     const normalizeInMiddle = true;
 
     /**
-     * @type {int} no-animation calculation method
+     * @type {number} no-animation calculation method
      * 1 -> iterative
      * 2 -> matrix-iterative
      * 3 -> algebraic
@@ -588,27 +582,30 @@ function myPageRank() {
         outEdgeStats[i] = n.outgoers('edge').length;
     });
 
-    // initial rankings
+    /**
+     * initial rankings
+     * @type {Array<number>}
+     */
     let ranks = new Array(len);
     for (let i = 0; i < len; i++) ranks[i] = 1 / len;
 
     /**
      * find the maximum and minimum anomg the vector of ranks
-     * @param {Array} ranks
-     * @return {Array}
+     * @param {Array<number>} rks
+     * @return {Array<number>}
      * */
-    function findMinAndMax(ranks) {
+    function findMinAndMax(rks) {
         let min = Infinity;
         let max = 0;
         for (let i = 0; i < len; i++) {
-            if (ranks[i] < min) min = ranks[i];
-            if (ranks[i] > max) max = ranks[i];
+            if (ranks[i] < min) min = rks[i];
+            if (ranks[i] > max) max = rks[i];
         }
         return [min, max];
     }
 
     /**
-     * @param {int} size
+     * @param {number} size
      * @param {string} color
      * @return {Object}
      * */
@@ -621,8 +618,8 @@ function myPageRank() {
     }
 
     /**
-     * @param {int} size
-     * @param {Number} rank
+     * @param {number} size
+     * @param {number} rank
      * @return {Object}
      * */
     function getLabelStyle(size, rank) {
@@ -649,9 +646,9 @@ function myPageRank() {
     }
 
     /**
-     * @param {Array} ranks
-     * @param {int} duration
-     * @param {function} callback
+     * @param {Array<number>} ranks
+     * @param {number} duration
+     * @param {Function} callback
      * */
     function animateNodes(ranks, duration, callback = () => {}) {
         let [min, max] = findMinAndMax(ranks);
@@ -670,8 +667,8 @@ function myPageRank() {
     }
 
     /**
-     * @param {Array|Object} v
-     * @return {Array|Object}
+     * @param {Array<number>} v
+     * @return {Array<number>}
      * */
     function normalize(v) {
         const sum = math.sum(v);
@@ -679,10 +676,10 @@ function myPageRank() {
     }
 
     /**
-     * @param {int} i index of current node
-     * @param {Array} cRanks current PR
-     * @param {Array} pRanks previous PR
-     * @param {int} t iteration index
+     * @param {number} i index of current node
+     * @param {Array<number>} cRanks current PR
+     * @param {Array<number>} pRanks previous PR
+     * @param {number} t iteration index
      * */
     function call(t, i, cRanks, pRanks) {
         cy.edges().removeStyle();

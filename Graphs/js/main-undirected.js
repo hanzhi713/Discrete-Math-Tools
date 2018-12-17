@@ -6,8 +6,8 @@
  * the factorial function
  * @public
  * @function
- * @param {int} n
- * @return {int}
+ * @param {number} n
+ * @return {number}
  * */
 function f(n) {
     return n <= 1 ? 1 : n * f(n - 1);
@@ -426,7 +426,7 @@ function myDijkstra() {
      * @private
      * @param {cytoscape.NodeSingular} node
      * @callback
-     * @param {function} callback
+     * @param {Function} callback
      * the function to execute after completion of animation
      * @return {void}
      * */
@@ -458,7 +458,7 @@ function myDijkstra() {
      * @private
      * @param {cytoscape.EdgeSingular} edge
      * @callback
-     * @param {function} callback
+     * @param {Function} callback
      * the function to execute after completion of animation
      * @return {void}
      * */
@@ -488,7 +488,7 @@ function myDijkstra() {
      * @private
      * @param {cytoscape.NodeSingular} node
      * @callback
-     * @param {function} callback
+     * @param {Function} callback
      * the function to execute after completion of animation
      * @return {void}
      * */
@@ -596,7 +596,7 @@ function myDijkstra() {
      * current node with a permanent label
      * @param {cytoscape.EdgeCollection} edges
      * all edges connect to n
-     * @param {int} i
+     * @param {number} i
      * the index of the edge that we're up to
      * @return {void}
      * */
@@ -1176,8 +1176,8 @@ function eulerianCycle() {
 }
 /**
  * @param {Array} weightMatrix
- * @param {int} numOfThreads
- * @param {function} callback
+ * @param {number} numOfThreads
+ * @param {Function} callback
  * The callback function to be executed after completion of all threads
  * @return {void}
  * */

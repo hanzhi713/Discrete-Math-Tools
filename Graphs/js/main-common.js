@@ -238,7 +238,7 @@ function addOneNode(random, position) {
  * @function
  * @public
  * @param {cytoscape.EdgeSingular} edge
- * @return {int} weight
+ * @return {number} weight
  * */
 function getWeight(edge) {
     const weight = edge.data('weight');
@@ -384,7 +384,7 @@ function snapToGrid(c, flag) {
 /**
  * @function
  * @public
- * @param {int} idx
+ * @param {number} idx
  * @return {void}
  * */
 function changeLayout(idx) {
@@ -479,7 +479,7 @@ function removeSelected() {
  * @public
  * @param {string} src
  * @param {string} tg
- * @param {int} w
+ * @param {number} w
  * @return {cytoscape.EdgeSingular} the edge added
  * */
 function addEdgeBwt(src, tg, w) {
@@ -615,7 +615,7 @@ function readWM() {
  * @function
  * @param {string} prompt_text
  * @param {string} default_value
- * @return {cytoscape.NodeSingular|undefined} The first node (selected or entered)
+ * @return {cytoscape.NodeSingular} The first node (selected or entered)
  * */
 function getCyStartNode(prompt_text, default_value) {
     let root = cy.nodes(':selected');
@@ -629,7 +629,7 @@ function getCyStartNode(prompt_text, default_value) {
  * Concert a two dimensional matrix to string
  * @function
  * @public
- * @param {Array<number>} m
+ * @param {Array<Array<number>>} m
  * @return {string}
  * */
 function matrixToString(m) {
@@ -644,7 +644,7 @@ function matrixToString(m) {
  * @public
  * @param {cytoscape.Core} c The Cytoscape object
  * @param {boolean} output
- * @return {Array<number>}
+ * @return {Array<Array<number>>}
  * */
 function getAM(c, output) {
     const nodes = getAllNodes(c);
@@ -666,7 +666,6 @@ function getAM(c, output) {
         const i = id_index[ele.data('source')];
         const j = id_index[ele.data('target')];
         matrix[i][j] += 1;
-        if (i !== j) matrix[j][i] += 1;
     });
     if (output) document.getElementById('matrix_input').value = matrixToString(matrix);
     return matrix;
@@ -677,7 +676,7 @@ function getAM(c, output) {
  * @public
  * @param {cytoscape.Core} c The Cytoscape object
  * @param {boolean} output
- * @return {Array<number>}
+ * @return {Array<Array<number>>}
  * */
 function getWM(c, output) {
     const nodes = getAllNodes(c);
@@ -695,7 +694,6 @@ function getWM(c, output) {
         const w = getWeight(ele);
         if (matrix[i][j] === 0) matrix[i][j] = w;
         else if (w < matrix[i][j]) matrix[i][j] = w;
-        matrix[j][i] = matrix[i][j];
     });
     if (output) document.getElementById('matrix_input').value = matrixToString(matrix);
     return matrix;
@@ -712,7 +710,7 @@ function getWM(c, output) {
  * @typedef LinkedList
  * @type {object}
  * @property {LinkedListNode} head
- * @property {int} length
+ * @property {number} length
  * @property {function} getTail
  * @property {function} add
  * @property {function} addNode
@@ -740,7 +738,7 @@ class LinkedList {
          * */
         this.head = null;
         /**
-         * @type {int}
+         * @type {number}
          * @public
          * */
         this.length = 0;
@@ -750,6 +748,7 @@ class LinkedList {
      * Get the last node of the linked list
      * @public
      * @function
+     * @return {LinkedListNode}
      * */
     getTail() {
         let currentNode = this.head;
@@ -760,7 +759,7 @@ class LinkedList {
     /**
      * @public
      * @function
-     * @param cargo
+     * @param {*} cargo
      * add a cargo
      * */
     add(cargo) {
@@ -786,6 +785,7 @@ class LinkedList {
      * @public
      * @function
      * @param {function} func
+     * @return {LinkedListNode}
      * */
     search(func) {
         let currentNode = this.head;
