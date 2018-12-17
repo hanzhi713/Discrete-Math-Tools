@@ -1,4 +1,4 @@
-/* global _, addEdge, addEdgeBetweenSelected, addEdgeBwt, addNode, addOneNode, animation_check, animationFlag, auto_refresh, ca, CaLayout, callToAlgorithms, caReLayout, changeLayout, clearCaStyle, clearCyStyle, clearResult, clearSource, copiedEles, copy, cy, CyLayout, cyReLayout, drawOn, duplicateEdge, duration, getAM, getAllNodes, getCaTarget, getCyStartNode, getTarget, getWeight, getWM, hideDuration, hideResult, hideWeight, initCircularMenu, initConventionalMenu, initializeCytoscapeObjects, layoutName, LinkedList, LinkedListNode, math, matrix_input, matrixToString, paste, perform_bottom, readAM, readWM, reLayout, removeEdge, removeNode, removeSelected, perform_button, selectAllOfTheSameType, snapToGrid, stopAnimation, weight_input */
+/* global _, addEdge, addEdgeBetweenSelected, addEdgeBwt, addNode, addOneNode, animation_check, animationFlag: true, auto_refresh, ca, CaLayout, callToAlgorithms, caReLayout, changeLayout, clearCaStyle, clearCyStyle, clearResult, clearSource, copiedEles, copy, cy, CyLayout, cyReLayout, drawOn, duplicateEdge, duration, getAM, getAllNodes, getCaTarget, getCyStartNode, getTarget, getWeight, getWM, hideDuration, hideResult, hideWeight, initCircularMenu, initConventionalMenu, initializeCytoscapeObjects, layoutName, LinkedList, LinkedListNode, math, matrix_input, matrixToString, paste, perform_bottom, readAM, readWM, reLayout, removeEdge, removeNode, removeSelected, perform_button, selectAllOfTheSameType, snapToGrid, stopAnimation, weight_input */
 
 'use strict';
 
@@ -73,7 +73,7 @@ function createFromAM(m) {
  * @public
  * @param {Object|Array} m
  * The weight matrix
- * @return void
+ * @return {void}
  * */
 function createFromWM(m) {
     stopAnimation();
@@ -112,7 +112,7 @@ function createFromWM(m) {
  * generate a random graph
  * @function
  * @public
- * @return void
+ * @return {void}
  * */
 function generateGraph() {
     stopAnimation();
@@ -180,7 +180,7 @@ function generateGraph() {
  * Generate a complete graph of n vertices by first generating its corresponding adjacency matrix
  * @function
  * @public
- * @return void
+ * @return {void}
  * */
 function Kn() {
     stopAnimation();
@@ -217,7 +217,7 @@ function Kn() {
  * generate a complete bipartile graph by first generating its adjacency matrix
  * @function
  * @public
- * @return void
+ * @return {void}
  * */
 function Kn_n() {
     stopAnimation();
@@ -255,7 +255,7 @@ function Kn_n() {
  * Breadth first search is implemented in the library
  * @function
  * @public
- * @return void
+ * @return {void}
  * */
 function breadthFirstSearch() {
     stopAnimation();
@@ -278,7 +278,7 @@ function breadthFirstSearch() {
  * DFS implemented in the library
  * @function
  * @public
- * @return void
+ * @return {void}
  * */
 function depthFirstSearch() {
     stopAnimation();
@@ -301,7 +301,7 @@ function depthFirstSearch() {
  * Kruskal is implemented in the library
  * @function
  * @public
- * @return void
+ * @return {void}
  * */
 function performKruskal() {
     stopAnimation();
@@ -330,7 +330,7 @@ function performKruskal() {
  * Dijkstra is implemented in the library
  * @function
  * @public
- * @return void
+ * @return {void}
  * */
 function performDijkstra() {
     stopAnimation();
@@ -367,7 +367,7 @@ function performDijkstra() {
  * a detailed implementation of Dijkstra's algorithm, showing every step
  * @function
  * @public
- * @return void
+ * @return {void}
  * */
 function myDijkstra() {
     if (!isConnected()) {
@@ -428,7 +428,7 @@ function myDijkstra() {
      * @callback
      * @param {function} callback
      * the function to execute after completion of animation
-     * @return void
+     * @return {void}
      * */
     function animateNode(node, callback) {
         if (node !== undefined && node.length > 0)
@@ -460,7 +460,7 @@ function myDijkstra() {
      * @callback
      * @param {function} callback
      * the function to execute after completion of animation
-     * @return void
+     * @return {void}
      * */
     function animateEdge(edge, callback) {
         if (edge !== undefined && edge.length > 0)
@@ -490,7 +490,7 @@ function myDijkstra() {
      * @callback
      * @param {function} callback
      * the function to execute after completion of animation
-     * @return void
+     * @return {void}
      * */
     function animateLabel(node, callback) {
         if (node !== undefined && node.length > 0)
@@ -519,7 +519,7 @@ function myDijkstra() {
      * @function
      * @private
      * @param {cytoscape.NodeSingular} current
-     * @return void
+     * @return {void}
      * */
     function traceBack(current) {
         // animate current node
@@ -598,7 +598,7 @@ function myDijkstra() {
      * all edges connect to n
      * @param {int} i
      * the index of the edge that we're up to
-     * @return void
+     * @return {void}
      * */
     function addNextLabel(currentNode, edges, i) {
         // get the value of the permanent label
@@ -785,7 +785,7 @@ function myDijkstra() {
 /**
  * @function
  * @public
- * @return void
+ * @return {void}
  * */
 function prim() {
     stopAnimation();
@@ -891,7 +891,7 @@ function localMinimalWeightCycle(root) {
  * Find the minimal weight cycle, either local or global
  * @function
  * @public
- * @return void
+ * @return {void}
  * */
 function minimalWeightCycle() {
     stopAnimation();
@@ -910,8 +910,8 @@ function minimalWeightCycle() {
 
         // Traverse every node, finding the minimal weight cycle starting from each node
         // thus finding the minimal one from these local minimal cycles
-        getAllNodes(cy).forEach(root => {
-            const results = localMinimalWeightCycle(root);
+        getAllNodes(cy).forEach(startNode => {
+            const results = localMinimalWeightCycle(startNode);
             if (results[0] < globalMinWeight) {
                 [globalMinWeight, globalPath, globalE] = results;
             }
@@ -1014,7 +1014,7 @@ function nearestNeighborAlgorithm(root) {
  * find that of minimal weight by performing the algorithm on every node
  * @function
  * @public
- * @return void
+ * @return {void}
  * */
 function nearestNeighbor() {
     stopAnimation();
@@ -1061,7 +1061,7 @@ function nearestNeighbor() {
  * @param {cytoscape.NodeSingular} start
  * the cytoscape object
  * @param {cytoscape.Core} c
- * @return void
+ * @return {void}
  * */
 function traceEulerianCycle(start, c) {
     // establish a linked list and add first node into it
@@ -1072,6 +1072,15 @@ function traceEulerianCycle(start, c) {
     // get the unselected edges which are connected to this node
     let connectedEdges = currentNode.connectedEdges(':unselected');
     let nextJourney;
+
+    /**
+     * @param {cytoscape.Singular} ele
+     * @return {boolean}
+     */
+    function hasUnselEdges(ele) {
+        return ele.isNode() && ele.connectedEdges(':unselected') > 0;
+    }
+
     while (true) {
         // if there are unvisited edges connecting to this node
         while (connectedEdges.length > 0) {
@@ -1101,11 +1110,7 @@ function traceEulerianCycle(start, c) {
         // if there are still edges which remain unselected
         if (c.edges(':unselected').length !== 0) {
             // find the node which still have unselected edges connected to it
-            const node = path.search(element => {
-                if (element.isNode()) {
-                    if (element.connectedEdges(':unselected').length > 0) return true;
-                }
-            });
+            const node = path.search(hasUnselEdges);
 
             // break the journey (note: the next half of the journey journey will be added back later)
             nextJourney = node.next;
@@ -1174,7 +1179,7 @@ function eulerianCycle() {
  * @param {int} numOfThreads
  * @param {function} callback
  * The callback function to be executed after completion of all threads
- * @return void
+ * @return {void}
  * */
 function minimalWeightMatchingMultiThread(weightMatrix, numOfThreads, callback) {
     // generator is used to merge the results from each worker
@@ -1265,7 +1270,7 @@ function minimalWeightMatching() {
      * @function
      * @private
      * @param {Array} minPairing
-     * @return void
+     * @return {void}
      * */
     function displayPairings(minPairing) {
         /**
@@ -1303,7 +1308,7 @@ function minimalWeightMatching() {
  * solve the Chinese postman problem
  * @function
  * @public
- * @return void
+ * @return {void}
  * */
 function CPP() {
     stopAnimation();
@@ -1370,10 +1375,41 @@ function CPP() {
     minimalWeightMatchingMultiThread(weightMatrix, 4, displayResult);
 }
 /**
+ * Get the lower bound for the travelling salesman problem by vertex deletion algorithm
+ * @function
+ * @public
+ * @param {cytoscape.NodeSingular} root
+ * @return {Array}
+ * */
+function TSPLowerBound(root) {
+    cy.startBatch();
+    // starting from a given node
+    // find two connected edges of minimal weight, record the sum of their weight
+    const edges = root.connectedEdges().sort((e1, e2) => getWeight(e1) - getWeight(e2));
+    let weight = getWeight(edges[0]) + getWeight(edges[1]);
+
+    // remove this node and all its adjacent edges
+    cy.remove(root);
+
+    // find the minimal spanning tree of the remaining graph by kruskal
+    const spanningTree = cy.elements(':grabbable').kruskal(getWeight);
+
+    // calculate the total weight of this tree
+    spanningTree.edges().forEach(edge => {
+        weight += getWeight(edge);
+    });
+
+    // add back the removed stuffs
+    cy.add(root);
+    cy.add(edges);
+    cy.endBatch();
+    return [weight, edges[0], edges[1], spanningTree];
+}
+/**
  * find the maximal lower bound for TSP by performing the vertex deletion algorithm on every node
  * @function
  * @public
- * @return void
+ * @return {void}
  * */
 function TSPGlobalLowerBound() {
     stopAnimation();
@@ -1442,42 +1478,11 @@ function TSPGlobalLowerBound() {
     }
 }
 /**
- * Get the lower bound for the travelling salesman problem by vertex deletion algorithm
- * @function
- * @public
- * @param {cytoscape.NodeSingular} root
- * @return {Array}
- * */
-function TSPLowerBound(root) {
-    cy.startBatch();
-    // starting from a given node
-    // find two connected edges of minimal weight, record the sum of their weight
-    const edges = root.connectedEdges().sort((e1, e2) => getWeight(e1) - getWeight(e2));
-    let weight = getWeight(edges[0]) + getWeight(edges[1]);
-
-    // remove this node and all its adjacent edges
-    cy.remove(root);
-
-    // find the minimal spanning tree of the remaining graph by kruskal
-    const spanningTree = cy.elements(':grabbable').kruskal(getWeight);
-
-    // calculate the total weight of this tree
-    spanningTree.edges().forEach(edge => {
-        weight += getWeight(edge);
-    });
-
-    // add back the removed stuffs
-    cy.add(root);
-    cy.add(edges);
-    cy.endBatch();
-    return [weight, edges[0], edges[1], spanningTree];
-}
-/**
  * generate graphml from the graph
  * @function
  * @public
  * @param {cytoscape.Core} c
- * @return void
+ * @return {void}
  * */
 function getGraphML(c) {
     matrix_input.value = c.graphml();
@@ -1488,7 +1493,7 @@ function getGraphML(c) {
  * it's not working very well and is therefore temporarily disabled
  * @function
  * @public
- * @return void
+ * @return {void}
  * */
 function readGraphML() {
     clearSource();

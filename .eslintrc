@@ -21,7 +21,8 @@
         "no-lonely-if": "warn",
         "no-bitwise": "off",
         "no-param-reassign": "warn",
-        "no-console": "off"
+        "no-console": "off",
+        "prefer-const": "warn"
     },
     "env": {
         "browser": true,
@@ -29,7 +30,7 @@
     },
     "globals": {
         "ctyoscape": false,
-        "layout_options": false,
+        "layoutOptions": false,
         "defaultStyle": false
     },
     "plugins": ["prettier"],

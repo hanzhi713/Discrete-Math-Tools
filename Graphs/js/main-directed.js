@@ -1,4 +1,4 @@
-/* global _, addEdge, addEdgeBetweenSelected, addEdgeBwt, addNode, addOneNode, animation_check, animationFlag, auto_refresh, ca, CaLayout, callToAlgorithms, caReLayout, changeLayout, clearCaStyle, clearCyStyle, clearResult, clearSource, copiedEles, copy, cy, CyLayout, cyReLayout, drawOn, duplicateEdge, duration, getAM, getAllNodes, getCaTarget, getCyStartNode, getTarget, getWeight, getWM, hideDuration, hideResult, hideWeight, initCircularMenu, initConventionalMenu, initializeCytoscapeObjects, layoutName, LinkedList, LinkedListNode, math, matrixToString, paste, perform_bottom, readAM, readWM, reLayout, removeEdge, removeNode, removeSelected, selectAllOfTheSameType, snapToGrid, stopAnimation, weight_input */
+/* global _, addEdge, addEdgeBetweenSelected, addEdgeBwt, addNode, addOneNode, animation_check, animationFlag: true, auto_refresh, ca, CaLayout, callToAlgorithms, caReLayout, changeLayout, clearCaStyle, clearCyStyle, clearResult, clearSource, copiedEles, copy, cy, CyLayout, cyReLayout, drawOn, duplicateEdge, duration, getAM, getAllNodes, getCaTarget, getCyStartNode, getTarget, getWeight, getWM, hideDuration, hideResult, hideWeight, initCircularMenu, initConventionalMenu, initializeCytoscapeObjects, layoutName, LinkedList, LinkedListNode, math, matrix_input, matrixToString, paste, perform_bottom, readAM, readWM, reLayout, removeEdge, removeNode, removeSelected, perform_button, selectAllOfTheSameType, snapToGrid, stopAnimation, weight_input */
 
 'use strict';
 
@@ -9,9 +9,9 @@ hideResult(document.getElementById('hide_result'));
  * create graph from an adjacency matrix
  * @function
  * @public
- * @param {Object|Array} m
+ * @param {Array<Array<number>>} m
  * The adjacency matrix
- * @return void
+ * @return {void}
  * */
 function createFromAM(m) {
     stopAnimation();
@@ -54,9 +54,9 @@ function createFromAM(m) {
  * create the graph from a weight matrix
  * @function
  * @public
- * @param {Object|Array} m
+ * @param {Array<Array<number>>} m
  * The weight matrix
- * @return void
+ * @return {void}
  * */
 function createFromWM(m) {
     stopAnimation();
@@ -95,7 +95,7 @@ function createFromWM(m) {
  * generate a random graph
  * @function
  * @public
- * @return void
+ * @return {void}
  * */
 function generateGraph() {
     stopAnimation();
@@ -165,7 +165,7 @@ function generateGraph() {
  * Generate a complete graph of n vertices by first generating its corresponding adjacency matrix
  * @function
  * @public
- * @return void
+ * @return {void}
  * */
 function Kn() {
     stopAnimation();
@@ -202,7 +202,7 @@ function Kn() {
 //  * generate a complete bipartile graph by first generating its adjacency matrix
 //  * @function
 //  * @public
-//  * @return void
+//  * @return {void}
 //  * */
 // function Kn_n() {
 //     stopAnimation();
@@ -257,7 +257,7 @@ function getCyStartNode(prompt_text, default_value) {
  * Breadth first search is implemented in the library
  * @function
  * @public
- * @return void
+ * @return {void}
  * */
 function breadthFirstSearch() {
     stopAnimation();
@@ -284,7 +284,7 @@ function breadthFirstSearch() {
  * DFS implemented in the library
  * @function
  * @public
- * @return void
+ * @return {void}
  * */
 function depthFirstSearch() {
     stopAnimation();
@@ -307,44 +307,11 @@ function depthFirstSearch() {
     pathList.traverse(animation_check.checked, true);
 }
 
-// /**
-//  * Kruskal is implemented in the library
-//  * @function
-//  * @public
-//  * @return void
-//  * */
-// function performKruskal() {
-//     stopAnimation();
-//     clearCyStyle();
-//     cy.elements(":grabbable").unselect();
-//     let spanningTree = cy.elements(":grabbable").kruskal(getWeight);
-//     clearResult();
-//     ca.add(spanningTree);
-//     spanningTree.select();
-//     caReLayout();
-//     let pathList = new LinkedList();
-//     spanningTree.forEach((ele)=> {
-//         if (ele.isEdge()) {
-//             pathList.add(ele);
-//             if (pathList.search((e) => {
-//                     return e.data('id') === ele.source().data('id');
-//                 }) === null) {
-//                 pathList.add(ele.source());
-//             }
-//             if (pathList.search((e) => {
-//                     return e.data('id') === ele.target().data('id');
-//                 }) === null) {
-//                 pathList.add(ele.target());
-//             }
-//         }
-//     });
-//     pathList.traverse(animation_check.checked, false);
-// }
 /**
  * Dijkstra is implemented in the library
  * @function
  * @public
- * @return void
+ * @return {void}
  * */
 function performDijkstra() {
     stopAnimation();
@@ -536,7 +503,7 @@ const jetMapHex = [
  * perform page rank
  * @public
  * @function
- * @return void
+ * @return {void}
  * */
 function pageRank() {
     const len = cy.nodes().length;
@@ -566,7 +533,7 @@ function pageRank() {
         });
         n.style({
             fontSize: `${13 + Math.floor(size ** 0.33)}px`,
-            label: n => `${n.data('id')}\n${(r * 100).toFixed(2)}%`,
+            label: node => `${node.data('id')}\n${(r * 100).toFixed(2)}%`,
             textWrap: 'wrap',
             textValign: 'top'
         });
@@ -577,7 +544,7 @@ function pageRank() {
  * perform detailed page rank
  * @public
  * @function
- * @return void
+ * @return {void}
  * */
 function myPageRank() {
     /**
