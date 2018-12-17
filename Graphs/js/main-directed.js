@@ -1,4 +1,4 @@
-/* global _, addEdge, addEdgeBetweenSelected, addEdgeBwt, addNode, addOneNode, animation_check, animationFlag: true, auto_refresh, ca, CaLayout, callToAlgorithms, caReLayout, changeLayout, clearCaStyle, clearCyStyle, clearResult, clearSource, copiedEles, copy, cy, CyLayout, cyReLayout, drawOn, duplicateEdge, duration, getAM, getAllNodes, getCaTarget, getCyStartNode, getTarget, getWeight, getWM, hideDuration, hideResult, hideWeight, initCircularMenu, initConventionalMenu, initializeCytoscapeObjects, layoutName, LinkedList, LinkedListNode, math, matrix_input, matrixToString, paste, perform_bottom, readAM, readWM, reLayout, removeEdge, removeNode, removeSelected, perform_button, selectAllOfTheSameType, snapToGrid, stopAnimation, weight_input */
+/* global _, addEdge, addEdgeBetweenSelected, addEdgeBwt, addNode, addOneNode, animation_check, animationFlag: true, auto_refresh, ca, CaLayout, callToAlgorithms, caReLayout, changeLayout, clearCaStyle, clearCyStyle, clearResult, clearSource, copiedEles, copy, cy, CyLayout, cyReLayout, drawOn, duplicateEdge, duration, getAM, getAllNodes, getCaTarget, getCyStartNode, getTarget, getWeight, getWM, hideDuration, hideResult, hideWeight, initCircularMenu, initConventionalMenu, initializeCytoscapeObjects, layoutName, LinkedList, LinkedListNode, math, matrixToString, paste, readAM, readWM, reLayout, removeEdge, removeNode, removeSelected, perform_button, selectAllOfTheSameType, snapToGrid, stopAnimation */
 
 'use strict';
 
@@ -30,8 +30,8 @@ function createFromAM(m) {
                 id: i
             },
             position: {
-                x: Math.random() * 250 + 25,
-                y: Math.random() * 250 + 25
+                x: Math.random() * 300 + 25,
+                y: Math.random() * 300 + 25
             }
         });
 
@@ -71,8 +71,8 @@ function createFromWM(m) {
                 id: i
             },
             position: {
-                x: Math.random() * 250 + 25,
-                y: Math.random() * 250 + 25
+                x: Math.random() * 300 + 25,
+                y: Math.random() * 300 + 25
             }
         });
 

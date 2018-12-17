@@ -80,20 +80,10 @@ let copiedEles;
  * */
 let drawOn = false;
 /**
- * matrix_input text box
- * @type {HTMLTextAreaElement}
- * */
-const matrix_input = document.getElementById('matrix_input');
-/**
  * auto_refresh checkbox
  * @type {HTMLInputElement}
  * */
 const auto_refresh = document.getElementById('autorefresh');
-/**
- * "perform animation" button
- * @type {HTMLButtonElement}
- * */
-const perform_button = document.getElementById('perform');
 /**
  * the animation checkbox
  * @type {HTMLInputElement}
@@ -614,7 +604,7 @@ function clearResult() {
  * */
 function readAM() {
     clearCyStyle();
-    createFromAM(eval(matrix_input.value));
+    createFromAM(eval(document.getElementById('matrix_input').value));
 }
 /**
  * @function
@@ -623,7 +613,7 @@ function readAM() {
  * */
 function readWM() {
     clearCyStyle();
-    createFromWM(eval(matrix_input.value));
+    createFromWM(eval(document.getElementById('matrix_input').value));
 }
 
 /**
@@ -684,7 +674,7 @@ function getAM(c, output) {
         matrix[i][j] += 1;
         if (i !== j) matrix[j][i] += 1;
     });
-    if (output) matrix_input.value = matrixToString(matrix);
+    if (output) document.getElementById('matrix_input').value = matrixToString(matrix);
     return matrix;
 }
 /**
@@ -713,7 +703,7 @@ function getWM(c, output) {
         else if (w < matrix[i][j]) matrix[i][j] = w;
         matrix[j][i] = matrix[i][j];
     });
-    if (output) matrix_input.value = matrixToString(matrix);
+    if (output) document.getElementById('matrix_input').value = matrixToString(matrix);
     return matrix;
 }
 

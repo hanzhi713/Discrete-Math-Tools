@@ -1,4 +1,4 @@
-/* global _, addEdge, addEdgeBetweenSelected, addEdgeBwt, addNode, addOneNode, animation_check, animationFlag: true, auto_refresh, ca, CaLayout, callToAlgorithms, caReLayout, changeLayout, clearCaStyle, clearCyStyle, clearResult, clearSource, copiedEles, copy, cy, CyLayout, cyReLayout, drawOn, duplicateEdge, duration, getAM, getAllNodes, getCaTarget, getCyStartNode, getTarget, getWeight, getWM, hideDuration, hideResult, hideWeight, initCircularMenu, initConventionalMenu, initializeCytoscapeObjects, layoutName, LinkedList, LinkedListNode, math, matrix_input, matrixToString, paste, perform_bottom, readAM, readWM, reLayout, removeEdge, removeNode, removeSelected, perform_button, selectAllOfTheSameType, snapToGrid, stopAnimation, weight_input */
+/* global _, addEdge, addEdgeBetweenSelected, addEdgeBwt, addNode, addOneNode, animation_check, animationFlag: true, auto_refresh, ca, CaLayout, callToAlgorithms, caReLayout, changeLayout, clearCaStyle, clearCyStyle, clearResult, clearSource, copiedEles, copy, cy, CyLayout, cyReLayout, drawOn, duplicateEdge, duration, getAM, getAllNodes, getCaTarget, getCyStartNode, getTarget, getWeight, getWM, hideDuration, hideResult, hideWeight, initCircularMenu, initConventionalMenu, initializeCytoscapeObjects, layoutName, LinkedList, LinkedListNode, math, matrixToString, paste, readAM, readWM, reLayout, removeEdge, removeNode, removeSelected, perform_button, selectAllOfTheSameType, snapToGrid, stopAnimation */
 
 'use strict';
 
@@ -47,8 +47,8 @@ function createFromAM(m) {
                 id: i
             },
             position: {
-                x: Math.random() * 250 + 25,
-                y: Math.random() * 250 + 25
+                x: Math.random() * 300 + 25,
+                y: Math.random() * 300 + 25
             }
         });
 
@@ -88,8 +88,8 @@ function createFromWM(m) {
                 id: i
             },
             position: {
-                x: Math.random() * 250 + 25,
-                y: Math.random() * 250 + 25
+                x: Math.random() * 300 + 25,
+                y: Math.random() * 300 + 25
             }
         });
 
@@ -1197,7 +1197,7 @@ function minimalWeightMatchingMultiThread(weightMatrix, numOfThreads, callback) 
                 minWeight = minWeights[i];
                 minPairing = minPairings[i];
             }
-        perform_button.disabled = false;
+        document.getElementById('perform').disabled = false;
         callback(minPairing);
     }
 
@@ -1207,7 +1207,7 @@ function minimalWeightMatchingMultiThread(weightMatrix, numOfThreads, callback) 
     let minPairings = new Array(numOfThreads);
     const portion = Math.floor(weightMatrix.length / numOfThreads);
     const eles = _.range(0, weightMatrix.length);
-    perform_button.disabled = true;
+    document.getElementById('perform').disabled = true;
 
     // distribute the workload to a number of independent threads
     for (let i = 0; i < numOfThreads; i++) {
@@ -1476,27 +1476,4 @@ function TSPGlobalLowerBound() {
         ca.add(results[1]);
         caReLayout();
     }
-}
-/**
- * generate graphml from the graph
- * @function
- * @public
- * @param {cytoscape.Core} c
- * @return {void}
- * */
-function getGraphML(c) {
-    matrix_input.value = c.graphml();
-}
-
-/**
- * convert the graphml to cytoscape graphs
- * it's not working very well and is therefore temporarily disabled
- * @function
- * @public
- * @return {void}
- * */
-function readGraphML() {
-    clearSource();
-    cy.graphml(matrix_input.value);
-    cyReLayout();
 }
