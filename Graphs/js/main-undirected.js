@@ -16,7 +16,7 @@ function f(n) {
  * check whether the graph is connected by performing breadth first search
  * @function
  * @public
- * @return boolean
+ * @return {boolean}
  * */
 function isConnected() {
     const { path } = cy.elements(':grabbable').bfs(getAllNodes(cy)[0]);
@@ -26,7 +26,7 @@ function isConnected() {
  * create graph from an adjacency matrix
  * @function
  * @public
- * @param {Object|Array} m
+ * @param {Array<Array<number>>} m
  * The adjacency matrix
  * @return {void}
  * */
@@ -71,7 +71,7 @@ function createFromAM(m) {
  * create the graph from a weight matrix
  * @function
  * @public
- * @param {Object|Array} m
+ * @param {Array<Array<number>>} m
  * The weight matrix
  * @return {void}
  * */
@@ -852,7 +852,7 @@ function prim() {
  * @function
  * @public
  * @param {cytoscape.NodeSingular} root
- * @return {Array}
+ * @return {[number, cytoscape.Collection, cytoscape.EdgeSingular]}
  * */
 function localMinimalWeightCycle(root) {
     let minWeight = Infinity;
@@ -940,7 +940,7 @@ function minimalWeightCycle() {
  * @function
  * @public
  * @param {cytoscape.NodeSingular} root
- * @return {Array}
+ * @return {[number, LinkedList]}
  * */
 function nearestNeighborAlgorithm(root) {
     let currentNode = root;
@@ -1175,7 +1175,7 @@ function eulerianCycle() {
     }
 }
 /**
- * @param {Array} weightMatrix
+ * @param {Array<Array<number>>} weightMatrix
  * @param {number} numOfThreads
  * @param {Function} callback
  * The callback function to be executed after completion of all threads
@@ -1269,16 +1269,16 @@ function minimalWeightMatching() {
     /**
      * @function
      * @private
-     * @param {Array} minPairing
+     * @param {Array<number>} minPairing
      * @return {void}
      * */
     function displayPairings(minPairing) {
         /**
          * @function
          * @private
-         * @param {object} node1
-         * @param {object} node2
-         * @return {object}
+         * @param {cytoscape.NodeSingular} node1
+         * @param {cytoscape.NodeSingular} node2
+         * @return {cytoscape.EdgeSingular}
          * */
         function getCyEdge(node1, node2) {
             const e = cy.$id(`${node1.data('id')}-${node2.data('id')}-0`);
@@ -1342,7 +1342,10 @@ function CPP() {
         for (let y = x + 1; y < n; y++) weightMatrix[x][y] = paths[x].distanceTo(nodes[y]);
     }
 
-    // the callback function used to show the result on the result canvas
+    /**
+     * the callback function used to show the result on the result canvas
+     * @param {Array<number>} minPairing
+     */
     function displayResult(minPairing) {
         clearResult();
         ca.add(cy.elements(':grabbable'));
@@ -1381,7 +1384,7 @@ function CPP() {
  * @function
  * @public
  * @param {cytoscape.NodeSingular} root
- * @return {Array}
+ * @returns {[number, cytoscape.EdgeSingular, cytoscape.EdgeSingular, cytoscape.Collection]}
  * */
 function TSPLowerBound(root) {
     cy.startBatch();

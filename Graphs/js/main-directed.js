@@ -353,8 +353,8 @@ function performDijkstra() {
  * convert a RGB array to a hexadecimal string
  * @public
  * @function
- * @param {Array} color
- * @return string
+ * @param {[number, number, number]} color
+ * @return {string}
  * */
 function colorRGB2Hex(color) {
     const r = color[0];
