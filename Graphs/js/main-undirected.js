@@ -1301,9 +1301,19 @@ function minimalWeightMatching() {
         caReLayout();
     }
 
-    const weightMatrix = getWM(cy, false);
+    const [weightMatrix] = getWM(cy, false, false);
     minimalWeightMatchingMultiThread(weightMatrix, 4, displayPairings);
 }
+/**
+ * @function
+ * @public
+ * @return {void}
+ */
+function pathTreeFlower(){
+    const nodes = cy.nodes();
+    
+}
+
 /**
  * solve the Chinese postman problem
  * @function

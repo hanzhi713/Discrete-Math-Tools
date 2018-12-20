@@ -557,7 +557,7 @@ function myPageRank() {
      * @type {Array<number>}
      */
     const outEdgeStats = new Array(len);
-    const adjacencyMatrix = getAM(cy, false);
+    const [adjacencyMatrix] = getAM(cy, false, true);
     /**
      * @type {number} basic size of nodes in pixels
      * */

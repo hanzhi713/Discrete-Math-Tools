@@ -22,7 +22,11 @@
         "no-bitwise": "off",
         "no-param-reassign": "warn",
         "no-console": "off",
-        "prefer-const": "warn"
+        "prefer-const": "warn",
+        "no-restricted-syntax": "off",
+        "no-continue": "off",
+        "guard-for-in": "warn",
+        "no-constant-condition": "off"
     },
     "env": {
         "browser": true,

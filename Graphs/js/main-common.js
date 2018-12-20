@@ -644,9 +644,10 @@ function matrixToString(m) {
  * @public
  * @param {cytoscape.Core} c The Cytoscape object
  * @param {boolean} output
- * @return {Array<Array<number>>}
+ * @param {directed}
+ * @return {[Array<Array<number>>, Object]}
  * */
-function getAM(c, output) {
+function getAM(c, output, directed) {
     const nodes = getAllNodes(c);
     const numOfNodes = nodes.length;
     const matrix = new Array(numOfNodes);
@@ -666,9 +667,12 @@ function getAM(c, output) {
         const i = id_index[ele.data('source')];
         const j = id_index[ele.data('target')];
         matrix[i][j] += 1;
+        if (!directed) {
+            matrix[j][i] += 1;
+        }
     });
     if (output) document.getElementById('matrix_input').value = matrixToString(matrix);
-    return matrix;
+    return [matrix, id_index];
 }
 /**
  * get the weight matrix
@@ -676,9 +680,10 @@ function getAM(c, output) {
  * @public
  * @param {cytoscape.Core} c The Cytoscape object
  * @param {boolean} output
- * @return {Array<Array<number>>}
+ * @param {boolean} directed
+ * @return {[Array<Array<number>>, object]}
  * */
-function getWM(c, output) {
+function getWM(c, output, directed) {
     const nodes = getAllNodes(c);
     const numOfNodes = nodes.length;
     const matrix = new Array(numOfNodes);
@@ -694,9 +699,11 @@ function getWM(c, output) {
         const w = getWeight(ele);
         if (matrix[i][j] === 0) matrix[i][j] = w;
         else if (w < matrix[i][j]) matrix[i][j] = w;
+
+        if (!directed) matrix[j][i] = matrix[i][j];
     });
     if (output) document.getElementById('matrix_input').value = matrixToString(matrix);
-    return matrix;
+    return [matrix, id_index];
 }
 
 /**
