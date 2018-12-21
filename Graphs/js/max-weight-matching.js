@@ -57,7 +57,7 @@ function maxWeightMatching(weightMatrix, maxcardinality = false) {
     // If v is a matched vertex, mate[v] is its partner vertex.
     // If v is a single vertex, v does not occur as a key in mate.
     // Initially all vertices are single; updated during augmentation.
-    const mate = {};
+    const mate = new Map();
 
     // If b is a top-level blossom,
     // label.get(b) is None if b is unlabeled (free),
@@ -68,7 +68,7 @@ function maxWeightMatching(weightMatrix, maxcardinality = false) {
     // If v is a vertex inside a T-blossom, label[v] is 2 iff v is reachable
     // from an S-vertex outside the blossom.
     // Labels are assigned during a stage and reset after each augmentation.
-    let label = {};
+    const label = new Map();
 
     // If b is a labeled top-level blossom,
     // labeledge[b] = (v, w) is the edge through which b obtained its label
@@ -76,7 +76,7 @@ function maxWeightMatching(weightMatrix, maxcardinality = false) {
     // If w is a vertex inside a T-blossom and label[w] == 2,
     // labeledge[w] = (v, w) is an edge through which w is reachable from
     // outside the blossom.
-    let labeledge = {};
+    const labeledge = new Map();
 
     // If v is a vertex, inblossom[v] is the top-level blossom to which v
     // belongs.
@@ -84,27 +84,24 @@ function maxWeightMatching(weightMatrix, maxcardinality = false) {
     // a (trivial) top-level blossom.
     // Initially all vertices are top-level trivial blossoms.
 
-    /**
-     * @type {Map<number, number>}
-     */
-    const inblossom = {};
+    const inblossom = new Map();
     for (const i of gnodes) {
-        inblossom[i] = i;
+        inblossom.set(i, i);
     }
 
     // If b is a sub-blossom,
     // blossomparent[b] is its immediate parent (sub-)blossom.
     // If b is a top-level blossom, blossomparent[b] is None.
-    const blossomparent = {};
+    const blossomparent = new Map();
     for (const i of gnodes) {
-        blossomparent[i] = undefined;
+        blossomparent.set(i, undefined);
     }
 
     // If b is a (sub-)blossom,
     // blossombase[b] is its base VERTEX (i.e. recursive sub-blossom).
-    const blossombase = {};
+    const blossombase = new Map();
     for (const i of gnodes) {
-        blossombase[i] = i;
+        blossombase.set(i, i);
     }
 
     // If w is a free vertex (or an unreached vertex inside a T-blossom),
@@ -114,27 +111,27 @@ function maxWeightMatching(weightMatrix, maxcardinality = false) {
     // bestedge[b] = (v, w) is the least-slack edge to a different S-blossom
     // (v inside b), or None if there is no such edge.
     // This is used for efficient computation of delta2 and delta3.
-    let bestedge = {};
+    const bestedge = new Map();
 
     // If v is a vertex,
     // dualvar[v] = 2 * u(v) where u(v) is the v's variable in the dual
     // optimization problem (if all edge weights are integers, multiplication
     // by two ensures that all values remain integers throughout the algorithm).
     // Initially, u(v) = maxweight / 2.
-    const dualvar = {};
+    const dualvar = new Map();
     for (const i of gnodes) {
-        dualvar[i] = maxweight;
+        dualvar.set(i, maxweight);
     }
 
     // If b is a non-trivial blossom,
     // blossomdual[b] = z(b) where z(b) is b's variable in the dual
     // optimization problem.
-    const blossomdual = {};
+    const blossomdual = new Map();
 
     // If (v, w) in allowedge or (w, v) in allowedg, then the edge
     // (v, w) is known to have zero slack in the optimization problem;
     // otherwise the edge may or may not have zero slack.
-    let allowedge = {};
+    const allowedge = new Map();
 
     // Queue of newly discovered S-vertices.
     let queue = [];
@@ -146,7 +143,7 @@ function maxWeightMatching(weightMatrix, maxcardinality = false) {
      * @return {number}
      */
     function slack(v, w) {
-        return dualvar[v] + dualvar[w] - 2 * weightMatrix[v][w];
+        return dualvar.get(v) + dualvar.get(w) - 2 * weightMatrix[v][w];
     }
 
     /**
@@ -175,29 +172,29 @@ function maxWeightMatching(weightMatrix, maxcardinality = false) {
      * @param {number} v
      */
     function assignLabel(w, t, v) {
-        const b = inblossom[w];
-        assertTrue(label[w] === undefined && label[b] === undefined);
-        label[w] = t;
-        label[b] = t;
+        const b = inblossom.get(w);
+        assertTrue(label.get(w) === undefined && label.get(b) === undefined);
+        label.set(w, t);
+        label.set(b, t);
         if (v !== undefined) {
-            labeledge[w] = [v, w];
-            labeledge[b] = [v, w];
+            labeledge.set(w, [v, w]);
+            labeledge.set(b, [v, w]);
         } else {
-            labeledge[w] = undefined;
-            labeledge[b] = undefined;
+            labeledge.set(w, undefined);
+            labeledge.set(b, undefined);
         }
-        bestedge[w] = undefined;
-        bestedge[b] = undefined;
+        bestedge.set(w, undefined);
+        bestedge.set(b, undefined);
         if (t === 1) {
             // b became an S-vertex/blossom; add it(s vertices) to the queue.
-            if (b instanceof Blossom) queue = queue.concat(b.leaves());
+            if (b instanceof Blossom) queue.push(...b.leaves());
             else queue.push(b);
         } else if (t === 2) {
             // b became a T-vertex/blossom; assign label S to its mate.
             // (If b is a non-trivial blossom, its base is the only vertex
             // with an external mate.)
-            const base = blossombase[b];
-            assignLabel(mate[base], 1, base);
+            const base = blossombase.get(b);
+            assignLabel(mate.get(base), 1, base);
         }
     }
 
@@ -214,33 +211,33 @@ function maxWeightMatching(weightMatrix, maxcardinality = false) {
         let base = NoNode;
         while (v !== NoNode) {
             // Look for a breadcrumb in v's blossom or put a new breadcrumb.
-            let b = inblossom[v];
-            if (label[b] & 4) {
-                base = blossombase[b];
+            let b = inblossom.get(v);
+            if (label.get(b) & 4) {
+                base = blossombase.get(b);
                 break;
             }
-            assertTrue(label[b] === 1);
+            assertTrue(label.get(b) === 1);
             path.push(b);
-            label[b] = 5;
+            label.set(b, 5);
             // Trace one step back.
-            if (labeledge[b] === undefined) {
+            if (labeledge.get(b) === undefined) {
                 // The base of blossom b is single; stop tracing this path.
-                assertTrue(!(blossombase[b] in mate));
+                assertTrue(!mate.has(blossombase.get(b)));
                 v = NoNode;
             } else {
-                assertTrue(labeledge[b][0] === mate[blossombase[b]]);
-                v = labeledge[b][0];
-                b = inblossom[v];
-                assertTrue(label[b] === 2);
+                assertTrue(labeledge.get(b)[0] === mate.get(blossombase.get(b)));
+                v = labeledge.get(b)[0];
+                b = inblossom.get(v);
+                assertTrue(label.get(b) === 2);
                 // b is a T-blossom; trace one more step back.
-                v = labeledge[b][0];
+                v = labeledge.get(b)[0];
             }
             // Swap v and w so that we alternate between both paths.
             if (w !== NoNode) [v, w] = [w, v];
         }
         // Remove breadcrumbs.
         for (const b of path) {
-            label[b] = 1;
+            label.set(b, 1);
         }
         return base;
     }
@@ -255,29 +252,30 @@ function maxWeightMatching(weightMatrix, maxcardinality = false) {
      * @param {number} w
      */
     function addBlossom(base, v, w) {
-        const bb = inblossom[base];
-        let bv = inblossom[v];
-        let bw = inblossom[w];
+        const bb = inblossom.get(base);
+        let bv = inblossom.get(v);
+        let bw = inblossom.get(w);
         // Create blossom
         const b = new Blossom();
-        blossombase[b] = base;
-        blossomparent[b] = undefined;
-        blossomparent[bb] = b;
+        blossombase.set(b, base);
+        blossomparent.set(b, undefined);
+        blossomparent.set(bb, b);
         // Make list of sub-blossoms and their interconnecting edge endpoints.
         const path = [];
         const edgs = [[v, w]];
         b.childs = path;
         b.edges = edgs;
         while (bv !== bb) {
-            blossomparent[bv] = b;
+            blossomparent.set(bv, b);
             path.push(bv);
-            edgs.push(labeledge[bv]);
+            edgs.push(labeledge.get(bv));
             assertTrue(
-                label[bv] === 2 || (label[bv] === 1 && labeledge[bv][0] === mate[blossombase[bv]])
+                label.get(bv) === 2 ||
+                    (label.get(bv) === 1 && labeledge.get(bv)[0] === mate.get(blossombase.get(bv)))
             );
             // Trace one step back
-            v = labeledge[bv][0];
-            bv = inblossom[v];
+            v = labeledge.get(bv)[0];
+            bv = inblossom.get(v);
         }
         // Add base sub-blossom; reverse lists.
         path.push(bb);
@@ -285,29 +283,34 @@ function maxWeightMatching(weightMatrix, maxcardinality = false) {
         edgs.reverse();
         // Trace back from w to base.
         while (bw !== bb) {
-            blossomparent[bw] = b;
+            blossomparent.set(bw, b);
             path.push(bw);
-            edgs.push([labeledge[bw][1], labeledge[bw][0]]);
+            edgs.push([labeledge.get(bw)[1], labeledge.get(bw)[0]]);
             assertTrue(
-                label[bw] === 2 || (label[bw] === 1 && labeledge[bw][0] === mate[blossombase[bw]])
+                label.get(bw) === 2 ||
+                    (label.get(bw) === 1 && labeledge.get(bw)[0] === mate.get(blossombase.get(bw)))
             );
             // Trace one step back
-            w = labeledge[bw][0];
-            bw = inblossom[w];
+            w = labeledge.get(bw)[0];
+            bw = inblossom.get(w);
         }
         // Set label to S
-        assertTrue(label[bb] === 1);
-        label[b] = 1;
-        labeledge[b] = labeledge[bb];
+        assertTrue(label.get(bb) === 1);
+        label.set(b, 1);
+        labeledge.set(b, labeledge.get(bb));
         // Set dual variable to zero.
-        blossomdual[b] = 0;
+        blossomdual.set(b, 0);
         // Relabel vertices
         for (const i of b.leaves()) {
-            if (label[inblossom[i]] === 2) queue.push(i);
-            inblossom[i] = b;
+            if (label.get(inblossom.get(i)) === 2) {
+                // This T-vertex now turns into an S-vertex because it becomes
+                // part of an S-blossom; add it to the queue.
+                queue.push(i);
+            }
+            inblossom.set(i, b);
         }
         // Compute b.mybestedges.
-        const bestedgeto = {};
+        const bestedgeto = new Map();
         for (const bv of path) {
             let nblist = [];
             if (bv instanceof Blossom) {
@@ -329,27 +332,24 @@ function maxWeightMatching(weightMatrix, maxcardinality = false) {
             }
             for (const k of nblist) {
                 let [i, j] = k;
-                if (inblossom[j] === b) [i, j] = [j, i];
-                const bj = inblossom[j];
+                if (inblossom.get(j) === b) [i, j] = [j, i];
+                const bj = inblossom.get(j);
                 if (
                     bj !== b &&
-                    label[bj] === 1 &&
-                    (!(bj in bestedgeto) || slack(i, j) < slack(...bestedgeto[bj]))
+                    label.get(bj) === 1 &&
+                    (!bestedgeto.has(bj) || slack(i, j) < slack(...bestedgeto.get(bj)))
                 ) {
-                    bestedgeto[bj] = k;
+                    bestedgeto.set(bj, k);
                 }
             }
             // Forget about least-slack edge of the subblossom.
-            bestedge[bv] = undefined;
+            bestedge.set(bv, undefined);
         }
-        b.mybestedges = [];
-        for (const k in bestedgeto) {
-            b.mybestedges.push(bestedgeto[k]);
-        }
+        b.mybestedges = [...bestedgeto.values()];
         // Select bestedge[b].
         let mybestedge;
         let mybestslack = Infinity;
-        bestedge[b] = undefined;
+        bestedge.set(b, undefined);
         for (const k of b.mybestedges) {
             const kslack = slack(...k);
             if (mybestedge === undefined || kslack < mybestslack) {
@@ -357,7 +357,7 @@ function maxWeightMatching(weightMatrix, maxcardinality = false) {
                 mybestslack = kslack;
             }
         }
-        bestedge[b] = mybestedge;
+        bestedge.set(b, mybestedge);
     }
 
     /**
@@ -368,25 +368,25 @@ function maxWeightMatching(weightMatrix, maxcardinality = false) {
     function expandBlossom(b, endstage) {
         // Convert sub-blossoms into top-level blossoms.
         for (const s of b.childs) {
-            blossomparent[s] = undefined;
+            blossomparent.set(s, undefined);
             if (s instanceof Blossom) {
-                // Recursively expand this sub-blossom.
-                if (endstage && blossomdual[s] === 0) expandBlossom(s, endstage);
-                else
-                    for (const v of s.leaves()) {
-                        inblossom[v] = s;
-                    }
-            } else inblossom[s] = s;
+                if (endstage && blossomdual.get(s) === 0) {
+                    // Recursively expand this sub-blossom.
+                    expandBlossom(s, endstage);
+                } else {
+                    for (const v of s.leaves()) inblossom.set(v, s);
+                }
+            } else inblossom.set(s, s);
         }
         // If we expand a T-blossom during a stage, its sub-blossoms must be
         // relabeled.
-        if (!endstage && label[b] === 2) {
+        if (!endstage && label.get(b) === 2) {
             // Start at the sub-blossom through which the expanding
             // blossom obtained its label, and relabel sub-blossoms untili
             // we reach the base.
             // Figure out through which sub-blossom the expanding blossom
             // obtained its label initially.
-            const entrychild = inblossom[labeledge[b][1]];
+            const entrychild = inblossom.get(labeledge.get(b)[1]);
             // Decide in which direction we will go round the blossom.
             let j = b.childs.indexOf(entrychild);
             let jstep;
@@ -397,35 +397,35 @@ function maxWeightMatching(weightMatrix, maxcardinality = false) {
                 // Start index is even; go backward.
             } else jstep = -1;
             // Move along the blossom until we get to the base.
-            let [v, w] = labeledge[b];
+            let [v, w] = labeledge.get(b);
             while (j !== 0) {
                 // Relabel the T-sub-blossom
                 let p;
                 let q;
                 if (jstep === 1) [p, q] = b.edges[j];
                 else [q, p] = b.edges[j - 1];
-                label[w] = undefined;
-                label[q] = undefined;
+                label.set(w, undefined);
+                label.set(q, undefined);
                 assignLabel(w, 2, v);
                 // Step to the next S-sub-blossom and note its forward edge.
-                allowedge[[p, q]] = true;
-                allowedge[[q, p]] = true;
+                allowedge.set([p, q], true);
+                allowedge.set([q, p], true);
                 j += jstep;
                 if (jstep === 1) [v, w] = b.edges[j];
                 else [w, v] = b.edges[j - 1];
                 // Step to the next T-sub-blossom.
-                allowedge[[v, w]] = true;
-                allowedge[[w, v]] = true;
+                allowedge.set([v, w], true);
+                allowedge.set([w, v], true);
                 j += jstep;
             }
             // Relabel the base T-sub-blossom WITHOUT stepping through to
             // its mate (so don't call assignLabel).
             const bw = b.childs[j];
-            label[w] = 2;
-            label[bw] = 2;
-            labeledge[w] = [v, w];
-            labeledge[bw] = [v, w];
-            bestedge[bw] = undefined;
+            label.set(w, 2);
+            label.set(bw, 2);
+            labeledge.set(w, [v, w]);
+            labeledge.set(bw, [v, w]);
+            bestedge.set(bw, undefined);
             // Continue along the blossom until we get back to entrychild.
             j += jstep;
             while (b.childs[j] !== entrychild) {
@@ -433,33 +433,33 @@ function maxWeightMatching(weightMatrix, maxcardinality = false) {
                 // it is reachable from a neighbouring S-vertex outside the
                 // expanding blossom.
                 const bv = b.childs[j];
-                if (label[bv] === 1) {
+                if (label.get(bv) === 1) {
                     // This sub-blossom just got label S through one of its
                     // neighbours; leave it be.
                     j += jstep;
                     continue;
                 }
                 if (bv instanceof Blossom) {
-                    for (const i of bv.leaves()) if (label[i]) break;
+                    for (const i of bv.leaves()) if (label.get(i)) break;
                 } else v = bv;
                 // If the sub-blossom contains a reachable vertex, assign
                 // label T to the sub-blossom.
-                if (label[v]) {
-                    assertTrue(label[v] === 2);
-                    assertTrue(inblossom[v] === bv);
-                    label[v] = undefined;
-                    label[mate[blossombase[bv]]] = undefined;
-                    assignLabel(v, 2, labeledge[v][0]);
+                if (label.get(v)) {
+                    assertTrue(label.get(v) === 2);
+                    assertTrue(inblossom.get(v) === bv);
+                    label.set(v, undefined);
+                    label.set(mate.get(blossombase.get(bv)), undefined);
+                    assignLabel(v, 2, labeledge.get(v)[0]);
                 }
                 j += jstep;
             }
         }
-        delete label[b];
-        delete labeledge[b];
-        delete bestedge[b];
-        delete blossomparent[b];
-        delete blossombase[b];
-        delete blossomdual[b];
+        label.delete(b);
+        labeledge.delete(b);
+        bestedge.delete(b);
+        blossomparent.delete(b);
+        blossombase.delete(b);
+        blossomdual.delete(b);
     }
 
     // Swap matched/unmatched edges over an alternating path through blossom b
@@ -473,12 +473,12 @@ function maxWeightMatching(weightMatrix, maxcardinality = false) {
         // Bubble up through the blossom tree from vertex v to an immediate
         // sub-blossom of b.
         let t = v;
-        while (blossomparent[t] !== b) t = blossomparent[t];
+        while (blossomparent.get(t) !== b) t = blossomparent.get(t);
         // Recursively deal with the first sub-blossom.
         if (t instanceof Blossom) augmentBlossom(t, v);
         // Decide in which direction we will go round the blossom.
         const i = b.childs.indexOf(t);
-        let j = b.childs.indexOf(t);
+        let j = i;
         let jstep;
         if (i & 1) {
             // Start index is odd; go forward and wrap.
@@ -502,14 +502,14 @@ function maxWeightMatching(weightMatrix, maxcardinality = false) {
             t = b.childs[j];
             if (t instanceof Blossom) augmentBlossom(t, x);
             // Match the edge connecting those sub-blossoms.
-            mate[w] = x;
-            mate[x] = w;
+            mate.set(w, x);
+            mate.set(x, w);
         }
         // Rotate the list of sub-blossoms to put the new base at the front.
         b.childs = b.childs.slice(i).concat(b.childs.slice(0, i));
         b.edges = b.edges.slice(i).concat(b.edges.slice(0, i));
-        blossombase[b] = blossombase[b.childs[0]];
-        assertTrue(blossombase[b] === v);
+        blossombase.set(b, blossombase.get(b.childs[0]));
+        assertTrue(blossombase.get(b) === v);
     }
 
     // Swap matched/unmatched edges over an alternating path between two
@@ -520,30 +520,30 @@ function maxWeightMatching(weightMatrix, maxcardinality = false) {
             // until we find a single vertex, swapping matched and unmatched
             // edges as we go.
             while (true) {
-                const bs = inblossom[s];
-                assertTrue(label[bs] === 1);
+                const bs = inblossom.get(s);
+                assertTrue(label.get(bs) === 1);
                 assertTrue(
-                    (labeledge[bs] === undefined && !(blossombase[bs] in mate)) ||
-                        labeledge[bs][0] === mate[blossombase[bs]]
+                    (labeledge.get(bs) === undefined && !mate.has(blossombase.get(bs))) ||
+                        labeledge.get(bs)[0] === mate.get(blossombase.get(bs))
                 );
                 // Augment through the S-blossom from s to base.
                 if (bs instanceof Blossom) augmentBlossom(bs, s);
                 // Update mate[s]
-                mate[s] = j;
+                mate.set(s, j);
                 // Trace one step back.
-                if (labeledge[bs] === undefined)
+                if (labeledge.get(bs) === undefined)
                     // Reached single vertex; stop.
                     break;
-                const t = labeledge[bs][0];
-                const bt = inblossom[t];
-                assertTrue(label[bt] === 2);
+                const t = labeledge.get(bs)[0];
+                const bt = inblossom.get(t);
+                assertTrue(label.get(bt) === 2);
                 // Trace one more step back.
-                [s, j] = labeledge[bt];
+                [s, j] = labeledge.get(bt);
                 // Augment through the T-blossom from j to base.
-                assertTrue(blossombase[bt] === t);
+                assertTrue(blossombase.get(bt) === t);
                 if (bt instanceof Blossom) augmentBlossom(bt, j);
                 // Update mate[j]
-                mate[j] = s;
+                mate.set(j, s);
             }
         }
     }
@@ -555,23 +555,24 @@ function maxWeightMatching(weightMatrix, maxcardinality = false) {
         // the matching.
 
         // Remove labels from top-level blossoms/vertices.
-        label = {};
-        labeledge = {};
+        label.clear();
+        labeledge.clear();
 
         // Forget all about least-slack edges.
-        bestedge = {};
-        for (const b in blossomdual) b.mybestedges = undefined;
+        bestedge.clear();
+        for (const b of blossomdual.keys()) b.mybestedges = undefined;
 
         // Loss of labeling means that we can not be sure that currently
         // allowable edges remain allowable throughout this stage.
-        allowedge = {};
+        allowedge.clear();
 
         // Make queue empty.
         queue = [];
 
         // Label single blossoms/vertices with S and put them in the queue.
         for (const v of gnodes) {
-            if (!(v in mate) && label[inblossom[v]] === undefined) assignLabel(v, 1, undefined);
+            if (!mate.has(v) && label.get(inblossom.get(v)) === undefined)
+                assignLabel(v, 1, undefined);
         }
 
         // Loop until we succeed in augmenting the matching.
@@ -589,7 +590,7 @@ function maxWeightMatching(weightMatrix, maxcardinality = false) {
             while (queue.length > 0 && !augmented) {
                 // Take an S vertex from the queue.
                 const v = queue.pop();
-                assertTrue(label[inblossom[v]] === 1);
+                assertTrue(label.get(inblossom.get(v)) === 1);
 
                 let kslack;
 
@@ -597,25 +598,25 @@ function maxWeightMatching(weightMatrix, maxcardinality = false) {
                 for (const w of neighbours(v)) {
                     if (w === v) continue; // ignore self-loops
                     // w is a neighbour to v
-                    const bv = inblossom[v];
-                    const bw = inblossom[w];
+                    const bv = inblossom.get(v);
+                    const bw = inblossom.get(w);
                     if (bv === bw)
                         // this edge is internal to a blossom; ignore it
                         continue;
-                    if (!([v, w] in allowedge)) {
+                    if (!allowedge.has([v, w])) {
                         kslack = slack(v, w);
                         if (kslack <= 0) {
                             // edge k has zero slack => it is allowable
-                            allowedge[[v, w]] = true;
-                            allowedge[[w, v]] = true;
+                            allowedge.set([v, w], true);
+                            allowedge.set([w, v], true);
                         }
                     }
-                    if ([v, w] in allowedge) {
-                        if (label[bw] === undefined)
+                    if (allowedge.has([v, w])) {
+                        if (label.get(bw) === undefined)
                             // (C1) w is a free vertex;
                             // label w with T and label its mate with S (R12).
                             assignLabel(w, 2, v);
-                        else if (label[bw] === 1) {
+                        else if (label.get(bw) === 1) {
                             // (C2) w is an S-vertex (not in the same blossom);
                             // follow back-links to discover either an
                             // augmenting path or a new blossom.
@@ -631,25 +632,28 @@ function maxWeightMatching(weightMatrix, maxcardinality = false) {
                                 augmented = 1;
                                 break;
                             }
-                        } else if (label[w] === undefined) {
+                        } else if (label.get(w) === undefined) {
                             // w is inside a T-blossom, but w itself has not
                             // yet been reached from outside the blossom;
                             // mark it as reached (we need this to relabel
                             // during T-blossom expansion).
-                            assertTrue(label[bw] === 2);
-                            label[w] = 2;
-                            labeledge[w] = [v, w];
-                        } else if (label[bw] === 1) {
+                            assertTrue(label.get(bw) === 2);
+                            label.set(w, 2);
+                            labeledge.set(w, [v, w]);
+                        } else if (label.get(bw) === 1) {
                             // keep track of the least-slack non-allowable edge to
                             // a different S-blossom.
-                            if (bestedge[bv] === undefined || kslack < slack(...bestedge[bv]))
-                                bestedge[bv] = [v, w];
-                        } else if (label[w] === undefined) {
+                            if (
+                                bestedge.get(bv) === undefined ||
+                                kslack < slack(...bestedge.get(bv))
+                            )
+                                bestedge.set(bv, [v, w]);
+                        } else if (label.get(w) === undefined) {
                             // w is a free vertex (or an unreached vertex inside
                             // a T-blossom) but we can not reach it yet;
                             // keep track of the least-slack edge that reaches w.
-                            if (bestedge[w] === undefined || kslack < slack(...bestedge[w]))
-                                bestedge[w] = (v, w);
+                            if (bestedge.get(w) === undefined || kslack < slack(...bestedge.get(w)))
+                                bestedge.set(w, [v, w]);
                         }
                     }
                 }
@@ -669,30 +673,31 @@ function maxWeightMatching(weightMatrix, maxcardinality = false) {
             // Compute delta1: the minimum value of any vertex dual.
             if (!maxcardinality) {
                 deltatype = 1;
-                delta = Infinity;
-                for (const k in dualvar) {
-                    if (dualvar[k] < delta) delta = dualvar[k];
-                }
+                delta = Math.min(...dualvar.values());
             }
 
             // Compute delta2: the minimum slack on any edge between
             // an S-vertex and a free vertex.
             for (const v of gnodes) {
-                if (label[inblossom[v]] === undefined && bestedge[v] !== undefined) {
-                    const d = slack(...bestedge[v]);
+                if (label.get(inblossom.get(v)) === undefined && bestedge.get(v) !== undefined) {
+                    const d = slack(...bestedge.get(v));
                     if (deltatype === -1 || d < delta) {
                         delta = d;
                         deltatype = 2;
-                        deltaedge = bestedge[v];
+                        deltaedge = bestedge.get(v);
                     }
                 }
             }
 
             // Compute delta3: half the minimum slack on any edge between
             // a pair of S-blossoms.
-            for (const b in blossomparent) {
-                if (blossomparent[b] === undefined && label[b] === 1 && bestedge[b] !== undefined) {
-                    const kslack = slack(...bestedge[b]);
+            for (const b of blossomparent.keys()) {
+                if (
+                    blossomparent.get(b) === undefined &&
+                    label.get(b) === 1 &&
+                    bestedge.get(b) !== undefined
+                ) {
+                    const kslack = slack(...bestedge.get(b));
                     // if allinteger:
                     //     assert (kslack % 2) == 0
                     //     d = kslack // 2
@@ -701,19 +706,19 @@ function maxWeightMatching(weightMatrix, maxcardinality = false) {
                     if (deltatype === -1 || d < delta) {
                         delta = d;
                         deltatype = 3;
-                        deltaedge = bestedge[b];
+                        deltaedge = bestedge.get(b);
                     }
                 }
             }
 
             // Compute delta4: minimum z variable of any T-blossom.
-            for (const b in blossomdual) {
+            for (const b of blossomdual.keys()) {
                 if (
-                    blossomparent[b] === undefined &&
-                    label[b] === 2 &&
-                    (deltatype === -1 || blossomdual[b] < delta)
+                    blossomparent.get(b) === undefined &&
+                    label.get(b) === 2 &&
+                    (deltatype === -1 || blossomdual.get(b) < delta)
                 ) {
-                    delta = blossomdual[b];
+                    delta = blossomdual.get(b);
                     deltatype = 4;
                     deltablossom = b;
                 }
@@ -725,30 +730,26 @@ function maxWeightMatching(weightMatrix, maxcardinality = false) {
                 // verifyable.
                 assertTrue(maxcardinality);
                 deltatype = 1;
-                delta = Infinity;
-                for (const k in dualvar) {
-                    if (dualvar[k] < delta) delta = dualvar[k];
-                }
-                delta = Math.max(0, delta);
+                delta = Math.max(0, Math.min(...dualvar.values()));
             }
 
             // Update dual variables according to delta.
             for (const v of gnodes) {
-                if (label[inblossom[v]] === 1)
+                if (label.get(inblossom.get(v)) === 1)
                     // S-vertex: 2*u = 2*u - 2*delta
-                    dualvar[v] -= delta;
-                else if (label[inblossom[v]] === 2)
+                    dualvar.set(v, dualvar.get(v) - delta);
+                else if (label.get(inblossom.get(v)) === 2)
                     // T-vertex: 2*u = 2*u + 2*delta
-                    dualvar[v] += delta;
+                    dualvar.set(v, dualvar.get(v) + delta);
             }
-            for (const b in blossomdual) {
-                if (blossomparent[b] === undefined) {
-                    if (label[b] === 1)
+            for (const b of blossomdual.keys()) {
+                if (blossomparent.get(b) === undefined) {
+                    if (label.get(b) === 1)
                         // top-level S-blossom: z = z + 2*delta
-                        blossomdual[b] += delta;
-                    else if (label[b] === 2)
+                        blossomdual.set(b, blossomdual.get(b) + delta);
+                    else if (label.get(b) === 2)
                         // top-level T-blossom: z = z - 2*delta
-                        blossomdual[b] -= delta;
+                        blossomdual.set(b, blossomdual.get(b) - delta);
                 }
             }
 
@@ -759,16 +760,16 @@ function maxWeightMatching(weightMatrix, maxcardinality = false) {
             else if (deltatype === 2) {
                 // Use the least-slack edge to continue the search.
                 const [v, w] = deltaedge;
-                assertTrue(label[inblossom[v]] === 1);
-                allowedge[[v, w]] = true;
-                allowedge[[w, v]] = true;
+                assertTrue(label.get(inblossom.get(v)) === 1);
+                allowedge.set([v, w], true);
+                allowedge.set([w, v], true);
                 queue.push(v);
             } else if (deltatype === 3) {
                 // Use the least-slack edge to continue the search.
                 const [v, w] = deltaedge;
-                allowedge[[v, w]] = true;
-                allowedge[[w, v]] = true;
-                assertTrue(label[inblossom[v]] === 1);
+                allowedge.set([v, w], true);
+                allowedge.set([w, v], true);
+                assertTrue(label.get(inblossom.get(v)) === 1);
                 queue.push(v);
             } else if (deltatype === 4)
                 // Expand the least-z blossom.
@@ -778,9 +779,9 @@ function maxWeightMatching(weightMatrix, maxcardinality = false) {
         // End of a this substage.
 
         // Paranoia check that the matching is symmetric.
-        for (const v in mate) {
+        for (const v of mate.keys()) {
             // use abstract equality due to weak type
-            assertTrue(mate[mate[v]] == v);
+            assertTrue(mate.get(mate.get(v)) === v);
         }
 
         // Stop when no more augmenting path can be found.
@@ -788,27 +789,31 @@ function maxWeightMatching(weightMatrix, maxcardinality = false) {
 
         // End of a stage; expand all S-blossoms which have zero dual.
         const blossomkeys = [];
-        for (const b in blossomdual) {
-            blossomkeys.push(+b);
+        for (const b of blossomdual.keys()) {
+            blossomkeys.push(b);
         }
 
         for (const b of blossomkeys) {
-            if (!(b in blossomdual)) continue; // already expanded
-            if (blossomparent[b] === undefined && label[b] === 1 && blossomdual[b] === 0)
+            if (!blossomdual.has(b)) continue; // already expanded
+            if (
+                blossomparent.get(b) === undefined &&
+                label.get(b) === 1 &&
+                blossomdual.get(b) === 0
+            )
                 expandBlossom(b, true);
         }
     }
     console.log(mate);
-    const matchings = {};
-    const results = [];
-    for (const k in mate) {
-        const v = mate[k];
-        if (!([v, k] in matchings)) {
-            matchings[[k, v]] = 1;
-            results.push([k, v]);
-        }
-    }
-    return results;
+    // const matchings = {};
+    // const results = [];
+    // for (const k in mate) {
+    //     const v = mate[k];
+    //     if (!([v, k] in matchings)) {
+    //         matchings[[k, v]] = 1;
+    //         results.push([k, v]);
+    //     }
+    // }
+    // return results;
 }
 
 const arr1 = [
@@ -846,5 +851,5 @@ for (let i = 0; i < arr1.length; i++) {
     }
 }
 
-let r = maxWeightMatching(arr2, false);
-console.log(r.toString());
+const r = maxWeightMatching(arr2, true);
+// console.log(r.toString());
