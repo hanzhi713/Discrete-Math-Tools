@@ -1309,9 +1309,42 @@ function minimalWeightMatching() {
  * @public
  * @return {void}
  */
-function pathTreeFlower(){
-    const nodes = cy.nodes();
-    
+function pathTreeFlower() {
+    stopAnimation();
+    clearCyStyle();
+
+    const [weightMatrix, id_index] = getWM(cy, false, false);
+    const pairing = maxWeightMatching(weightMatrix, true);
+    console.log(pairing);
+
+    /**
+     * @param {number} idx
+     * @return {string}
+     */
+    function findNodeID(idx) {
+        for (const key in id_index) {
+            if (id_index[key] == idx) {
+                return key;
+            }
+        }
+    }
+
+    for (const [n1, n2] of pairing) {
+        const id1 = findNodeID(n1);
+        const id2 = findNodeID(n2);
+        const node1 = cy.$id(id1);
+        const node2 = cy.$id(id2);
+        console.log(`${id1}-${id2}`);
+        let edge = cy.$id(`${id1}-${id2}-0`);
+        if (edge.length === 0) edge = cy.$id(`${id2}-${id1}-0`);
+        node1.select();
+        node2.select();
+        edge.select();
+    }
+
+    clearResult();
+    ca.add(cy.elements(':selected'));
+    caReLayout();
 }
 
 /**
