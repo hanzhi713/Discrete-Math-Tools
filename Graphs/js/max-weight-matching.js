@@ -1,12 +1,9 @@
 /**
  * Max weight matching algorithm adapted from NetworkX's source code
- */
-
-/**
  * @param {Array<Array<number>>} weightMatrix
  * @returns {Array<[number, number]>}
  */
-function maxWeightMatching(weightMatrix, maxcardinality = false) {
+function maxWeightMatching(weightMatrix, maxcardinality) {
     class NoNode {
         // Dummy value which is different from any node
     }
@@ -337,10 +334,9 @@ function maxWeightMatching(weightMatrix, maxcardinality = false) {
                     nblist = bv.mybestedges;
                     // The sub-blossom won't need this data again.
                     bv.mybestedges = undefined;
-                }
-                for (const i of bv.leaves()) {
-                    for (const j of neighbours(i)) {
-                        if (j !== i) nblist.push([i, j]);
+                } else {
+                    for (const i of bv.leaves()) {
+                        for (const j of neighbours(i)) if (j !== i) nblist.push([i, j]);
                     }
                 }
             } else {
@@ -416,12 +412,13 @@ function maxWeightMatching(weightMatrix, maxcardinality = false) {
             } else jstep = -1;
             // Move along the blossom until we get to the base.
             let [v, w] = g(labeledge, b);
+            const len = b.edges.length;
             while (j !== 0) {
                 // Relabel the T-sub-blossom
                 let p;
                 let q;
-                if (jstep === 1) [p, q] = b.edges[j];
-                else [q, p] = b.edges[j - 1];
+                if (jstep === 1) [p, q] = b.edges[j < 0 ? len + j : j];
+                else [q, p] = b.edges[j - 1 < 0 ? len + j - 1 : j - 1];
                 label.set(w, null);
                 label.set(q, null);
                 assignLabel(w, 2, v);
@@ -429,8 +426,8 @@ function maxWeightMatching(weightMatrix, maxcardinality = false) {
                 allowedge[[p, q]] = true;
                 allowedge[[q, p]] = true;
                 j += jstep;
-                if (jstep === 1) [v, w] = b.edges[j];
-                else [w, v] = b.edges[j - 1];
+                if (jstep === 1) [v, w] = b.edges[j < 0 ? len + j : j];
+                else [w, v] = b.edges[j - 1 < 0 ? len + j - 1 : j - 1];
                 // Step to the next T-sub-blossom.
                 allowedge[[v, w]] = true;
                 allowedge[[w, v]] = true;
@@ -438,7 +435,7 @@ function maxWeightMatching(weightMatrix, maxcardinality = false) {
             }
             // Relabel the base T-sub-blossom WITHOUT stepping through to
             // its mate (so don't call assignLabel).
-            const bw = b.childs[j];
+            const bw = b.childs[j < 0 ? len + j : j];
             label.set(w, 2);
             label.set(bw, 2);
             labeledge.set(w, [v, w]);
@@ -446,11 +443,11 @@ function maxWeightMatching(weightMatrix, maxcardinality = false) {
             bestedge.set(bw, null);
             // Continue along the blossom until we get back to entrychild.
             j += jstep;
-            while (b.childs[j] !== entrychild) {
+            while (b.childs[j < 0 ? len + j : j] !== entrychild) {
                 // Examine the vertices of the sub-blossom to see whether
                 // it is reachable from a neighbouring S-vertex outside the
                 // expanding blossom.
-                const bv = b.childs[j];
+                const bv = b.childs[j < 0 ? len + j : j];
                 if (label.get(bv) === 1) {
                     // This sub-blossom just got label S through one of its
                     // neighbours; leave it be.
@@ -505,19 +502,21 @@ function maxWeightMatching(weightMatrix, maxcardinality = false) {
         }
         // Start index is even; go backward.
         else jstep = -1;
+        const len = b.edges.length;
         // Move along the blossom until we get to the base.
         while (j !== 0) {
             // Step to the next sub-blossom and augment it recursively.
             j += jstep;
-            t = b.childs[j];
+            t = b.childs[j < 0 ? len + j : j];
             let w;
             let x;
-            if (jstep === 1) [w, x] = b.edges[j];
-            else [x, w] = b.edges[j - 1];
+            if (jstep === 1) [w, x] = b.edges[j < 0 ? len + j : j];
+            else [x, w] = b.edges[j - 1 < 0 ? len + j - 1 : j - 1];
+
             if (t instanceof Blossom) augmentBlossom(t, w);
             // Step to the next sub-blossom and augment it recursively.
             j += jstep;
-            t = b.childs[j];
+            t = b.childs[j < 0 ? len + j : j];
             if (t instanceof Blossom) augmentBlossom(t, x);
             // Match the edge connecting those sub-blossoms.
             mate.set(w, x);
@@ -578,7 +577,7 @@ function maxWeightMatching(weightMatrix, maxcardinality = false) {
 
         // Forget all about least-slack edges.
         bestedge.clear();
-        for (const b of blossomdual.keys()) b.mybestedges = null;
+        for (const b of blossomdual.keys()) b.mybestedges = undefined;
 
         // Loss of labeling means that we can not be sure that currently
         // allowable edges remain allowable throughout this stage.
@@ -820,41 +819,3 @@ function maxWeightMatching(weightMatrix, maxcardinality = false) {
     }
     return results;
 }
-
-const arr1 = [
-    [0, 0, 2, 3, 0, 0, 0, 4],
-    [0, 0, 4, 1, 3, 3, 3, 0],
-    [0, 0, 0, 3, 0, 4, 4, 0],
-    [0, 0, 0, 0, 2, 3, 4, 2],
-    [0, 0, 0, 0, 0, 0, 0, 3],
-    [0, 0, 0, 0, 0, 0, 0, 4],
-    [0, 0, 0, 0, 0, 0, 0, 1],
-    [0, 0, 0, 0, 0, 0, 0, 0]
-];
-
-const arr2 = [
-    [0, 0, 0, 0, 2, 2, 3, 0, 4, 0, 0, 0, 0, 0, 1],
-    [0, 0, 1, 2, 0, 1, 0, 4, 0, 4, 1, 1, 0, 0, 2],
-    [0, 1, 0, 0, 4, 0, 0, 0, 4, 2, 1, 0, 0, 0, 0],
-    [0, 2, 0, 0, 1, 0, 0, 0, 0, 0, 4, 4, 1, 0, 0],
-    [2, 0, 4, 1, 0, 4, 0, 0, 0, 0, 0, 0, 3, 0, 4],
-    [2, 1, 0, 0, 4, 0, 0, 3, 0, 0, 0, 0, 0, 0, 3],
-    [3, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 3, 0, 4],
-    [0, 4, 0, 0, 0, 3, 1, 0, 0, 0, 0, 0, 0, 2, 3],
-    [4, 0, 4, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0],
-    [0, 4, 2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 3, 2],
-    [0, 1, 1, 4, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 4],
-    [0, 1, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0],
-    [0, 0, 0, 1, 3, 0, 3, 0, 1, 0, 0, 0, 0, 0, 1],
-    [0, 0, 0, 0, 0, 0, 0, 2, 0, 3, 0, 2, 0, 0, 0],
-    [1, 2, 0, 0, 4, 3, 4, 3, 0, 2, 4, 0, 1, 0, 0]
-];
-
-for (let i = 0; i < arr1.length; i++) {
-    for (let j = 0; j < i; j++) {
-        arr1[i][j] = arr1[j][i];
-    }
-}
-
-const r = maxWeightMatching(arr2, true);
-console.log(r.toString());

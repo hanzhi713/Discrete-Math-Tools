@@ -1,4 +1,4 @@
-/* global _, addEdge, addEdgeBetweenSelected, addEdgeBwt, addNode, addOneNode, animation_check, animationFlag: true, auto_refresh, ca, CaLayout, callToAlgorithms, caReLayout, changeLayout, clearCaStyle, clearCyStyle, clearResult, clearSource, copiedEles, copy, cy, CyLayout, cyReLayout, drawOn, duplicateEdge, duration, getAM, getAllNodes, getCaTarget, getCyStartNode, getTarget, getWeight, getWM, hideDuration, hideResult, hideWeight, initCircularMenu, initConventionalMenu, initializeCytoscapeObjects, layoutName, LinkedList, LinkedListNode, math, matrixToString, paste, readAM, readWM, reLayout, removeEdge, removeNode, removeSelected, perform_button, selectAllOfTheSameType, snapToGrid, stopAnimation */
+/* global _, addEdge, addEdgeBetweenSelected, addEdgeBwt, addNode, addOneNode, animation_check, animationFlag: true, auto_refresh, ca, CaLayout, callToAlgorithms, caReLayout, changeLayout, clearCaStyle, clearCyStyle, clearResult, clearSource, copiedEles, copy, cy, CyLayout, cyReLayout, drawOn, duplicateEdge, duration, getAM, getAllNodes, getCaTarget, getCyStartNode, getTarget, getWeight, getWM, hideDuration, hideResult, hideWeight, initCircularMenu, initConventionalMenu, initializeCytoscapeObjects, layoutName, LinkedList, LinkedListNode, math, matrixToString, paste, readAM, readWM, reLayout, removeEdge, removeNode, removeSelected, perform_button, selectAllOfTheSameType, snapToGrid, stopAnimation, maxWeightMatching */
 
 'use strict';
 
@@ -1245,77 +1245,30 @@ function minimalWeightMatchingMultiThread(weightMatrix, numOfThreads, callback) 
 /**
  * @function
  * @public
- * @returns {void}
- * */
-function minimalWeightMatching() {
-    stopAnimation();
-    clearCyStyle();
-    cy.elements(':grabbable').unselect();
-
-    // precondition: the graph is connected
-    if (!isConnected()) return alert('Graph not connected!');
-
-    const len = getAllNodes(cy).length;
-    if (len > 14)
-        if (
-            !confirm(
-                `Warning! This graph has ${len} nodes, at most ${f(len) /
-                    (f(len / 2) *
-                        2 ** (len / 2))} iterations are needed and it might take a long time！`
-            )
-        )
-            return;
-    clearResult();
-    /**
-     * @function
-     * @private
-     * @param {Array<number>} minPairing
-     * @return {void}
-     * */
-    function displayPairings(minPairing) {
-        /**
-         * @function
-         * @private
-         * @param {cytoscape.NodeSingular} node1
-         * @param {cytoscape.NodeSingular} node2
-         * @return {cytoscape.EdgeSingular}
-         * */
-        function getCyEdge(node1, node2) {
-            const e = cy.$id(`${node1.data('id')}-${node2.data('id')}-0`);
-            return e.length === 0 ? cy.$id(`${node2.data('id')}-${node1.data('id')}-0`) : e;
-        }
-
-        const nodes = getAllNodes(cy);
-        for (let i = 0; i < minPairing.length; i += 2) {
-            const n1 = nodes[minPairing[i]];
-            if (minPairing[i + 1] === undefined) break;
-            const n2 = nodes[minPairing[i + 1]];
-            const e = getCyEdge(n1, n2);
-            ca.add(n1);
-            ca.add(n2);
-            ca.add(e);
-            n1.select();
-            n2.select();
-            e.select();
-        }
-        caReLayout();
-    }
-
-    const [weightMatrix] = getWM(cy, false, false);
-    minimalWeightMatchingMultiThread(weightMatrix, 4, displayPairings);
-}
-/**
- * @function
- * @public
  * @return {void}
  */
 function pathTreeFlower() {
     stopAnimation();
     clearCyStyle();
+    cy.elements().unselect();
 
     const [weightMatrix, id_index] = getWM(cy, false, false);
-    const pairing = maxWeightMatching(weightMatrix, true);
-    console.log(pairing);
+
+    const maxCardinality = confirm('Max cardinality?');
+    const minWeightMatching = confirm('Minimum weight matching?');
+
+    if (minWeightMatching) {
+        let maxWeight = -Infinity;
+        for (let i = 0; i < weightMatrix.length; i++) {
+            for (let j = 0; j < weightMatrix.length; j++) {
+                const wt = weightMatrix[i][j];
+                if (wt > maxWeight) maxWeight = wt;
+            }
+        }
+        weightMatrix.map(arr => arr.map(x => maxWeight - x));
+    }
+
+    const pairing = maxWeightMatching(weightMatrix, maxCardinality);
 
     /**
      * @param {number} idx
@@ -1327,18 +1280,16 @@ function pathTreeFlower() {
                 return key;
             }
         }
+        return '';
     }
 
     for (const [n1, n2] of pairing) {
         const id1 = findNodeID(n1);
         const id2 = findNodeID(n2);
-        const node1 = cy.$id(id1);
-        const node2 = cy.$id(id2);
-        console.log(`${id1}-${id2}`);
+        cy.$id(id1).select();
+        cy.$id(id2).select();
         let edge = cy.$id(`${id1}-${id2}-0`);
         if (edge.length === 0) edge = cy.$id(`${id2}-${id1}-0`);
-        node1.select();
-        node2.select();
         edge.select();
     }
 
@@ -1366,24 +1317,30 @@ function CPP() {
     });
     const nodes = cy.nodes(':selected');
     const n = nodes.length;
-    if (n > 14)
-        if (
-            !confirm(
-                `Warning! This graph has ${n} nodes of odd degree, at most ${f(n) /
-                    (f(n / 2) *
-                        2 ** (n / 2))} iterations are needed and it might take a long time！`
-            )
-        )
-            return;
 
     // get the weight matrix of these nodes (the subgraph consisting only the nodes of odd degree)
+    /**
+     * @type {number[][]}
+     */
     const weightMatrix = new Array(n);
+    /**
+     * @type {Array<cytoscape.SearchDijkstraResult>}
+     */
     const paths = new Array(n);
     for (let x = 0; x < n; x++) {
         paths[x] = cy.elements(':grabbable').dijkstra(nodes[x], getWeight);
         weightMatrix[x] = new Array(n);
         for (let y = x + 1; y < n; y++) weightMatrix[x][y] = paths[x].distanceTo(nodes[y]);
     }
+
+    let maxWeight = -Infinity;
+    for (let i = 0; i < weightMatrix.length; i++) {
+        for (let j = 0; j < weightMatrix.length; j++) {
+            const wt = weightMatrix[i][j];
+            if (wt > maxWeight) maxWeight = wt;
+        }
+    }
+    weightMatrix.map(arr => arr.map(x => maxWeight - x));
 
     /**
      * the callback function used to show the result on the result canvas
@@ -1420,7 +1377,7 @@ function CPP() {
     }
 
     // get the minimal weight perfect matching
-    minimalWeightMatchingMultiThread(weightMatrix, 4, displayResult);
+    displayResult(maxWeightMatching(weightMatrix, true));
 }
 /**
  * Get the lower bound for the travelling salesman problem by vertex deletion algorithm
