@@ -1252,7 +1252,7 @@ function pathTreeFlower() {
     clearCyStyle();
     cy.elements().unselect();
 
-    const [weightMatrix, id_index] = getWM(cy, false, false);
+    let [weightMatrix, id_index] = getWM(cy, false, false);
 
     const maxCardinality = confirm('Max cardinality?');
     const minWeightMatching = confirm('Minimum weight matching?');
@@ -1265,7 +1265,8 @@ function pathTreeFlower() {
                 if (wt > maxWeight) maxWeight = wt;
             }
         }
-        weightMatrix.map(arr => arr.map(x => maxWeight - x));
+        maxWeight += 1;
+        weightMatrix = weightMatrix.map(arr => arr.map(x => (x === 0 ? 0 : maxWeight - x)));
     }
 
     const pairing = maxWeightMatching(weightMatrix, maxCardinality);
@@ -1283,6 +1284,7 @@ function pathTreeFlower() {
         return '';
     }
 
+    cy.startBatch();
     for (const [n1, n2] of pairing) {
         const id1 = findNodeID(n1);
         const id2 = findNodeID(n2);
@@ -1292,6 +1294,7 @@ function pathTreeFlower() {
         if (edge.length === 0) edge = cy.$id(`${id2}-${id1}-0`);
         edge.select();
     }
+    cy.endBatch();
 
     clearResult();
     ca.add(cy.elements(':selected'));
@@ -1322,7 +1325,7 @@ function CPP() {
     /**
      * @type {number[][]}
      */
-    const weightMatrix = new Array(n);
+    let weightMatrix = new Array(n);
     /**
      * @type {Array<cytoscape.SearchDijkstraResult>}
      */
@@ -1340,11 +1343,12 @@ function CPP() {
             if (wt > maxWeight) maxWeight = wt;
         }
     }
-    weightMatrix.map(arr => arr.map(x => maxWeight - x));
+    maxWeight += 1;
+    weightMatrix = weightMatrix.map(arr => arr.map(x => (x === 0 ? 0 : maxWeight - x)));
 
     /**
      * the callback function used to show the result on the result canvas
-     * @param {Array<number>} minPairing
+     * @param {Array<[number, number]>} minPairing
      */
     function displayResult(minPairing) {
         clearResult();
@@ -1365,8 +1369,8 @@ function CPP() {
             }
         }
 
-        for (let x = 0; x < minPairing.length; x += 2) {
-            paths[minPairing[x]].pathTo(nodes[minPairing[x + 1]]).forEach(dupEdges);
+        for (const [n1, n2] of minPairing) {
+            paths[n1].pathTo(nodes[n2]).forEach(dupEdges);
         }
         caReLayout();
         ca.elements(':grabbable').unselect();
