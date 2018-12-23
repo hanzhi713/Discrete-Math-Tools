@@ -878,7 +878,7 @@ function findBridge() {
                 `p: ${n.data('_parent') === null ? 'N/A' : n.data('_parent').id()}\n${n.data(
                     'id'
                 )}|${n.data('low') === Infinity ? 'inf' : n.data('low')}|${
-                    n.data('disc') === Infinity ? 'inf' : n.data('disc')
+                n.data('disc') === Infinity ? 'inf' : n.data('disc')
                 }`,
             textWrap: 'wrap'
         });
@@ -1418,19 +1418,20 @@ function CPP() {
      * @type {Array<cytoscape.SearchDijkstraResult>}
      */
     const paths = new Array(n);
+    let maxWeight = -Infinity;
     for (let x = 0; x < n; x++) {
         paths[x] = cy.elements(':grabbable').dijkstra({ root: nodes[x], weight: getWeight });
         weightMatrix[x] = new Array(n);
-        for (let y = x + 1; y < n; y++) weightMatrix[x][y] = paths[x].distanceTo(nodes[y]);
-    }
-
-    let maxWeight = -Infinity;
-    for (let i = 0; i < weightMatrix.length; i++) {
-        for (let j = 0; j < weightMatrix.length; j++) {
-            const wt = weightMatrix[i][j];
-            if (wt > maxWeight) maxWeight = wt;
+        for (let y = 0; y < n; y++) {
+            if (x === y) weightMatrix[x][x] = 0;
+            else {
+                const wt = paths[x].distanceTo(nodes[y]);
+                weightMatrix[x][y] = wt;
+                if (wt > maxWeight) maxWeight = wt;
+            }
         }
     }
+
     maxWeight += 1;
     weightMatrix = weightMatrix.map(arr => arr.map(x => (x === 0 ? 0 : maxWeight - x)));
 
