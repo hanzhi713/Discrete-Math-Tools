@@ -607,19 +607,6 @@ function myPageRank() {
      * */
     function getLabelStyle(size, rank) {
         const fs = 13 + Math.floor(size ** 0.33);
-        // let s = Math.ceil(size * 0.5 / fs);
-        // let wp = '\n';
-        // for (let i = 0; i < s; i++)
-        //     wp += '\n';
-        // return {
-        //     fontSize: fs + 'px',
-        //     label: (n) => {
-        //         return (rank * 100).toFixed(2) + '%' + wp + n.data('id')
-        //     },
-        //     textWrap: 'wrap',
-        //     textValign: 'center',
-        //     textMarginY: -(s - 1) * fs
-        // };
         return {
             fontSize: `${fs}px`,
             label: n => `${n.data('id')}\n${(rank * 100).toFixed(2)}%`,
