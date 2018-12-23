@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <link rel="shortcut icon" href="../img/head.ico" type="image/x-icon">
     <link href="css/font-awesome.min.css?ver=4.7" rel="stylesheet" type="text/css">
@@ -25,7 +26,8 @@
 
         .tb tr td {
             border: solid 1px;
-            border-spacing: 0;;
+            border-spacing: 0;
+            ;
         }
 
         .layout-img {
@@ -57,671 +59,698 @@
         }
     </style>
 </head>
-<body style="width:1000px; margin: auto auto; font-size: 16px;"><br/>
-Note: 'node' and 'vertex' are of the same meaning<br/>
-<h2>Layout options:</h2>
-Breadthfirst: Place the nodes based on the result of breadth first traversal. Not recommended for complicated
-graphs.<br/>
-Circle: Put nodes on a circle<br/>
-Cola: Dynamic physical simulations of nodes. With smooth animations.<br/>
-CoSE-Bilken: The best choice for trees and graphs that are not too complicated. With animation. It is computationally
-expensive, so it will take a noticeable time for large graphs.<br/>
-Grid: Put nodes in grids<br/>
-Random: Randomly place the nodes<br/>
-Snap to grid: Display grid, allowing nodes to be snapped to the middle of grids<br/>
-Spread: Maximize the use of the space, making nodes as far as from each other as possible<br/>
-<table class="table" style="vertical-align: bottom">
-    <tr>
-        <td style="vertical-align: bottom">
-            <figure class="layout-img">
-                <img src="demo/breadthfirst.png"/>
-                <figcaption class="fig-caption">Breadth First</figcaption>
-            </figure>
-        </td>
-        <td style="vertical-align: bottom">
-            <figure class="layout-img">
-                <img src="demo/circle.png"/>
-                <figcaption class="fig-caption">Circle</figcaption>
-            </figure>
-        </td>
-        <td style="vertical-align: bottom">
-            <figure class="layout-img">
-                <img src="demo/cola.png"/>
-                <figcaption class="fig-caption">Cola</figcaption>
-            </figure>
-        </td>
-        <td style="vertical-align: bottom">
-            <figure class="layout-img">
-                <img src="demo/cose.png"/>
-                <figcaption class="fig-caption">CoSE-Bilken</figcaption>
-            </figure>
-        </td>
-    </tr>
-    <tr>
-        <td style="vertical-align: bottom">
-            <figure class="layout-img">
-                <img src="demo/grid.png"/>
-                <figcaption class="fig-caption">Grid</figcaption>
-            </figure>
-        </td>
-        <td style="vertical-align: bottom">
-            <figure class="layout-img">
-                <img src="demo/random.png"/>
-                <figcaption class="fig-caption">Random</figcaption>
-            </figure>
-        </td>
-        <td style="vertical-align: bottom">
-            <figure class="layout-img">
-                <img src="demo/snap-to-grid.png"/>
-                <figcaption class="fig-caption">Snap-to-grid</figcaption>
-            </figure>
-        </td>
-        <td style="vertical-align: bottom">
-            <figure class="layout-img">
-                <img src="demo/spread.png"/>
-                <figcaption class="fig-caption">Spread</figcaption>
-            </figure>
-        </td>
-    </tr>
-</table>
-<strong>Other options</strong><br/>
-Auto-refresh: Refresh the layout after any addition / deletion of elements<br/>
-Hide result: Hide the result canvas, thereby increasing the size for drawing in source canvas.<br/>
-<h2>Create Nodes</h2>
-To create a node, you can just click the 'add a node' button, which will create a node with the minimal id that is not
-in the graph.
-If you want to create multiple nodes, enter the number of nodes you want to create in the 'number' field.<br/>
-<h2>Remove Nodes</h2>
-To remove a node, enter the id of this node and click remove.<br/>
-You can remove multiple nodes by entering their id respectively, separated by commas, or entering the range.<br/>
-Example: enter 1,2,3,4 or 1-4 to remove node 1, node 2, node 3, and node 4.<br/>
-<h2>Create Edges</h2>
-To create an edge connecting node src and node tg, enter the src-tg-num, which stands for source-target-number.<br/>
-If the '-num' part is omitted, it will create one edge connecting node src and node tg.<br/>
-Example: 1-2-3 will add three edges connecting node 1 and 2.<br/>
-Alternatively, you can create edges by selecting nodes and clicking the 'add edge(s) between selected' button. This will
-create edges connecting all nodes that you've selected.<br/>
-Or you can use the edge handle plugin:<br/>
-<img src="demo/edgehandles.png"/>
-<br/><br/>
-To put weight on these edges, input the weight number before add the edge.<br/>
-Weight can be omitted. The default weight is 1.<br/><br/>
-<h2>Remove Edges</h2>
-To remove an edge, just enter the src-tg-num for this edge, where num is the number of edges connecting src and tg that
-will be removed.
-If the '-num' part is omitted, it will remove one edge connecting node src and node tg.<br/>
-Example: 1-2-2 means remove 2 edges connecting node 1 and node 2. <br/>
-Or you can just select all the edges that you want to remove, then click 'remove selected' button.<br/>
-<h2>Create Graph from Adjacency Matrix / Weight Matrix</h2>
-Graph can also be created from the adjacency matrix or weight matrix. The matrix must be declared as the javascript
-nested array format.<br/><br/>
-In the adjacency matrix, the element in ith row and jth column denotes the number of edges connecting node i and node j.<br/><br/>
-In the weight matrix, the element in ith row and jth column denotes the weight of the edge connecting node i and node j.
-If weight <= 0, it means that these two nodes are not connected<br/><br/>
-<table class="table table-bordered">
-    <caption>Examples of creating from matrix</caption>
-    <thead>
-    <tr class="tb-head">
-        <td style="text-align: center">Matrix type</td>
-        <td style="text-align: center">Input</td>
-        <td style="text-align: center">Result</td>
-    </tr>
-    </thead>
-    <tbody>
-    <tr>
-        <td>Weight matrix</td>
-        <td>
-            <code lang="javascript">
-                [[0,4,3,0,0],<br/>
-                &nbsp;[4,0,4,4,0],<br/>
-                &nbsp;[3,4,0,2,4],<br/>
-                &nbsp;[0,4,2,0,0],<br/>
-                &nbsp;[0,0,4,0,0]]
-            </code>
-        </td>
-        <td style="text-align: center"><img style="height: 400px;" src="demo/weight-matrix-example.png"/></td>
-    </tr>
-    <tr>
-        <td>Adjacency matrix</td>
-        <td>
-            <code lang="javascript">
-                [[0,1,0,0,0,2,1],<br/>
-                &nbsp;[1,0,1,1,1,1,1],<br/>
-                &nbsp;[0,1,0,0,1,0,1],<br/>
-                &nbsp;[0,1,0,0,0,0,2],<br/>
-                &nbsp;[0,1,1,0,0,2,0],<br/>
-                &nbsp;[2,1,0,0,2,1,0],<br/>
-                &nbsp;[1,1,1,2,0,0,0]]
-            </code>
-        </td>
-        <td style="text-align: center"><img style="height: 400px;" src="demo/adj-matrix-example.png"/></td>
-    </tr>
-    </tbody>
-</table>
-<br/>
-The whole matrix must be enclosed by a pair of square parentheses, and each row also should be enclosed by a pair of
-square parentheses.
-Rows and columns are separated by commas.<br/><br/>
-In theory, the matrix should be symmetric about the major diagonal (because the graph is undirected),
-yet this is not checked. My program only take the half above the major diagonal.<br/>
-<h2>Context menu</h2>
-A circular menu will be shown when you right click on a node, an edge, or the canvas. Thank to FontAwesome for creating
-these icons.<br/>
-<table class="table table-striped table-bordered" style="font-size: 16px;">
-    <caption class="tb-head"><h4>Meaning of menu options</h4></caption>
-    <tr class="tb-head">
-        <td colspan="2">Core</td>
-        <td colspan="2">Nodes</td>
-        <td colspan="2">Edges</td>
-    </tr>
-    <tr>
-        <td><i class="fa fa-plus fa-2x" aria-hidden="true"></i></td>
-        <td width="230px">Add an node</td>
-        <td><i class="fa fa-road fa-2x" aria-hidden="true"></i></td>
-        <td>Add edges between selected node</td>
-        <td><i class="fa fa-trash fa-2x" aria-hidden="true"></i></td>
-        <td>Remove this edge</td>
-    </tr>
-    <tr>
-        <td><i class="fa fa-trash fa-2x" aria-hidden="true"></i></td>
-        <td>Remove selected</td>
-        <td><i class="fa fa-trash fa-2x" aria-hidden="true"></i></td>
-        <td>Remove this node</td>
-        <td><i class="fa fa-plus fa-2x" aria-hidden="true"></i></td>
-        <td>Duplicate this edge</td>
-    </tr>
-    <tr>
-        <td><i class="fa fa-crosshairs fa-2x" aria-hidden="true"></i></td>
-        <td>Select all elements</td>
-        <td>BFS</td>
-        <td>Perform breadth first search starting at this node</td>
-        <td><i class="fa fa-tag fa-2x" aria-hidden="true"></i></td>
-        <td>Add/Modify weight of this edge</td>
-    </tr>
-    <tr>
-        <td><i class="fa fa-refresh fa-2x" aria-hidden="true"></i></td>
-        <td>Refresh layout</td>
-        <td>DFS</td>
-        <td>Perform depth first search starting at this node</td>
-        <td colspan="2"></td>
-    </tr>
-    <tr>
-        <td><i class="fa fa-external-link fa-2x" aria-hidden="true"></i></td>
-        <td>
-            Enable/Disable draw mode<br/>
-            drag to connect nodes
-        </td>
-        <td colspan="4"></td>
-    </tr>
-</table>
-<h2>Key bindings</h2>
-<table class="table table-striped table-bordered">
-    <thead>
-    <tr class="tb-head">
-        <td>Keys</td>
-        <td>Functions</td>
-    </tr>
-    </thead>
-    <tbody>
-    <tr>
-        <td>Delete</td>
-        <td>Delete selected nodes on the source canvas</td>
-    </tr>
-    <tr>
-        <td>Alt + a</td>
-        <td>Add a node on the source canvas</td>
-    </tr>
-    <tr>
-        <td>Alt + c</td>
-        <td>Connect selected nodes on the source canvas</td>
-    </tr>
-    <tr>
-        <td>Alt + f</td>
-        <td>refresh the layout</td>
-    </tr>
-    <tr>
-        <td>Alt + r</td>
-        <td>Clear the result canvas</td>
-    </tr>
-    <tr>
-        <td>Alt + s</td>
-        <td>Clear the source canvas</td>
-    </tr>
-    <tr>
-        <td>Ctrl + a</td>
-        <td>Select all elements in the source canvas</td>
-    </tr>
-    <tr>
-        <td>Ctrl + c</td>
-        <td>Copy selected elements</td>
-    </tr>
-    <tr>
-        <td>Ctrl + f</td>
-        <td>Clear the color of the source canvas</td>
-    </tr>
-    <tr>
-        <td>Ctrl + r</td>
-        <td>Clear the color of the result canvas</td>
-    </tr>
-    <tr>
-        <td>Ctrl + s</td>
-        <td>Stop animation</td>
-    </tr>
-    <tr>
-        <td>Ctrl + v</td>
-        <td>Paste elements</td>
-    </tr>
-    </tbody>
-</table>
-<h2>Algorithms</h2>
-<div id="bfs">
-    <h3>Breadth First Search</h3>
-    <figure>
-        <img src="demo/bfs.png" class="demo-pic"/>
-        <figcaption class="fig-caption">Breadth first search starting at node 2</figcaption>
-    </figure>
-    <table class="table table-striped">
-        <!--<caption><h3>Meaning of Visualizations</h3></caption>-->
-        <thead>
-        <tr class="tb-title">
-            <td>Source canvas</td>
-            <td>Result canvas</td>
-            <td>Animation</td>
-        </tr>
-        </thead>
-        <tbody>
+
+<body style="width:1000px; margin: auto auto; font-size: 16px;"><br />
+    Note: 'node' and 'vertex' are of the same
+    meaning<br />
+
+    <h2>Layout options:</h2> Breadthfirst: Place the nodes based on the result of breadth first traversal. Not
+    recommended for complicated graphs.<br />
+    Circle: Put nodes on a circle<br />
+    Cola: Dynamic physical simulations of
+    nodes. With smooth animations.<br />
+    CoSE-Bilken: The best choice for trees and graphs that are not too
+    complicated. With animation. It is computationally expensive, so it will take a noticeable time for large graphs.<br />
+
+    Grid: Put nodes in grids<br />
+    Random: Randomly place the nodes<br />
+    Snap to grid: Display grid, allowing nodes to
+    be snapped to the middle of grids<br />
+    Spread: Maximize the use of the space, making nodes as far as from each
+    other as possible<br />
+
+    <table class="table" style="vertical-align: bottom">
         <tr>
-            <td>Highlight the path which the algorithm has visited</td>
-            <td>Show the tree generated by this algorithm</td>
-            <td>Traverse the nodes and edges visited by order of visits</td>
-        </tr>
-        </tbody>
-    </table>
-</div>
-<div id="dfs">
-    <h3>Depth First Search</h3>
-    <figure>
-        <img src="demo/dfs.png" class="demo-pic"/>
-        <figcaption class="fig-caption">Depth first search starting at node 2</figcaption>
-    </figure>
-    <table class="table table-striped">
-        <!--<caption><h3>Meaning of Visualizations</h3></caption>-->
-        <thead>
-        <tr class="tb-title">
-            <td>Source canvas</td>
-            <td>Result canvas</td>
-            <td>Animation</td>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <td>Highlight the path which the algorithm has visited</td>
-            <td>Show the tree generated by this algorithm</td>
-            <td>Traverse the nodes and edges visited by order of visits</td>
-        </tr>
-        </tbody>
-    </table>
-</div>
-<div id="dijkstra">
-    <h3>Dijkstra's Algorithm</h3>
-    <figure>
-        <img src="demo/dijkstra.png" class="demo-pic"/>
-        <figcaption class="fig-caption">The minimal weight connector between node 1 and node 9</figcaption>
-    </figure>
-    <table class="table table-striped">
-        <!--<caption><h3>Meaning of Visualizations</h3></caption>-->
-        <thead>
-        <tr class="tb-title">
-            <td>Source canvas</td>
-            <td>Result canvas</td>
-            <td>Animation</td>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <td>Highlight the minimal weight connector</td>
-            <td>Show the minimal weight connector</td>
-            <td>Trace the minimal weight connector</td>
-        </tr>
-        </tbody>
-    </table>
-</div>
-<div id="dijkstra-detained">
-    <h3>Dijkstra's Algorithm (Detailed)</h3>
-    This version of Dijkstra's algorithm will trace every single step, including the label updates.<br/>
-    <figure>
-        <img src="demo/dijkstra-detailed.png" class="demo-pic"/>
-        <figcaption class="fig-caption">The minimal weight connector between node 9 and node 13</figcaption>
-    </figure>
-    <table class="table table-striped">
-        <!--<caption><h3>Meaning of Visualizations</h3></caption>-->
-        <thead>
-        <tr class="tb-title">
-            <td>Source canvas</td>
-            <td>Result canvas</td>
-            <td>Animation</td>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <td>
-                Highlight the minimal weight connector, all temporary labels, and all permanent labels.
-                The meaning of the labels: Note id|Temporary labels|Permanent label
+            <td style="vertical-align: bottom">
+                <figure class="layout-img"> <img src="demo/breadthfirst.png" />
+                    <figcaption class="fig-caption">Breadth First</figcaption>
+                </figure>
             </td>
-            <td>Show the minimal weight connector</td>
-            <td>Trace the algorithm step by step</td>
-        </tr>
-        </tbody>
-    </table>
-</div>
-<div id="kruskal">
-    <h3>Kruskal's Algorithm</h3>
-    Find a minimal spanning tree in a given connected graph<br/>
-    <figure>
-        <img src="demo/kruskal.png" class="demo-pic"/>
-        <figcaption class="fig-caption">Running Kruskal's algorithm</figcaption>
-    </figure>
-    <table class="table table-striped">
-        <!--<caption><h3>Meaning of Visualizations</h3></caption>-->
-        <thead>
-        <tr class="tb-title">
-            <td>Source canvas</td>
-            <td>Result canvas</td>
-            <td>Animation</td>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <td>Highlight the minimal spanning tree on the original graph</td>
-            <td>Show the minimal spanning tree obtained</td>
-            <td>Traverse the edges in the tree by order of visits</td>
-        </tr>
-        </tbody>
-    </table>
-</div>
-<div id="prim">
-    <h3>Prim's Algorithm</h3>
-    Find a minimal spanning tree in a given connected graph<br/>
-    <figure>
-        <img src="demo/prim.png" class="demo-pic"/>
-        <figcaption class="fig-caption">Prim's algorithm starting at node 2</figcaption>
-    </figure>
-    <table class="table table-striped">
-        <!--<caption><h3>Meaning of Visualizations</h3></caption>-->
-        <thead>
-        <tr class="tb-title">
-            <td>Source canvas</td>
-            <td>Result canvas</td>
-            <td>Animation</td>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <td>Highlight the path which the algorithm has visited on the original graph</td>
-            <td>Show the minimal spanning tree obtained by this algorithm</td>
-            <td>Traverse the nodes in the tree by order of visits</td>
-        </tr>
-        </tbody>
-    </table>
-</div>
-<div id="minimal-weight-cycle">
-    <h3>Minimal Weight Cycle</h3>
-    Find a minimal weight cycle, which can be local (starting from a selected vertex) or global, in a connected graph
-    with
-    no edge of negative weight<br/>
-    <figure>
-        <img src="demo/minimal-weight-cycle.png" class="demo-pic"/>
-        <figcaption class="fig-caption">Finding the global minimal weight cycle</figcaption>
-    </figure>
-    <table class="table table-striped">
-        <!--<caption><h3>Meaning of Visualizations</h3></caption>-->
-        <thead>
-        <tr class="tb-title">
-            <td>Source canvas</td>
-            <td>Result canvas</td>
-            <td>Animation</td>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <td>Highlight the minimal weight cycle found</td>
-            <td>Show the minimal weight cycle found</td>
-            <td>None</td>
-        </tr>
-        </tbody>
-    </table>
-</div>
-<div id="eulerian-cycle">
-    <h3>Eulerian Trail/Cycle</h3>
-    Find an Eulerian cycle in an Eulerian graph or an Eulerian path in a semi-Eulerian graph, by Hierholzer's
-    algorithm.<br/>
-    <figure>
-        <img src="demo/eulerian-cycle.png" class="demo-pic"/>
-        <figcaption class="fig-caption">Finding an Eulerian cycle on weighted K<sub>7</sub></figcaption>
-    </figure>
-    <table class="table table-striped">
-        <!--<caption><h3>Meaning of Visualizations</h3></caption>-->
-        <thead>
-        <tr class="tb-title">
-            <td>Source canvas</td>
-            <td>Result canvas</td>
-            <td>Animation</td>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <td>No change</td>
-            <td>Show the original graph</td>
-            <td>Traverse the nodes and edges by order of visits in the Eulerian cycle obtained</td>
-        </tr>
-        </tbody>
-    </table>
-</div>
-<div id="minimal-weight-matching">
-    <h3>Minimal Weight Matching</h3>
-    Find the minimal weight matching in a connected graph by brute force. If the graph has an even number of vertices,
-    then a minimal weight perfect matching is obtained. For graph which has >= 14 vertices, this algorithm will start to
-    take a noticeable time to run.<br/>
-    <figure>
-        <img src="demo/minimal-weight-matching.png" class="demo-pic"/>
-        <figcaption class="fig-caption">Finding the minimal weight matching on a weighted graph</figcaption>
-    </figure>
-    <table class="table table-striped">
-        <!--<caption><h3>Meaning of Visualizations</h3></caption>-->
-        <thead>
-        <tr class="tb-title">
-            <td>Source canvas</td>
-            <td>Result canvas</td>
-            <td>Animation</td>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <td>Highlight the matches</td>
-            <td>Show the matches</td>
-            <td>None</td>
-        </tr>
-        </tbody>
-    </table>
-</div>
-<div id="chinese-postman-problem">
-    <h3>Chinese Postman Problem</h3>
-    Solve the CPP by finding the minimal weight perfect matching between vertices of odd degrees, using brute force,
-    thereby making the graph Eulerian. For graph which has >= 14 vertices of odd degrees, this algorithm will start to
-    take a noticeable time to run.
-    If I have time, I will try to implement Edmonds' algorithm, which can find the minimal weight perfect matching in
-    polynomial time (complexity at about O(V^3))<br/>
-    <figure>
-        <img src="demo/chinese-postman-problem.png" class="demo-pic"/>
-        <figcaption class="fig-caption">Solving the Chinese postman problem on a weighted graph</figcaption>
-    </figure>
-    <table class="table table-striped">
-        <!--<caption><h3>Meaning of Visualizations</h3></caption>-->
-        <thead>
-        <tr class="tb-title">
-            <td>Source canvas</td>
-            <td>Result canvas</td>
-            <td>Animation</td>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <td>Highlight all odd nodes and edges that need to be duplicated (visited twice)</td>
-            <td>Show the graph after the duplication of these edges</td>
-            <td>Traverse all nodes and edges by order of visits in the Eulerian cycle obtained on the graph after
-                duplication of these edges
+            <td style="vertical-align: bottom">
+                <figure class="layout-img"> <img src="demo/circle.png" />
+                    <figcaption class="fig-caption">Circle</figcaption>
+                </figure>
+            </td>
+            <td style="vertical-align: bottom">
+                <figure class="layout-img"> <img src="demo/cola.png" />
+                    <figcaption class="fig-caption">Cola</figcaption>
+                </figure>
+            </td>
+            <td style="vertical-align: bottom">
+                <figure class="layout-img"> <img src="demo/cose.png" />
+                    <figcaption class="fig-caption">CoSE-Bilken</figcaption>
+                </figure>
             </td>
         </tr>
-        </tbody>
-    </table>
-</div>
-<div id="nearest-neighbor-algorithm">
-    <h3>Nearest Neighbor Algorithm</h3>
-    Find a Hamiltonian cycle of low but not necessarily of minimal weight in a complete and Euclidean graph.
-    If a node is selected, then it will be the starting point of the algorithm. Otherwise this algorithm will be
-    performed at every node, and the one of minimal total weight is returned.
-    This algorithm can run in a non-complete and/or non-Euclidean graph, but the result is not guaranteed.<br/>
-    <figure>
-        <img src="demo/nearest-neighbor.png" class="demo-pic"/>
-        <figcaption class="fig-caption">Finding a Hamiltonian cycle by the nearest neighbor algorithm on a complete
-            graph
-        </figcaption>
-    </figure>
-    <table class="table table-striped">
-        <!--<caption><h3>Meaning of Visualizations</h3></caption>-->
-        <thead>
-        <tr class="tb-title">
-            <td>Source canvas</td>
-            <td>Result canvas</td>
-            <td>Animation</td>
+        <tr>
+            <td style="vertical-align: bottom">
+                <figure class="layout-img"> <img src="demo/grid.png" />
+                    <figcaption class="fig-caption">Grid</figcaption>
+                </figure>
+            </td>
+            <td style="vertical-align: bottom">
+                <figure class="layout-img"> <img src="demo/random.png" />
+                    <figcaption class="fig-caption">Random</figcaption>
+                </figure>
+            </td>
+            <td style="vertical-align: bottom">
+                <figure class="layout-img"> <img src="demo/snap-to-grid.png" />
+                    <figcaption class="fig-caption">Snap-to-grid</figcaption>
+                </figure>
+            </td>
+            <td style="vertical-align: bottom">
+                <figure class="layout-img"> <img src="demo/spread.png" />
+                    <figcaption class="fig-caption">Spread</figcaption>
+                </figure>
+            </td>
         </tr>
+    </table> <strong>Other options</strong><br />
+    Auto-refresh: Refresh the layout after any addition / deletion of
+    elements<br />
+    Hide result: Hide the result canvas, thereby increasing the size for drawing in source canvas.<br />
+
+    <h2>Create Nodes</h2>
+    To create a node, you can just click the 'add a node' button, which will create a node with
+    the minimal id that is not in the graph. If you want to create multiple nodes, enter the number of nodes you want
+    to create in the 'number' field.<br />
+
+    <h2>Remove Nodes</h2>
+    To remove a node, enter the id of this node and click remove.<br />
+    You can remove multiple
+    nodes by entering their id respectively, separated by commas, or entering the range.<br />
+    Example: enter 1,2,3,4
+    or 1-4 to remove node 1, node 2, node 3, and node 4.<br />
+
+    <h2>Create Edges</h2>
+    To create an edge connecting node src and node tg, enter the src-tg-num, which stands for
+    source-target-number.<br />
+    If the '-num' part is omitted, it will create one edge connecting node src and node tg.<br />
+
+    Example: 1-2-3 will add three edges connecting node 1 and 2.<br />
+    Alternatively, you can create edges by selecting
+    nodes and clicking the 'add edge(s) between selected' button. This will create edges connecting all nodes that
+    you've selected.<br />
+    Or you can use the edge handle plugin:<br />
+    <img src="demo/edgehandles.png" /> <br />
+    <br />
+
+    To put weight on these edges, input the weight number before add the edge.<br />
+    Weight can be omitted. The default
+    weight is 1.<br />
+    <br />
+
+    <h2>Remove Edges</h2> To remove an edge, just enter the src-tg-num for this edge, where num is the number of edges
+    connecting src and tg that will be removed. If the '-num' part is omitted, it will remove one edge connecting node
+    src and node tg.<br />
+    Example: 1-2-2 means remove 2 edges connecting node 1 and node 2. <br />
+    Or you can just select all the edges that you want to remove, then click 'remove selected' button.<br />
+
+    <h2>Create Graph from Adjacency Matrix / Weight Matrix</h2> Graph can also be created from the adjacency matrix or
+    weight matrix. The matrix must be declared as the javascript nested array format.<br />
+    <br />
+    In the adjacency matrix,
+    the element in ith row and jth column denotes the number of edges connecting node i and node j.<br />
+    <br />
+
+    In the weight matrix, the element in ith row and jth column denotes the weight of the edge connecting node i and
+    node j. If weight &lt;= 0, it means that these two nodes are not connected<br />
+    <br />
+
+    <table class="table table-bordered">
+        <caption>Examples of creating from matrix</caption>
+        <thead>
+            <tr class="tb-head">
+                <td style="text-align: center">Matrix type</td>
+                <td style="text-align: center">Input</td>
+                <td style="text-align: center">Result</td>
+            </tr>
         </thead>
         <tbody>
-        <tr>
-            <td>Highlight the Hamiltonian cycle obtained</td>
-            <td>Show the Hamiltonian cycle</td>
-            <td>Traverse the Hamiltonian cycle</td>
-        </tr>
+            <tr>
+                <td>Weight matrix</td>
+                <td> <code lang="javascript">[[0,4,3,0,0],<br/>&nbsp;[4,0,4,4,0],<br/>&nbsp;[3,4,0,2,4],<br/>&nbsp;[0,4,2,0,0],<br/>&nbsp;[0,0,4,0,0]]</code>
+                </td>
+                <td style="text-align: center"><img style="height: 400px;" src="demo/weight-matrix-example.png" /></td>
+            </tr>
+            <tr>
+                <td>Adjacency matrix</td>
+                <td> <code lang="javascript">[[0,1,0,0,0,2,1],<br/>&nbsp;[1,0,1,1,1,1,1],<br/>&nbsp;[0,1,0,0,1,0,1],<br/>&nbsp;[0,1,0,0,0,0,2],<br/>&nbsp;[0,1,1,0,0,2,0],<br/>&nbsp;[2,1,0,0,2,1,0],<br/>&nbsp;[1,1,1,2,0,0,0]]</code>
+                </td>
+                <td style="text-align: center"><img style="height: 400px;" src="demo/adj-matrix-example.png" /></td>
+            </tr>
         </tbody>
-    </table>
-</div>
-<div id="tsp-lower-bound">
-    <h3>TSP Lower Bound</h3>
-    Find the lower bound for the travelling salesman problem in a complete and Euclidean graph by vertex deletion
-    algorithm.
-    If a node is selected, then it will be the starting point of the algorithm. Otherwise this algorithm will be
-    performed
-    at every node, and the one of maximal total weight is returned.
-    This algorithm can run in a non-complete and/or non-Euclidean graph, but the result is not guaranteed.<br/>
-    <figure>
-        <img src="demo/tsp-lower-bound.png" class="demo-pic"/>
-        <figcaption class="fig-caption">Finding the (global) lower bound for the traveling salesman problem in a
-            complete graph by vertex deletion algorithm
-        </figcaption>
-    </figure>
-    <table class="table table-striped">
-        <!--<caption><h3>Meaning of Visualizations</h3></caption>-->
-        <thead>
-        <tr class="tb-title">
-            <td>Source canvas</td>
-            <td>Result canvas</td>
-            <td>Animation</td>
+    </table> <br />
+    The whole matrix must be enclosed by a pair of square parentheses, and each row also should be
+    enclosed by a pair of square parentheses. Rows and columns are separated by commas.<br />
+    <br />
+    In theory, the
+    matrix should be symmetric about the major diagonal (because the graph is undirected), yet this is not checked. My
+    program only take the half above the major diagonal.<br />
+
+    <h2>Context menu</h2> A circular menu will be shown when you right click on a node, an edge, or the canvas. Thank
+    to FontAwesome for creating these icons.<br />
+
+    <table class="table table-striped table-bordered" style="font-size: 16px;">
+        <caption class="tb-head">
+            <h4>Meaning of menu options</h4>
+        </caption>
+        <tr class="tb-head">
+            <td colspan="2">Core</td>
+            <td colspan="2">Nodes</td>
+            <td colspan="2">Edges</td>
         </tr>
+        <tr>
+            <td><i class="fa fa-plus fa-2x" aria-hidden="true"></i></td>
+            <td width="230px">Add an node</td>
+            <td><i class="fa fa-road fa-2x" aria-hidden="true"></i></td>
+            <td>Add edges between selected node</td>
+            <td><i class="fa fa-trash fa-2x" aria-hidden="true"></i></td>
+            <td>Remove this edge</td>
+        </tr>
+        <tr>
+            <td><i class="fa fa-trash fa-2x" aria-hidden="true"></i></td>
+            <td>Remove selected</td>
+            <td><i class="fa fa-trash fa-2x" aria-hidden="true"></i></td>
+            <td>Remove this node</td>
+            <td><i class="fa fa-plus fa-2x" aria-hidden="true"></i></td>
+            <td>Duplicate this edge</td>
+        </tr>
+        <tr>
+            <td><i class="fa fa-crosshairs fa-2x" aria-hidden="true"></i></td>
+            <td>Select all elements</td>
+            <td>BFS</td>
+            <td>Perform breadth first search starting at this node</td>
+            <td><i class="fa fa-tag fa-2x" aria-hidden="true"></i></td>
+            <td>Add/Modify weight of this edge</td>
+        </tr>
+        <tr>
+            <td><i class="fa fa-refresh fa-2x" aria-hidden="true"></i></td>
+            <td>Refresh layout</td>
+            <td>DFS</td>
+            <td>Perform depth first search starting at this node</td>
+            <td colspan="2"></td>
+        </tr>
+        <tr>
+            <td><i class="fa fa-external-link fa-2x" aria-hidden="true"></i></td>
+            <td> Enable/Disable draw mode<br />
+                drag to connect nodes </td>
+            <td colspan="4"></td>
+        </tr>
+    </table>
+    <h2>Key bindings</h2>
+    <table class="table table-striped table-bordered">
+        <thead>
+            <tr class="tb-head">
+                <td>Keys</td>
+                <td>Functions</td>
+            </tr>
         </thead>
         <tbody>
-        <tr>
-            <td>Highlight the two edges deleted and the minimal spanning tree for the remaining graph</td>
-            <td>Show the graph formed by these two edges and the minimal spanning tree</td>
-            <td>None</td>
-        </tr>
+            <tr>
+                <td>Delete</td>
+                <td>Delete selected nodes on the source canvas</td>
+            </tr>
+            <tr>
+                <td>Alt + a</td>
+                <td>Add a node on the source canvas</td>
+            </tr>
+            <tr>
+                <td>Alt + c</td>
+                <td>Connect selected nodes on the source canvas</td>
+            </tr>
+            <tr>
+                <td>Alt + f</td>
+                <td>refresh the layout</td>
+            </tr>
+            <tr>
+                <td>Alt + r</td>
+                <td>Clear the result canvas</td>
+            </tr>
+            <tr>
+                <td>Alt + s</td>
+                <td>Clear the source canvas</td>
+            </tr>
+            <tr>
+                <td>Ctrl + a</td>
+                <td>Select all elements in the source canvas</td>
+            </tr>
+            <tr>
+                <td>Ctrl + c</td>
+                <td>Copy selected elements</td>
+            </tr>
+            <tr>
+                <td>Ctrl + f</td>
+                <td>Clear the color of the source canvas</td>
+            </tr>
+            <tr>
+                <td>Ctrl + r</td>
+                <td>Clear the color of the result canvas</td>
+            </tr>
+            <tr>
+                <td>Ctrl + s</td>
+                <td>Stop animation</td>
+            </tr>
+            <tr>
+                <td>Ctrl + v</td>
+                <td>Paste elements</td>
+            </tr>
         </tbody>
     </table>
-</div>
-<h2>Third-party code and dependencies</h2>
-Bootstrap<br/>
-Cytoscape.js<br/>
-Cola.js<br/>
-Cytoscape-cola.js<br/>
-Cytoscape-cose-bilkent.js<br/>
-Cytoscape-cxtmenu.js<br/>
-Cytoscape-panzoom.js<br/>
-Cytoscape-edgehandles.js<br/>
-Cytoscape-snap-to-grid.js<br/>
-Cytoscape-spread.js<br/>
-FontAwesone 4.7<br/>
-jQuery<br/>
-Weaver.js<br/>
-Lodash.js<br/>
-<h2>Update catalog</h2>
-<strong>February 23rd, 2018</strong><br/>
-1. Fixed a bug of minimal weight matching (see this <a
-        href="https://github.com/hanzhi713/Discrete-Math-Tools/commit/32125ba3efd65a62d28213b125b111df71a930cb"
-        target="_blank">commit</a>)<br/><br/>
-<strong>November 13th, 2017</strong><br/>
-1. Fixed a bug of Dijkstra (detailed)<br/><br/>
-<strong>August 26th, 2017</strong><br/>
-1. Adapted ECMAScript 2015. Babel is used to compile the script.<br/>
-2. Fixed some issues.<br/><br/>
-<strong>August 19th, 2017</strong><br/>
-1. Updated key bindings.<br/>
-2. Improved performance by reducing style updates and redraws.<br/><br/>
-<strong>August 18th, 2017</strong><br/>
-1. Implemented the Detailed Dijkstra's algorithm.<br/>
-2. Now you can customize the animation duration.<br/>
-3. Fixed minor issues.<br/>
-4. Redesigned the instruction page (this page).<br/><br/>
-<strong>August 12th, 2017</strong><br/>
-1. Adapted Bootstrap<br/>
-2. Added spread layout<br/><br/>
-<strong>August 9th, 2017</strong><br/>
-1. Added multi-threading support for the minimal weight matching algorithm, with the use of generators (ES6).<br/>
-2. Applied jQuery.<br/>
-3. Optimized the "Generate random graph" function.<br/>
-Note that the multi-threading support will be automatically disabled if the browser doesn't support generators<br/><br/>
-<strong>August 6th, 2017</strong><br/>
-1. Improved the efficiency of minimal weight matching algorithm by replacing objects with primitive data types.<br/>
-2. Redesigned the function for minimal weight matching so that it can also be applied to CPP.<br/><br/>
-<strong>August 4th, 2017</strong><br/>
-1. Optimized animation for Kruskal.<br/>
-2. Implemented Prim's algorithm.<br/>
-3. Fixed coding style issues and improved efficiency.<br/><br/>
-<strong>July 24th, 2017</strong><br/>
-1. Fixed issues regarding incorrect solutions found in CPP and minimal weight matching.<br/>
-2. Rewrote the recursion for minimal weight matching, thus improving its efficiency.<br/><br/>
-<strong>July 23th, 2017</strong><br/>
-1. Added minimal weight matching algorithm.<br/>
-2. Added context menu plugin.<br/>
-3. Added the edge handle plugin.<br/>
-4. Improved documentation.<br/>
-5. Optimized coding structure.<br/>
-6. Added some annotations.<br/><br/>
-<strong>July 2nd, 2017</strong><br/>
-1. Added Cola layout -- a dynamic physics simulation.<br/>
-2. Replace CoSE with CoSE-Bilken.<br/>
-3. Added right-click menu.<br/>
-4. Added zoom-pan-fit tool bar.<br/><br/>
-<strong>June 27th, 2017</strong><br/>
-1. Implemented algorithm for the Chinese Postman Problem.<br/><br/>
-<strong>June 26th, 2017</strong><br/>
-1. Added lower bound calculation for the Travelling Salesman Problem -- Vertex deletion algorithm.<br/>
-2. Fixed the problem of finding non-existent solutions for Eulerian cycle.<br/>
-3. Optimized the animation. Dijkstra and nearest neighbor are now supported.<br/><br/>
-<strong>June 25th, 2017</strong><br/>
-1. Implemented Eulerian cycle, by Hierholzer's algorithm, with animation.<br/>
-2. Animations will be applied to other algorithms in the future, if applicable.<br/><br/>
-<strong>June 24th, 2017</strong><br/>
-1. Implemented nearest neighbor algorithm. Global optimum can be found.<br/><br/>
-<strong>June 16th, 2017</strong><br/>
-1. Now you can customize the weight range for the randomly generated graphs.<br/>
-2. Random weight now can be applied to Kn and Kn,n graphs.<br/>
-3. Implemented local/global minimal weight cycle.<br/><br/>
-<strong>June 11th, 2017</strong><br/>
-1. Added breadth first search algorithm.<br/>
-2. Now you can generate random Kn and Kn,n graphs.<br/>
-3. Added circle and grid layout<br/><br/>
-<strong>June 10th, 2017</strong><br/>
-1. Graph theory algorithm visualization tools first version published!<br/>
-2. Added Kruskal's algorithm.<br/>
-3. Added Dijkstra's algorithm.<br/><br/>
+    <h2>Algorithms</h2>
+    <div id="bfs">
+        <h3>Breadth First Search</h3>
+        <figure> <img src="demo/bfs.png" class="demo-pic" />
+            <figcaption class="fig-caption">Breadth first search starting at node 2</figcaption>
+        </figure>
+        <table class="table table-striped">
+            <!--<caption><h3>Meaning of Visualizations</h3></caption>-->
+            <thead>
+                <tr class="tb-title">
+                    <td>Source canvas</td>
+                    <td>Result canvas</td>
+                    <td>Animation</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Highlight the path which the algorithm has visited</td>
+                    <td>Show the tree generated by this algorithm</td>
+                    <td>Traverse the nodes and edges visited by order of visits</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div id="dfs">
+        <h3>Depth First Search</h3>
+        <figure> <img src="demo/dfs.png" class="demo-pic" />
+            <figcaption class="fig-caption">Depth first search starting at node 2</figcaption>
+        </figure>
+        <table class="table table-striped">
+            <!--<caption><h3>Meaning of Visualizations</h3></caption>-->
+            <thead>
+                <tr class="tb-title">
+                    <td>Source canvas</td>
+                    <td>Result canvas</td>
+                    <td>Animation</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Highlight the path which the algorithm has visited</td>
+                    <td>Show the tree generated by this algorithm</td>
+                    <td>Traverse the nodes and edges visited by order of visits</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div id="dijkstra">
+        <h3>Dijkstra's Algorithm</h3>
+        <figure> <img src="demo/dijkstra.png" class="demo-pic" />
+            <figcaption class="fig-caption">The minimal weight connector between node 1 and node 9</figcaption>
+        </figure>
+        <table class="table table-striped">
+            <!--<caption><h3>Meaning of Visualizations</h3></caption>-->
+            <thead>
+                <tr class="tb-title">
+                    <td>Source canvas</td>
+                    <td>Result canvas</td>
+                    <td>Animation</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Highlight the minimal weight connector</td>
+                    <td>Show the minimal weight connector</td>
+                    <td>Trace the minimal weight connector</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div id="dijkstra-detained">
+        <h3>Dijkstra's Algorithm (Detailed)</h3> This version of Dijkstra's algorithm will trace every single step,
+        including the label updates.<br />
+
+        <figure> <img src="demo/dijkstra-detailed.png" class="demo-pic" />
+            <figcaption class="fig-caption">The minimal weight connector between node 9 and node 13</figcaption>
+        </figure>
+        <table class="table table-striped">
+            <!--<caption><h3>Meaning of Visualizations</h3></caption>-->
+            <thead>
+                <tr class="tb-title">
+                    <td>Source canvas</td>
+                    <td>Result canvas</td>
+                    <td>Animation</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td> Highlight the minimal weight connector, all temporary labels, and all permanent labels. The
+                        meaning of the labels: Note id|Temporary labels|Permanent label </td>
+                    <td>Show the minimal weight connector</td>
+                    <td>Trace the algorithm step by step</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div id="kruskal">
+        <h3>Kruskal's Algorithm</h3> Find a minimal spanning tree in a given connected graph<br />
+
+        <figure> <img src="demo/kruskal.png" class="demo-pic" />
+            <figcaption class="fig-caption">Running Kruskal's algorithm</figcaption>
+        </figure>
+        <table class="table table-striped">
+            <!--<caption><h3>Meaning of Visualizations</h3></caption>-->
+            <thead>
+                <tr class="tb-title">
+                    <td>Source canvas</td>
+                    <td>Result canvas</td>
+                    <td>Animation</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Highlight the minimal spanning tree on the original graph</td>
+                    <td>Show the minimal spanning tree obtained</td>
+                    <td>Traverse the edges in the tree by order of visits</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div id="prim">
+        <h3>Prim's Algorithm</h3> Find a minimal spanning tree in a given connected graph<br />
+
+        <figure> <img src="demo/prim.png" class="demo-pic" />
+            <figcaption class="fig-caption">Prim's algorithm starting at node 2</figcaption>
+        </figure>
+        <table class="table table-striped">
+            <!--<caption><h3>Meaning of Visualizations</h3></caption>-->
+            <thead>
+                <tr class="tb-title">
+                    <td>Source canvas</td>
+                    <td>Result canvas</td>
+                    <td>Animation</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Highlight the path which the algorithm has visited on the original graph</td>
+                    <td>Show the minimal spanning tree obtained by this algorithm</td>
+                    <td>Traverse the nodes in the tree by order of visits</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div id="bridge">
+        <h3>Bridge Finding Algorithm</h3> Find all bridges in an undirected graph. A bridge is an edge whose removal
+        causes the number of connected components to increase.<br />
+        Reference: <a href="https://www.geeksforgeeks.org/bridge-in-a-graph/">https://www.geeksforgeeks.org/bridge-in-a-graph/</a>
+
+        <figure> <img src="demo/bridge.png" class="demo-pic" />
+            <figcaption class="fig-caption">All bridges in a graph</figcaption>
+        </figure>
+        <table class="table table-striped">
+            <!--<caption><h3>Meaning of Visualizations</h3></caption>-->
+            <thead>
+                <tr class="tb-title">
+                    <td>Source canvas</td>
+                    <td>Result canvas</td>
+                    <td>Animation</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        Highlight all bridges. The format of node labels is <br />
+                        p: 'id of the parent node' <br />
+                        'node id'|'lowest discovery time'|'discovery time'
+                    </td>
+                    <td>Show all the bridges only</td>
+                    <td>N/A</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div id="minimal-weight-cycle">
+        <h3>Minimal Weight Cycle</h3> Find a minimal weight cycle, which can be local (starting from a selected vertex)
+        or global, in a connected graph with no edge of negative weights<br />
+
+        <figure> <img src="demo/minimal-weight-cycle.png" class="demo-pic" />
+            <figcaption class="fig-caption">Finding the global minimal weight cycle</figcaption>
+        </figure>
+        <table class="table table-striped">
+            <!--<caption><h3>Meaning of Visualizations</h3></caption>-->
+            <thead>
+                <tr class="tb-title">
+                    <td>Source canvas</td>
+                    <td>Result canvas</td>
+                    <td>Animation</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Highlight the minimal weight cycle found</td>
+                    <td>Show the minimal weight cycle found</td>
+                    <td>None</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div id="eulerian-cycle">
+        <h3>Eulerian Trail/Cycle</h3> Find an Eulerian cycle in an Eulerian graph or an Eulerian path in a
+        semi-Eulerian graph, by Hierholzer's algorithm.<br />
+
+        <figure> <img src="demo/eulerian-cycle.png" class="demo-pic" />
+            <figcaption class="fig-caption">Finding an Eulerian cycle on weighted K<sub>7</sub></figcaption>
+        </figure>
+        <table class="table table-striped">
+            <!--<caption><h3>Meaning of Visualizations</h3></caption>-->
+            <thead>
+                <tr class="tb-title">
+                    <td>Source canvas</td>
+                    <td>Result canvas</td>
+                    <td>Animation</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>No change</td>
+                    <td>Show the original graph</td>
+                    <td>Traverse the nodes and edges by order of visits in the Eulerian cycle obtained</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div id="minimal-weight-matching">
+        <h3>Minimal Weight Matching</h3> Find the minimal weight matching in a weighted undirected graph by Edmonds'
+        algorithm, also known as "paths, trees and flowers"<br />
+        <figure> <img src="demo/minimal-weight-matching.png" class="demo-pic" />
+            <figcaption class="fig-caption">Finding the minimal weight matching on a weighted graph</figcaption>
+        </figure>
+        <table class="table table-striped">
+            <!--<caption><h3>Meaning of Visualizations</h3></caption>-->
+            <thead>
+                <tr class="tb-title">
+                    <td>Source canvas</td>
+                    <td>Result canvas</td>
+                    <td>Animation</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Highlight the matches</td>
+                    <td>Show the matches</td>
+                    <td>None</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div id="chinese-postman-problem">
+        <h3>Chinese Postman Problem</h3> Solve the CPP by finding the minimal weight perfect matching between vertices
+        of odd degrees, thereby making the graph Eulerian. <br />
+        <figure> <img src="demo/chinese-postman-problem.png" class="demo-pic" />
+            <figcaption class="fig-caption">Solving the Chinese postman problem on a weighted graph</figcaption>
+        </figure>
+        <table class="table table-striped">
+            <!--<caption><h3>Meaning of Visualizations</h3></caption>-->
+            <thead>
+                <tr class="tb-title">
+                    <td>Source canvas</td>
+                    <td>Result canvas</td>
+                    <td>Animation</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Highlight all odd nodes and edges that need to be duplicated (visited twice)</td>
+                    <td>Show the graph after the duplication of these edges</td>
+                    <td>Traverse all nodes and edges by order of visits in the Eulerian cycle obtained on the graph
+                        after duplication of these edges </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div id="nearest-neighbor-algorithm">
+        <h3>Nearest Neighbor Algorithm</h3> Find a Hamiltonian cycle of low but not necessarily of minimal weight in a
+        complete and Euclidean graph. If a node is selected, then it will be the starting point of the algorithm.
+        Otherwise this algorithm will be performed at every node, and the one of minimal total weight is returned. This
+        algorithm can run in a non-complete and/or non-Euclidean graph, but the result is not guaranteed.<br />
+
+        <figure> <img src="demo/nearest-neighbor.png" class="demo-pic" />
+            <figcaption class="fig-caption">Finding a Hamiltonian cycle by the nearest neighbor algorithm on a complete
+                graph </figcaption>
+        </figure>
+        <table class="table table-striped">
+            <!--<caption><h3>Meaning of Visualizations</h3></caption>-->
+            <thead>
+                <tr class="tb-title">
+                    <td>Source canvas</td>
+                    <td>Result canvas</td>
+                    <td>Animation</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Highlight the Hamiltonian cycle obtained</td>
+                    <td>Show the Hamiltonian cycle</td>
+                    <td>Traverse the Hamiltonian cycle</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div id="tsp-lower-bound">
+        <h3>TSP Lower Bound</h3> Find the lower bound for the travelling salesman problem in a complete and Euclidean
+        graph by vertex deletion algorithm. If a node is selected, then it will be the starting point of the algorithm.
+        Otherwise this algorithm will be performed at every node, and the one of maximal total weight is returned. This
+        algorithm can run in a non-complete and/or non-Euclidean graph, but the result is not guaranteed.<br />
+
+        <figure> <img src="demo/tsp-lower-bound.png" class="demo-pic" />
+            <figcaption class="fig-caption">Finding the (global) lower bound for the traveling salesman problem in a
+                complete graph by vertex deletion algorithm </figcaption>
+        </figure>
+        <table class="table table-striped">
+            <!--<caption><h3>Meaning of Visualizations</h3></caption>-->
+            <thead>
+                <tr class="tb-title">
+                    <td>Source canvas</td>
+                    <td>Result canvas</td>
+                    <td>Animation</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Highlight the two edges deleted and the minimal spanning tree for the remaining graph</td>
+                    <td>Show the graph formed by these two edges and the minimal spanning tree</td>
+                    <td>None</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <h2>Third-party code and dependencies</h2>
+    Bootstrap<br />
+    Cytoscape.js<br />
+    Cola.js<br />
+    Cytoscape-cola.js<br />
+    Cytoscape-cose-bilkent.js<br />
+    Cytoscape-cxtmenu.js<br />
+    Cytoscape-panzoom.js<br />
+    Cytoscape-edgehandles.js<br />
+    Cytoscape-snap-to-grid.js<br />
+    Cytoscape-spread.js<br />
+    FontAwesone 4.7<br />
+    jQuery<br />
+    Weaver.js<br />
+    Lodash.js<br />
+    <h2>Update catalog</h2>
+
+    <strong>February 23rd, 2018</strong><br />
+    1. Fixed a bug of minimal weight matching (see this <a href="https://github.com/hanzhi713/Discrete-Math-Tools/commit/32125ba3efd65a62d28213b125b111df71a930cb"
+        target="_blank">commit</a>)<br /><br />
+    <strong>November 13th, 2017</strong><br />
+    1. Fixed a bug of Dijkstra (detailed)<br /><br />
+
+    <strong>August 26th, 2017</strong><br />
+    1. Adapted ECMAScript 2015. Babel is used to compile the script.<br />
+    2. Fixed some issues.<br /><br />
+    <strong>August 19th, 2017</strong><br />
+    1. Updated key bindings.<br />
+    2. Improved performance by reducing style updates and redraws.<br /><br />
+
+    <strong>August 18th,2017</strong><br />
+    1. Implemented the Detailed Dijkstra's algorithm.<br />
+    2. Now you can customize the animation duration.<br />
+    3. Fixed minor issues.<br />
+    4. Redesigned the instruction page (this page).<br /><br />
+
+    <strong>August 12th, 2017</strong><br />
+    1. Adapted Bootstrap<br />
+    2. Added spread layout<br /><br />
+
+    <strong>August 9th, 2017</strong><br />
+    1. Added multi-threading support for the minimal weight matching algorithm, with the use of generators (ES6).<br />
+    2. Applied jQuery.<br />
+    3. Optimized the "Generate random graph" function.<br />
+
+    Note that the multi-threading support will be automatically disabled if the browser doesn't support generators<br /><br />
+
+    <strong>August 6th, 2017</strong><br />
+    1. Improved the efficiency of minimal weight matching algorithm by replacing objects with primitive data types.<br />
+    2. Redesigned the function for minimal weight matching so that it can also be applied to CPP.<br /><br />
+
+    <strong>August 4th, 2017</strong><br />
+    1. Optimized animation for Kruskal.<br />
+    2. Implemented Prim's algorithm.<br />
+    3. Fixed coding style issues and improved efficiency.<br /><br />
+
+    <strong>July 24th, 2017</strong><br />
+    1. Fixed issues regarding incorrect solutions found in CPP and minimal weight matching.<br />
+    2. Rewrote the recursion for minimal weight matching, thus improving its efficiency.<br /><br />
+
+    <strong>July 23th, 2017</strong><br />
+    1. Added minimal weight matching algorithm.<br />
+    2. Added context menu plugin.<br />
+    3. Added the edge handle plugin.<br />
+    4. Improved documentation.<br />
+    5. Optimized coding structure.<br />
+    6. Added some annotations.<br /><br />
+
+    <strong>July 2nd, 2017</strong><br />
+    1. Added Cola layout
+    -- a dynamic physics simulation.<br />
+    2. Replace CoSE with CoSE-Bilken.<br />
+    3. Added right-click menu.<br />
+    4. Added zoom-pan-fit tool bar.<br /> <br />
+
+    <strong>June 27th, 2017</strong><br />
+    1. Implemented algorithm for the Chinese Postman Problem.<br /> <br />
+
+    <strong>June 26th, 2017</strong><br />
+    1. Added lower bound calculation for the Travelling Salesman Problem -- Vertex deletion algorithm.<br />
+    2. Fixed the problem of finding non-existent solutions for Eulerian cycle.<br />
+    3. Optimized the animation. Dijkstra and nearest neighbor are now supported.<br />
+    <br />
+
+    <strong>June 25th, 2017</strong><br />
+    1. Implemented Eulerian cycle, by Hierholzer's algorithm, with animation.<br />
+    2. Animations will be applied to other algorithms in the future, if applicable.<br /><br />
+
+    <strong>June 24th, 2017</strong><br />
+    1. Implemented nearest neighbor algorithm. Global optimum can be found.<br /><br />
+
+    <strong>June 16th, 2017</strong><br />
+    1. Now you can customize the weight range for the randomly generated graphs.<br />
+    2. Random weight now can be applied to Kn and Kn,n graphs.<br />
+    3. Implemented local/global minimal weight cycle.<br />
+    <br />
+    <strong>June 11th, 2017</strong><br />
+    1. Added breadth first search algorithm.<br />
+    2. Now you can generate random Kn and Kn,n graphs.<br />
+    3. Added circle and grid layout<br /><br />
+
+    <strong>June 10th, 2017</strong><br />
+    1. Graph theory algorithm visualization tools first version published!<br />
+    2. Added Kruskal's algorithm.<br />
+    3. Added Dijkstra's algorithm.<br />
+    <br />
 </body>
+
 </html>

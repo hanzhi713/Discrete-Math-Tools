@@ -1,12 +1,34 @@
+/* global _, addEdge, addEdgeBetweenSelected, addEdgeBwt, addNode, addOneNode, animation_check, animationFlag: true, auto_refresh, ca, CaLayout, callToAlgorithms, caReLayout, changeLayout, clearCaStyle, clearCyStyle, clearResult, clearSource, copiedEles, copy, cy, CyLayout, cyReLayout, drawOn, duplicateEdge, duration, getAM, getAllNodes, getCaTarget, getCyStartNode, getTarget, getWeight, getWM, hideDuration, hideResult, hideWeight, initCircularMenu, initConventionalMenu, initializeCytoscapeObjects, layoutName, LinkedList, LinkedListNode, math, matrixToString, paste, readAM, readWM, reLayout, removeEdge, removeNode, removeSelected, perform_button, selectAllOfTheSameType, snapToGrid, stopAnimation, maxWeightMatching */
+
 'use strict';
 
+/**
+ * the factorial function
+ * @public
+ * @function
+ * @param {number} n
+ * @return {number}
+ * */
+function f(n) {
+    return n <= 1 ? 1 : n * f(n - 1);
+}
+/**
+ * check whether the graph is connected by performing breadth first search
+ * @function
+ * @public
+ * @return {boolean}
+ * */
+function isConnected() {
+    const { path } = cy.elements(':grabbable').bfs(getAllNodes(cy)[0]);
+    return path.nodes().length === cy.nodes(':grabbable').length;
+}
 /**
  * create graph from an adjacency matrix
  * @function
  * @public
- * @param {Object|Array} m
+ * @param {Array<Array<number>>} m
  * The adjacency matrix
- * @return void
+ * @return {void}
  * */
 function createFromAM(m) {
     stopAnimation();
@@ -25,8 +47,8 @@ function createFromAM(m) {
                 id: i
             },
             position: {
-                x: Math.random() * 250 + 25,
-                y: Math.random() * 250 + 25
+                x: Math.random() * 300 + 25,
+                y: Math.random() * 300 + 25
             }
         });
 
@@ -49,9 +71,9 @@ function createFromAM(m) {
  * create the graph from a weight matrix
  * @function
  * @public
- * @param {Object|Array} m
+ * @param {Array<Array<number>>} m
  * The weight matrix
- * @return void
+ * @return {void}
  * */
 function createFromWM(m) {
     stopAnimation();
@@ -66,8 +88,8 @@ function createFromWM(m) {
                 id: i
             },
             position: {
-                x: Math.random() * 250 + 25,
-                y: Math.random() * 250 + 25
+                x: Math.random() * 300 + 25,
+                y: Math.random() * 300 + 25
             }
         });
 
@@ -90,7 +112,7 @@ function createFromWM(m) {
  * generate a random graph
  * @function
  * @public
- * @return void
+ * @return {void}
  * */
 function generateGraph() {
     stopAnimation();
@@ -158,7 +180,7 @@ function generateGraph() {
  * Generate a complete graph of n vertices by first generating its corresponding adjacency matrix
  * @function
  * @public
- * @return void
+ * @return {void}
  * */
 function Kn() {
     stopAnimation();
@@ -178,7 +200,7 @@ function Kn() {
         for (let i = 0; i < numOfNodes; i++) {
             matrix[i] = new Array(numOfNodes);
             for (let j = i + 1; j < numOfNodes; j++)
-                matrix[i][j] = parseInt(Math.random() * range + lower);
+                matrix[i][j] = Math.floor(Math.random() * range + lower);
         }
         createFromWM(matrix);
     } else {
@@ -195,7 +217,7 @@ function Kn() {
  * generate a complete bipartile graph by first generating its adjacency matrix
  * @function
  * @public
- * @return void
+ * @return {void}
  * */
 function Kn_n() {
     stopAnimation();
@@ -221,7 +243,7 @@ function Kn_n() {
         // I think you can understand this
         for (let i = 0; i < n1; i++)
             for (let j = n1; j < numOfNodes; j++)
-                matrix[i][j] = parseInt(Math.random() * range + lower);
+                matrix[i][j] = Math.floor(Math.random() * range + lower);
         createFromWM(matrix);
     } else {
         for (let i = 0; i < n1; i++) for (let j = n1; j < numOfNodes; j++) matrix[i][j] = 1;
@@ -233,7 +255,7 @@ function Kn_n() {
  * Breadth first search is implemented in the library
  * @function
  * @public
- * @return void
+ * @return {void}
  * */
 function breadthFirstSearch() {
     stopAnimation();
@@ -241,7 +263,7 @@ function breadthFirstSearch() {
     if (root === undefined) return;
     clearCyStyle();
     cy.elements(':grabbable').unselect();
-    const path = cy.elements(':grabbable').bfs(root).path;
+    const { path } = cy.elements(':grabbable').bfs(root);
     clearResult();
     const pathList = new LinkedList();
     path.select();
@@ -256,7 +278,7 @@ function breadthFirstSearch() {
  * DFS implemented in the library
  * @function
  * @public
- * @return void
+ * @return {void}
  * */
 function depthFirstSearch() {
     stopAnimation();
@@ -264,7 +286,7 @@ function depthFirstSearch() {
     if (root === undefined) return;
     clearCyStyle();
     cy.elements(':grabbable').unselect();
-    const path = cy.elements(':grabbable').dfs(root).path;
+    const { path } = cy.elements(':grabbable').dfs(root);
     clearResult();
     const pathList = new LinkedList();
     path.select();
@@ -279,7 +301,7 @@ function depthFirstSearch() {
  * Kruskal is implemented in the library
  * @function
  * @public
- * @return void
+ * @return {void}
  * */
 function performKruskal() {
     stopAnimation();
@@ -308,7 +330,7 @@ function performKruskal() {
  * Dijkstra is implemented in the library
  * @function
  * @public
- * @return void
+ * @return {void}
  * */
 function performDijkstra() {
     stopAnimation();
@@ -317,7 +339,7 @@ function performDijkstra() {
     if (nodes.length >= 2) {
         path = cy
             .elements(':grabbable')
-            .dijkstra(nodes[0], getWeight)
+            .dijkstra({ root: nodes[0], weight: getWeight })
             .pathTo(nodes[1]);
     } else {
         const p = prompt(
@@ -327,8 +349,8 @@ function performDijkstra() {
         const pt = p.split('-');
         path = cy
             .elements(':grabbable')
-            .dijkstra(`#${pt[0]}`, getWeight)
-            .pathTo(`#${pt[1]}`);
+            .dijkstra({ root: `#${pt[0]}`, weight: getWeight })
+            .pathTo(cy.$id(`${pt[1]}`));
     }
     const pathList = new LinkedList();
     path.forEach(ele => {
@@ -345,17 +367,72 @@ function performDijkstra() {
  * a detailed implementation of Dijkstra's algorithm, showing every step
  * @function
  * @public
- * @return void
+ * @return {void}
  * */
 function myDijkstra() {
+    if (!isConnected()) {
+        alert('This graph is not connected!');
+        return;
+    }
+    let root;
+    let target;
+    const ns = getAllNodes(cy);
+    const temp = cy.nodes(':selected');
+    if (temp.length >= 2) {
+        [root, target] = [temp[0], temp[1]];
+    } else {
+        const input = prompt(
+            'Please enter the id of source and target nodes, src-tg.\nExample: 1-2',
+            ''
+        );
+        const p = input.split('-');
+        root = cy.$id(p[0]);
+        target = cy.$id(p[1]);
+        if (root.length <= 0 || target.length <= 0) return;
+    }
+    clearCyStyle();
+    stopAnimation();
+
+    // set all labels to undefined
+    ns.data('temporary', []);
+    ns.removeData('permanent');
+    ns.removeData('previous');
+
+    // set the label function
+    // format: "id|temporary labels|permanent label"
+    cy.style()
+        .selector('node')
+        .style({
+            label: n => {
+                const temporary = n.data('temporary');
+                const l = temporary.length - 1;
+                let tempLabels = '';
+                if (l > -1) {
+                    tempLabels += '|';
+                    for (let i = 0; i < l; i++) tempLabels += `${temporary[i]}>`;
+                    tempLabels += temporary[l];
+                }
+                return (
+                    n.data('id') +
+                    tempLabels +
+                    (isNaN(n.data('permanent')) ? '' : `|${n.data('permanent')}`)
+                );
+            }
+        });
+
+    // give the starting node a permanent label
+    let currentNode = root;
+    currentNode.data('permanent', 0);
+    currentNode.data('temporary', [0]);
+
     /**
      * @function
      * @private
-     * @param {object} node
+     * @param {cytoscape.NodeSingular} node
      * @callback
-     * @param {function} callback
+     * @param {Function} callback
      * the function to execute after completion of animation
-     * @return void
+     * @return {void}
      * */
     function animateNode(node, callback) {
         if (node !== undefined && node.length > 0)
@@ -383,11 +460,11 @@ function myDijkstra() {
     /**
      * @function
      * @private
-     * @param {object} edge
+     * @param {cytoscape.EdgeSingular} edge
      * @callback
-     * @param {function} callback
+     * @param {Function} callback
      * the function to execute after completion of animation
-     * @return void
+     * @return {void}
      * */
     function animateEdge(edge, callback) {
         if (edge !== undefined && edge.length > 0)
@@ -413,11 +490,11 @@ function myDijkstra() {
     /**
      * @function
      * @private
-     * @param {object} node
+     * @param {cytoscape.NodeSingular} node
      * @callback
-     * @param {function} callback
+     * @param {Function} callback
      * the function to execute after completion of animation
-     * @return void
+     * @return {void}
      * */
     function animateLabel(node, callback) {
         if (node !== undefined && node.length > 0)
@@ -445,8 +522,8 @@ function myDijkstra() {
     /**
      * @function
      * @private
-     * @param {object} current
-     * @return void
+     * @param {cytoscape.NodeSingular} current
+     * @return {void}
      * */
     function traceBack(current) {
         // animate current node
@@ -519,13 +596,13 @@ function myDijkstra() {
     /**
      * @function
      * @private
-     * @param {object} currentNode
+     * @param {cytoscape.NodeSingular} currentNode
      * current node with a permanent label
-     * @param {object} edges
+     * @param {cytoscape.EdgeCollection} edges
      * all edges connect to n
-     * @param {int} i
+     * @param {number} i
      * the index of the edge that we're up to
-     * @return void
+     * @return {void}
      * */
     function addNextLabel(currentNode, edges, i) {
         // get the value of the permanent label
@@ -632,58 +709,6 @@ function myDijkstra() {
         }
     }
 
-    if (!isConnected()) {
-        alert('This graph is not connected!');
-        return;
-    }
-    let root;
-    let target;
-    let ns = getAllNodes(cy);
-    let temp = cy.nodes(':selected');
-    if (temp.length >= 2) {
-        root = temp[0];
-        target = temp[1];
-    } else {
-        temp = prompt('Please enter the id of source and target nodes, src-tg.\nExample: 1-2', '');
-        const p = temp.split('-');
-        root = cy.$id(p[0]);
-        target = cy.$id(p[1]);
-        if (root.length <= 0 || target.length <= 0) return;
-    }
-    clearCyStyle();
-
-    // set all labels to undefined
-    ns.data('temporary', []);
-    ns.removeData('permanent');
-    ns.removeData('previous');
-
-    // set the label function
-    // format: "id|temporary labels|permanent label"
-    cy.style()
-        .selector('node')
-        .style({
-            label: n => {
-                const temporary = n.data('temporary');
-                const l = temporary.length - 1;
-                let tempLabels = '';
-                if (l > -1) {
-                    tempLabels += '|';
-                    for (let i = 0; i < l; i++) tempLabels += `${temporary[i]}>`;
-                    tempLabels += temporary[l];
-                }
-                return (
-                    n.data('id') +
-                    tempLabels +
-                    (isNaN(n.data('permanent')) ? '' : `|${n.data('permanent')}`)
-                );
-            }
-        });
-
-    // give the starting node a permanent label
-    let currentNode = root;
-    currentNode.data('permanent', 0);
-    currentNode.data('temporary', [0]);
-
     if (animation_check.checked) {
         currentNode.style({
             textBorderOpacity: 1,
@@ -705,7 +730,8 @@ function myDijkstra() {
         while (target.data('permanent') === undefined) {
             const edges = currentNode.connectedEdges();
             const weight = currentNode.data('permanent');
-            edges.forEach(edge => {
+            for (let i = 0; i < edges.length; i++) {
+                const edge = edges[i];
                 const node = getTarget(currentNode, edge);
                 const nodeWeight = getWeight(edge) + weight;
                 if (node.data('permanent') === undefined) {
@@ -716,10 +742,12 @@ function myDijkstra() {
                         node.data('previous', currentNode.data('id'));
                     }
                 }
-            });
+            }
             let minW = Infinity;
             let nextPermanent;
-            ns.forEach(node => {
+
+            for (let i = 0; i < ns.length; i++) {
+                const node = ns[i];
                 const tempLabels = node.data('temporary');
                 if (tempLabels.length > 0 && node.data('permanent') === undefined) {
                     if (
@@ -731,7 +759,8 @@ function myDijkstra() {
                         nextPermanent = node;
                     }
                 }
-            });
+            }
+
             nextPermanent.data('permanent', minW);
             nextPermanent.style({
                 textBorderOpacity: 1,
@@ -760,7 +789,7 @@ function myDijkstra() {
 /**
  * @function
  * @public
- * @return void
+ * @return {void}
  * */
 function prim() {
     stopAnimation();
@@ -826,24 +855,104 @@ function prim() {
 /**
  * @function
  * @public
- * @param {object} root
- * @return {Array}
+ * @returns {void}
+ */
+function findBridge() {
+    stopAnimation();
+    clearCyStyle();
+
+    const nodes = getAllNodes(cy);
+    nodes.forEach(node => {
+        node.data({
+            visited: false,
+            _parent: null, // parent is a protect attribute. Used _parent instead
+            low: Infinity,
+            disc: Infinity
+        });
+    });
+
+    cy.style()
+        .selector('node')
+        .style({
+            label: n =>
+                `p: ${n.data('_parent') === null ? 'N/A' : n.data('_parent').id()}\n${n.data(
+                    'id'
+                )}|${n.data('low') === Infinity ? 'inf' : n.data('low')}|${
+                n.data('disc') === Infinity ? 'inf' : n.data('disc')
+                }`,
+            textWrap: 'wrap'
+        });
+
+    /**
+     * @type {Array<[cytoscape.NodeSingular, cytoscape.NodeSingular]>}
+     */
+    const bridges = [];
+
+    let discTime = 0;
+
+    /**
+     * @param {cytoscape.NodeSingular} node
+     * @param {Array<[cytoscape.NodeSingular, cytoscape.NodeSingular]>} bridges
+     */
+    function bridgeHelper(node, bridges) {
+        node.data({
+            visited: true,
+            low: discTime,
+            disc: discTime
+        });
+
+        discTime += 1;
+
+        node.neighborhood()
+            .nodes()
+            .forEach(n => {
+                if (!n.data('visited')) {
+                    n.data('_parent', node);
+                    bridgeHelper(n, bridges);
+                    node.data('low', Math.min(node.data('low'), n.data('low')));
+
+                    if (n.data('low') > node.data('disc')) bridges.push([node, n]);
+                } else if (n !== node.data('_parent')) {
+                    node.data('low', Math.min(node.data('low'), n.data('disc')));
+                }
+            });
+    }
+
+    for (let i = 0; i < nodes.length; i++) {
+        const node = nodes[i];
+        if (!node.data('visited')) {
+            bridgeHelper(node, bridges);
+        }
+    }
+
+    for (const [n1, n2] of bridges) {
+        n1.select();
+        n2.select();
+        let edge = cy.$id(`${n1.id()}-${n2.id()}-0`);
+        if (edge.length === 0) edge = cy.$id(`${n2.id()}-${n1.id()}-0`);
+        edge.select();
+    }
+
+    clearResult();
+    ca.add(cy.elements(':selected'));
+}
+/**
+ * @function
+ * @public
+ * @param {cytoscape.NodeSingular} root
+ * @return {[number, cytoscape.Collection, cytoscape.EdgeSingular]}
  * */
 function localMinimalWeightCycle(root) {
     let minWeight = Infinity;
     let path;
     let lastEdge;
-    let current_node;
-    let weight;
-    let d;
-    let distance;
 
     cy.startBatch();
     // Traverse the edges connected to this root node
     root.connectedEdges().forEach(edge => {
         // Select an edge and get its weight and the node which it connected to
-        current_node = getTarget(root, edge);
-        weight = getWeight(edge);
+        const current_node = getTarget(root, edge);
+        const weight = getWeight(edge);
 
         // Remove it
         cy.remove(edge);
@@ -851,8 +960,8 @@ function localMinimalWeightCycle(root) {
         // Find the minimal weight connector connecting these two nodes
         // If found, then a cycle is established after adding the edge back
         // Dijkstra method:
-        d = cy.elements(':grabbable').dijkstra(root, getWeight);
-        distance = d.distanceTo(current_node) + weight;
+        const d = cy.elements(':grabbable').dijkstra({ root, weight: getWeight });
+        const distance = d.distanceTo(current_node) + weight;
 
         // Find the minimal weight cycle starting from root node
         if (distance < minWeight) {
@@ -870,7 +979,7 @@ function localMinimalWeightCycle(root) {
  * Find the minimal weight cycle, either local or global
  * @function
  * @public
- * @return void
+ * @return {void}
  * */
 function minimalWeightCycle() {
     stopAnimation();
@@ -878,7 +987,6 @@ function minimalWeightCycle() {
         'Please enter id of the starting node.\nIf you want apply this algorithm too all nodes and get the best one, leave it blank',
         ''
     );
-    let results;
     clearCyStyle();
     cy.elements(':grabbable').unselect();
     // the global minimal weight cycle
@@ -890,14 +998,10 @@ function minimalWeightCycle() {
 
         // Traverse every node, finding the minimal weight cycle starting from each node
         // thus finding the minimal one from these local minimal cycles
-        getAllNodes(cy).forEach(root => {
-            results = localMinimalWeightCycle(root);
+        getAllNodes(cy).forEach(startNode => {
+            const results = localMinimalWeightCycle(startNode);
             if (results[0] < globalMinWeight) {
-                globalMinWeight = results[0];
-
-                // Record the path
-                globalPath = results[1];
-                globalE = results[2];
+                [globalMinWeight, globalPath, globalE] = results;
             }
         });
         clearResult();
@@ -910,7 +1014,7 @@ function minimalWeightCycle() {
     }
     // The local one
     else {
-        results = localMinimalWeightCycle(root);
+        const results = localMinimalWeightCycle(root);
         clearResult();
         results[1].select();
         results[2].select();
@@ -920,55 +1024,11 @@ function minimalWeightCycle() {
     caReLayout();
 }
 /**
- * The global nearest neighbor algorithm
- * find that of minimal weight by performing the algorithm on every node
- * @function
- * @public
- * @return void
- * */
-function nearestNeighbor() {
-    stopAnimation();
-    const root = getCyStartNode(
-        'Please enter id of the starting node.\nIf you want apply this algorithm too all nodes and get the best one, leave it blank',
-        ''
-    );
-    clearCyStyle();
-    cy.elements(':grabbable').unselect();
-    let results;
-    if (root === undefined) {
-        let minWeight = Infinity;
-        let minElements;
-        let minPath;
-        cy.startBatch();
-        getAllNodes(cy).forEach(currentNode => {
-            results = nearestNeighborAlgorithm(currentNode);
-            const sumWeight = results[0];
-            if (sumWeight <= minWeight) {
-                minElements = cy.$(':selected');
-                minWeight = sumWeight;
-                minPath = results[1];
-            }
-            cy.elements(':grabbable').unselect();
-        });
-        clearResult();
-        ca.add(minElements);
-        minElements.select();
-        cy.endBatch();
-        minPath.traverse(animation_check.checked, true);
-    } else {
-        results = nearestNeighborAlgorithm(root);
-        clearResult();
-        ca.add(cy.$(':selected'));
-        results[1].traverse(animation_check.checked, true);
-    }
-    caReLayout();
-}
-/**
  * The nearest neighbor algorithm starting from a given node
  * @function
  * @public
- * @param {object} root
- * @return {Array}
+ * @param {cytoscape.NodeSingular} root
+ * @return {[number, LinkedList]}
  * */
 function nearestNeighborAlgorithm(root) {
     let currentNode = root;
@@ -1038,53 +1098,58 @@ function nearestNeighborAlgorithm(root) {
     return [totalWeight + (getAllNodes(cy).length - numOfNodes) * 2 ** 32, path];
 }
 /**
- * check whether the graph is connected by performing breadth first search
+ * The global nearest neighbor algorithm
+ * find that of minimal weight by performing the algorithm on every node
  * @function
  * @public
- * @return boolean
+ * @return {void}
  * */
-function isConnected() {
-    const path = cy.elements(':grabbable').bfs(getAllNodes(cy)[0]).path;
-    return path.nodes().length === cy.nodes(':grabbable').length;
-}
-
-/**
- * @see traceEulerianCycle()
- * @function
- * @public
- * @return void
- * */
-function eulerianCycle() {
-    // first check if this graph is connected
+function nearestNeighbor() {
     stopAnimation();
-    if (!isConnected()) return alert('This graph is not connected');
-
-    // then check whether there're none or two vertices of odd degree
-    let numOfOddDegrees = 0;
-    getAllNodes(cy).forEach(ele => {
-        if (ele.degree() % 2 !== 0) numOfOddDegrees += 1;
-    });
-
-    // stop if the conditions for Eulerian/semi-Eulerian graphs are not satisfied.
-    if (numOfOddDegrees !== 0 && numOfOddDegrees !== 2)
-        return alert('This graph is neither Eulerian nor semi-Eulerian');
+    const root = getCyStartNode(
+        'Please enter id of the starting node.\nIf you want apply this algorithm too all nodes and get the best one, leave it blank',
+        ''
+    );
+    clearCyStyle();
     cy.elements(':grabbable').unselect();
-    clearResult();
-    ca.add(cy.elements(':grabbable'));
+    let results;
+    if (root === undefined) {
+        let minWeight = Infinity;
+        let minElements;
+        let minPath;
+        cy.startBatch();
+        getAllNodes(cy).forEach(currentNode => {
+            results = nearestNeighborAlgorithm(currentNode);
+            const sumWeight = results[0];
+            if (sumWeight <= minWeight) {
+                minElements = cy.$(':selected');
+                minWeight = sumWeight;
+                minPath = results[1];
+            }
+            cy.elements(':grabbable').unselect();
+        });
+        clearResult();
+        ca.add(minElements);
+        minElements.select();
+        cy.endBatch();
+        minPath.traverse(animation_check.checked, true);
+    } else {
+        results = nearestNeighborAlgorithm(root);
+        clearResult();
+        ca.add(cy.$(':selected'));
+        results[1].traverse(animation_check.checked, true);
+    }
     caReLayout();
-
-    // starting Eulerian Cycle from node 1
-    traceEulerianCycle(getAllNodes(ca)[0], ca);
 }
 /**
  * Find an Eulerian cycle/trail in an Eulerian/semi-Eulerian graph, by Hierholzer's algorithm
  * @public
  * @function
  * the starting node
- * @param {object} start
+ * @param {cytoscape.NodeSingular} start
  * the cytoscape object
- * @param {object} c
- * @return void
+ * @param {cytoscape.Core} c
+ * @return {void}
  * */
 function traceEulerianCycle(start, c) {
     // establish a linked list and add first node into it
@@ -1095,6 +1160,15 @@ function traceEulerianCycle(start, c) {
     // get the unselected edges which are connected to this node
     let connectedEdges = currentNode.connectedEdges(':unselected');
     let nextJourney;
+
+    /**
+     * @param {cytoscape.Singular} ele
+     * @return {boolean}
+     */
+    function hasUnselEdges(ele) {
+        return ele.isNode() && ele.connectedEdges(':unselected').length > 0;
+    }
+
     while (true) {
         // if there are unvisited edges connecting to this node
         while (connectedEdges.length > 0) {
@@ -1124,11 +1198,7 @@ function traceEulerianCycle(start, c) {
         // if there are still edges which remain unselected
         if (c.edges(':unselected').length !== 0) {
             // find the node which still have unselected edges connected to it
-            const node = path.search(element => {
-                if (element.isNode()) {
-                    if (element.connectedEdges(':unselected').length > 0) return true;
-                }
-            });
+            const node = path.search(hasUnselEdges);
 
             // break the journey (note: the next half of the journey journey will be added back later)
             nextJourney = node.next;
@@ -1145,84 +1215,59 @@ function traceEulerianCycle(start, c) {
     c.elements().unselect();
     path.traverse(animation_check.checked, true);
 }
+
 /**
- * the factorial function
- * @public
- * @function
- * @param {int} n
- * @return {int}
- * */
-function f(n) {
-    return n <= 1 ? 1 : n * f(n - 1);
-}
-/**
+ * @see traceEulerianCycle()
  * @function
  * @public
- * @return void
+ * @return {void}
  * */
-function minimalWeightMatching() {
+function eulerianCycle() {
+    // first check if this graph is connected
     stopAnimation();
-    clearCyStyle();
-    cy.elements(':grabbable').unselect();
+    if (!isConnected()) return alert('This graph is not connected');
 
-    // precondition: the graph is connected
-    if (!isConnected()) return alert('Graph not connected!');
-
-    const len = getAllNodes(cy).length;
-    if (len > 14)
-        if (
-            !confirm(
-                `Warning! This graph has ${len} nodes, at most ${f(len) /
-                    (f(len / 2) *
-                        2 ** (len / 2))} iterations are needed and it might take a long time！`
-            )
-        )
-            return;
-    clearResult();
-    /**
-     * @function
-     * @private
-     * @param {Array} minPairing
-     * @return void
-     * */
-    function displayPairings(minPairing) {
-        /**
-         * @function
-         * @private
-         * @param {object} node1
-         * @param {object} node2
-         * @return {object}
-         * */
-        function getCyEdge(node1, node2) {
-            const e = cy.$id(`${node1.data('id')}-${node2.data('id')}-0`);
-            return e.length === 0 ? cy.$id(`${node2.data('id')}-${node1.data('id')}-0`) : e;
+    // then check whether there're none or two vertices of odd degree
+    let numOfOddDegrees = 0;
+    const nodesOfOddDegrees = [];
+    getAllNodes(cy).forEach(ele => {
+        if (ele.degree() % 2 !== 0) {
+            numOfOddDegrees += 1;
+            nodesOfOddDegrees.push(ele);
         }
+    });
 
-        const nodes = getAllNodes(cy);
-        for (let i = 0; i < minPairing.length; i += 2) {
-            const n1 = nodes[minPairing[i]];
-            if (minPairing[i + 1] === undefined) break;
-            const n2 = nodes[minPairing[i + 1]];
-            const e = getCyEdge(n1, n2);
-            ca.add(n1);
-            ca.add(n2);
-            ca.add(e);
-            n1.select();
-            n2.select();
-            e.select();
-        }
+    // stop if the conditions for Eulerian/semi-Eulerian graphs are not satisfied.
+    if (numOfOddDegrees !== 0 && numOfOddDegrees !== 2)
+        alert('This graph is neither Eulerian nor semi-Eulerian');
+    else {
+        cy.elements(':grabbable').unselect();
+        clearResult();
+        ca.add(cy.elements(':grabbable'));
         caReLayout();
-    }
 
-    const weightMatrix = getWM(cy, false);
-    minimalWeightMatchingMultiThread(weightMatrix, 4, displayPairings);
+        if (numOfOddDegrees === 0) {
+            // starting Eulerian Cycle from node 1
+            traceEulerianCycle(getAllNodes(ca)[0], ca);
+        } else {
+            const caNodes = ca.nodes(':grabbable');
+            let oddNode;
+            for (let i = 0; i < caNodes.length; i++) {
+                if (caNodes[i].degree() % 2 !== 0) {
+                    oddNode = caNodes[i];
+                    break;
+                }
+            }
+            traceEulerianCycle(oddNode, ca);
+        }
+    }
 }
 /**
- * @param {Array} weightMatrix
- * @param {int} numOfThreads
- * @param {function} callback
+ * @param {Array<Array<number>>} weightMatrix
+ * @param {number} numOfThreads
+ * @param {Function} callback
  * The callback function to be executed after completion of all threads
- * @return void
+ * @return {void}
  * */
 function minimalWeightMatchingMultiThread(weightMatrix, numOfThreads, callback) {
     // generator is used to merge the results from each worker
@@ -1240,7 +1285,7 @@ function minimalWeightMatchingMultiThread(weightMatrix, numOfThreads, callback) 
                 minWeight = minWeights[i];
                 minPairing = minPairings[i];
             }
-        perform_button.disabled = false;
+        document.getElementById('perform').disabled = false;
         callback(minPairing);
     }
 
@@ -1250,7 +1295,7 @@ function minimalWeightMatchingMultiThread(weightMatrix, numOfThreads, callback) 
     let minPairings = new Array(numOfThreads);
     const portion = Math.floor(weightMatrix.length / numOfThreads);
     const eles = _.range(0, weightMatrix.length);
-    perform_button.disabled = true;
+    document.getElementById('perform').disabled = true;
 
     // distribute the workload to a number of independent threads
     for (let i = 0; i < numOfThreads; i++) {
@@ -1285,47 +1330,115 @@ function minimalWeightMatchingMultiThread(weightMatrix, numOfThreads, callback) 
         };
     }
 }
+/**
+ * @function
+ * @public
+ * @return {void}
+ */
+function pathTreeFlower() {
+    stopAnimation();
+    clearCyStyle();
+    cy.elements().unselect();
+
+    let [weightMatrix, id_index] = getWM(cy, false, false);
+
+    const maxCardinality = confirm('Max cardinality?');
+    const minWeightMatching = confirm('Minimum weight matching?');
+
+    if (minWeightMatching) {
+        let maxWeight = -Infinity;
+        for (let i = 0; i < weightMatrix.length; i++) {
+            for (let j = 0; j < weightMatrix.length; j++) {
+                const wt = weightMatrix[i][j];
+                if (wt > maxWeight) maxWeight = wt;
+            }
+        }
+        maxWeight += 1;
+        weightMatrix = weightMatrix.map(arr => arr.map(x => (x === 0 ? 0 : maxWeight - x)));
+    }
+
+    const pairing = maxWeightMatching(weightMatrix, maxCardinality);
+
+    /**
+     * @param {number} idx
+     * @return {string}
+     */
+    function findNodeID(idx) {
+        for (const key in id_index) {
+            if (id_index[key] == idx) {
+                return key;
+            }
+        }
+        return '';
+    }
+
+    cy.startBatch();
+    for (const [n1, n2] of pairing) {
+        const id1 = findNodeID(n1);
+        const id2 = findNodeID(n2);
+        cy.$id(id1).select();
+        cy.$id(id2).select();
+        let edge = cy.$id(`${id1}-${id2}-0`);
+        if (edge.length === 0) edge = cy.$id(`${id2}-${id1}-0`);
+        edge.select();
+    }
+    cy.endBatch();
+
+    clearResult();
+    ca.add(cy.elements(':selected'));
+    caReLayout();
+}
 
 /**
  * solve the Chinese postman problem
  * @function
  * @public
- * @return void
+ * @return {void}
  * */
 function CPP() {
     stopAnimation();
     clearCyStyle();
     cy.elements(':grabbable').unselect();
 
+    if (!isConnected()) return alert('This graph is not connected!');
+
     // get the collection of odd nodes
     getAllNodes(cy).forEach(ele => {
-        if (ele.degree() % 2 !== 0) ele.select();
+        if (ele.degree(false) % 2 !== 0) ele.select();
     });
     const nodes = cy.nodes(':selected');
     const n = nodes.length;
-    if (n > 14)
-        if (
-            !confirm(
-                `Warning! This graph has ${n} nodes of odd degree, at most ${f(n) /
-                    (f(n / 2) *
-                        2 ** (n / 2))} iterations are needed and it might take a long time！`
-            )
-        )
-            return;
 
     // get the weight matrix of these nodes (the subgraph consisting only the nodes of odd degree)
-    const weightMatrix = new Array(n);
+    /**
+     * @type {number[][]}
+     */
+    let weightMatrix = new Array(n);
+    /**
+     * @type {Array<cytoscape.SearchDijkstraResult>}
+     */
     const paths = new Array(n);
+    let maxWeight = -Infinity;
     for (let x = 0; x < n; x++) {
-        paths[x] = cy.elements(':grabbable').dijkstra(nodes[x], getWeight);
+        paths[x] = cy.elements(':grabbable').dijkstra({ root: nodes[x], weight: getWeight });
         weightMatrix[x] = new Array(n);
-        for (let y = x + 1; y < n; y++) weightMatrix[x][y] = paths[x].distanceTo(nodes[y]);
+        for (let y = 0; y < n; y++) {
+            if (x === y) weightMatrix[x][x] = 0;
+            else {
+                const wt = paths[x].distanceTo(nodes[y]);
+                weightMatrix[x][y] = wt;
+                if (wt > maxWeight) maxWeight = wt;
+            }
+        }
     }
 
-    // get the minimal weight perfect matching
-    minimalWeightMatchingMultiThread(weightMatrix, 4, displayResult);
+    maxWeight += 1;
+    weightMatrix = weightMatrix.map(arr => arr.map(x => (x === 0 ? 0 : maxWeight - x)));
 
-    // the callback function used to show the result on the result canvas
+    /**
+     * the callback function used to show the result on the result canvas
+     * @param {Array<[number, number]>} minPairing
+     */
     function displayResult(minPairing) {
         clearResult();
         ca.add(cy.elements(':grabbable'));
@@ -1333,15 +1446,20 @@ function CPP() {
 
         // Once the minimal weight perfect matching is found,
         // duplicated these edges, so the graph becomes Eulerian
-        for (let x = 0; x < minPairing.length; x += 2) {
-            paths[minPairing[x]].pathTo(nodes[minPairing[x + 1]]).forEach(ele => {
-                if (ele.isEdge()) {
-                    ele.select();
-                    const duplicatedEdge = duplicateEdge(ele, ca);
-                    if (addedEdges === undefined) addedEdges = duplicatedEdge;
-                    else addedEdges = addedEdges.union(duplicatedEdge);
-                }
-            });
+        /**
+         * @param {cytoscape.Singular} ele
+         */
+        function dupEdges(ele) {
+            if (ele.isEdge()) {
+                ele.select();
+                const duplicatedEdge = duplicateEdge(ele, ca);
+                if (addedEdges === undefined) addedEdges = duplicatedEdge;
+                else addedEdges = addedEdges.union(duplicatedEdge);
+            }
+        }
+
+        for (const [n1, n2] of minPairing) {
+            paths[n1].pathTo(nodes[n2]).forEach(dupEdges);
         }
         caReLayout();
         ca.elements(':grabbable').unselect();
@@ -1350,85 +1468,16 @@ function CPP() {
         // starting the Eulerian Cycle from the first node
         traceEulerianCycle(getAllNodes(ca)[0], ca);
     }
-}
-/**
- * find the maximal lower bound for TSP by performing the vertex deletion algorithm on every node
- * @function
- * @public
- * @return void
- * */
-function TSPGlobalLowerBound() {
-    stopAnimation();
-    const root = getCyStartNode(
-        'Please enter id of the starting node.\nIf you want apply this algorithm too all nodes and get the highest lower bound, leave it blank',
-        ''
-    );
-    let results;
-    clearCyStyle();
-    cy.elements(':grabbable').unselect();
-    if (root === undefined) {
-        let maxWeight = 0;
-        let maxResults;
-        let maxRoot;
-        let sumWeight;
-        getAllNodes(cy).forEach(currentNode => {
-            // Find the maximal lower bound...
-            results = TSPLowerBound(currentNode);
-            sumWeight = results[0];
-            if (sumWeight > maxWeight) {
-                // record the weight, results, and the node deleted
-                maxWeight = sumWeight;
-                maxResults = results;
-                maxRoot = currentNode;
-            }
-        });
-        clearResult();
 
-        // select the node, the two deleted edges, and the minimal spanning tree
-        maxResults[3].nodes().style({
-            backgroundColor: '#eba300'
-        });
-        maxResults[3].edges().style({
-            lineColor: '#eba300'
-        });
-        maxResults[2].select();
-        maxResults[1].select();
-
-        // Order must be correct...
-        ca.add(maxResults[3]);
-        ca.elements(':grabbable').select();
-        ca.add(maxRoot);
-        ca.add(maxResults[2]);
-        ca.add(maxResults[1]);
-        caReLayout();
-    }
-
-    // the lower bound at a given starting node
-    else {
-        results = TSPLowerBound(root);
-        clearResult();
-        results[3].nodes().style({
-            backgroundColor: '#eba300'
-        });
-        results[3].edges().style({
-            lineColor: '#eba300'
-        });
-        results[2].select();
-        results[1].select();
-        ca.add(results[3]);
-        ca.elements(':grabbable').select();
-        ca.add(root);
-        ca.add(results[2]);
-        ca.add(results[1]);
-        caReLayout();
-    }
+    // get the minimal weight perfect matching
+    displayResult(maxWeightMatching(weightMatrix, true));
 }
 /**
  * Get the lower bound for the travelling salesman problem by vertex deletion algorithm
  * @function
  * @public
- * @param {object} root
- * @return {Array}
+ * @param {cytoscape.NodeSingular} root
+ * @returns {[number, cytoscape.EdgeSingular, cytoscape.EdgeSingular, cytoscape.Collection]}
  * */
 function TSPLowerBound(root) {
     cy.startBatch();
@@ -1455,25 +1504,76 @@ function TSPLowerBound(root) {
     return [weight, edges[0], edges[1], spanningTree];
 }
 /**
- * generate graphml from the graph
+ * find the maximal lower bound for TSP by performing the vertex deletion algorithm on every node
  * @function
  * @public
- * @param {Object} c
- * @return void
+ * @return {void}
  * */
-function getGraphML(c) {
-    matrix_input.value = c.graphml();
-}
+function TSPGlobalLowerBound() {
+    stopAnimation();
+    const root = getCyStartNode(
+        'Please enter id of the starting node.\nIf you want apply this algorithm too all nodes and get the highest lower bound, leave it blank',
+        ''
+    );
+    clearCyStyle();
+    cy.elements(':grabbable').unselect();
+    if (root === undefined) {
+        let maxWeight = 0;
+        let maxResults;
+        let maxRoot;
+        let sumWeight;
+        let results;
+        getAllNodes(cy).forEach(currentNode => {
+            // Find the maximal lower bound...
+            results = TSPLowerBound(currentNode);
+            sumWeight = results[0];
+            if (sumWeight > maxWeight) {
+                // record the weight, results, and the node deleted
+                maxWeight = sumWeight;
+                maxResults = results;
+                maxRoot = currentNode;
+            }
+        });
+        clearResult();
 
-/**
- * convert the graphml to cytoscape graphs
- * it's not working very well and is therefore temporarily disabled
- * @function
- * @public
- * @return void
- * */
-function readGraphML() {
-    clearSource();
-    cy.graphml(matrix_input.value);
-    cyReLayout();
+        if (maxResults) {
+            // select the node, the two deleted edges, and the minimal spanning tree
+            maxResults[3].nodes().style({
+                backgroundColor: '#eba300'
+            });
+            maxResults[3].edges().style({
+                lineColor: '#eba300'
+            });
+            maxResults[2].select();
+            maxResults[1].select();
+
+            // Order must be correct...
+            ca.add(maxResults[3]);
+            ca.elements(':grabbable').select();
+            ca.add(maxRoot);
+            ca.add(maxResults[2]);
+            ca.add(maxResults[1]);
+            caReLayout();
+        }
+    }
+
+    // the lower bound at a given starting node
+    else {
+        const results = TSPLowerBound(root);
+        clearResult();
+        results[3].nodes().style({
+            backgroundColor: '#eba300'
+        });
+        results[3].edges().style({
+            lineColor: '#eba300'
+        });
+        results[2].select();
+        results[1].select();
+        ca.add(results[3]);
+        ca.elements(':grabbable').select();
+        ca.add(root);
+        ca.add(results[2]);
+        ca.add(results[1]);
+        caReLayout();
+    }
 }

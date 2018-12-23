@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+        "target": "ES6",
+        "checkJs": false
+    },
+    "typeAcquisition": {
+        "include": [
+            "lodash",
+            "jquery",
+            "cytoscape",
+            "mathjs",
+        ]
+    },
+    "exclude": [
+        "js/MWMMT.js"
+    ],
+}

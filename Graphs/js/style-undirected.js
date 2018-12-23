@@ -3,33 +3,31 @@ const defaultStyle = [
         selector: 'node',
         style: {
             'background-color': '#666',
-            'label': 'data(id)',
-            'height': '25px',
-            'width': '25px',
+            label: 'data(id)',
+            height: '25px',
+            width: '25px',
             'font-size': '20px'
         }
     },
     {
         selector: 'edge',
         style: {
-            'width': 2,
+            width: 2,
             'line-color': '#ccc',
             'curve-style': 'bezier',
-            'label': (edge) => {
-                return isNaN(edge.data('weight')) ? '' : edge.data('weight');
-            },
-            'color': 'red',
+            label: edge => (isNaN(edge.data('weight')) ? '' : edge.data('weight')),
+            color: 'red',
             'font-size': '20px'
         }
     },
     {
         selector: '.eh-handle',
         style: {
-            'label': '',
+            label: '',
             'background-color': 'red',
-            'width': 12,
-            'height': 12,
-            'shape': 'ellipse',
+            width: 12,
+            height: 12,
+            shape: 'ellipse',
             'overlay-opacity': 0,
             'border-width': 12, // makes the handle easier to hit
             'border-opacity': 0
@@ -67,7 +65,7 @@ const defaultStyle = [
     {
         selector: '.eh-ghost-edge.eh-preview-active',
         style: {
-            'opacity': 0
+            opacity: 0
         }
     }
 ];

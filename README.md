@@ -1,7 +1,9 @@
 # Discrete Math Tools
+
 #### Please visit https://hanzhi713.github.io/Discrete-Math-Tools for online demo
 
 ### How to Use
+
 For number theory part: Visit demo and you'll see
 
 For undirected graph part: Click [here](https://hanzhi713.github.io/Discrete-Math-Tools/Graphs/undirected-graph-help.html)
@@ -17,23 +19,26 @@ Linear Diophantine Equations
 Simultaneous Congruences
 
 ### Implemented undirected graph theory algorithms
+
 Breadth First Search *
 
 Depth First Search *
 
 Dijkstra's Algorithm *
 
-Step-by-step Dijkstra 
+Step-by-step Dijkstra
 
 Kruskal's Algorithm *
 
 Prim's Algorithm
 
+Tarjan's Bridge-Finding algorithm
+
 Minimal Weight Cycle
 
 Eulerian Trail/Eulerian Cycle
 
-Minimal Weight Matching
+Max/Min Weight Matching (Edmonds' Algorithm)
 
 Chinese Postman Problem
 

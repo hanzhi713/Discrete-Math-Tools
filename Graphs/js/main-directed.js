@@ -1,3 +1,5 @@
+/* global _, addEdge, addEdgeBetweenSelected, addEdgeBwt, addNode, addOneNode, animation_check, animationFlag: true, auto_refresh, ca, CaLayout, callToAlgorithms, caReLayout, changeLayout, clearCaStyle, clearCyStyle, clearResult, clearSource, copiedEles, copy, cy, CyLayout, cyReLayout, drawOn, duplicateEdge, duration, getAM, getAllNodes, getCaTarget, getCyStartNode, getTarget, getWeight, getWM, hideDuration, hideResult, hideWeight, initCircularMenu, initConventionalMenu, initializeCytoscapeObjects, layoutName, LinkedList, LinkedListNode, math, matrixToString, paste, readAM, readWM, reLayout, removeEdge, removeNode, removeSelected, perform_button, selectAllOfTheSameType, snapToGrid, stopAnimation */
+
 'use strict';
 
 const processDiv = document.getElementById('process');
@@ -7,9 +9,9 @@ hideResult(document.getElementById('hide_result'));
  * create graph from an adjacency matrix
  * @function
  * @public
- * @param {Object|Array} m
+ * @param {Array<Array<number>>} m
  * The adjacency matrix
- * @return void
+ * @return {void}
  * */
 function createFromAM(m) {
     stopAnimation();
@@ -28,8 +30,8 @@ function createFromAM(m) {
                 id: i
             },
             position: {
-                x: Math.random() * 250 + 25,
-                y: Math.random() * 250 + 25
+                x: Math.random() * 300 + 25,
+                y: Math.random() * 300 + 25
             }
         });
 
@@ -52,9 +54,9 @@ function createFromAM(m) {
  * create the graph from a weight matrix
  * @function
  * @public
- * @param {Object|Array} m
+ * @param {Array<Array<number>>} m
  * The weight matrix
- * @return void
+ * @return {void}
  * */
 function createFromWM(m) {
     stopAnimation();
@@ -69,8 +71,8 @@ function createFromWM(m) {
                 id: i
             },
             position: {
-                x: Math.random() * 250 + 25,
-                y: Math.random() * 250 + 25
+                x: Math.random() * 300 + 25,
+                y: Math.random() * 300 + 25
             }
         });
 
@@ -93,7 +95,7 @@ function createFromWM(m) {
  * generate a random graph
  * @function
  * @public
- * @return void
+ * @return {void}
  * */
 function generateGraph() {
     stopAnimation();
@@ -163,7 +165,7 @@ function generateGraph() {
  * Generate a complete graph of n vertices by first generating its corresponding adjacency matrix
  * @function
  * @public
- * @return void
+ * @return {void}
  * */
 function Kn() {
     stopAnimation();
@@ -183,7 +185,7 @@ function Kn() {
         for (let i = 0; i < numOfNodes; i++) {
             matrix[i] = new Array(numOfNodes);
             for (let j = 0; j < numOfNodes; j++)
-                if (i !== j) matrix[i][j] = parseInt(Math.random() * range + lower);
+                if (i !== j) matrix[i][j] = Math.floor(Math.random() * range + lower);
         }
         createFromWM(matrix);
     } else {
@@ -200,7 +202,7 @@ function Kn() {
 //  * generate a complete bipartile graph by first generating its adjacency matrix
 //  * @function
 //  * @public
-//  * @return void
+//  * @return {void}
 //  * */
 // function Kn_n() {
 //     stopAnimation();
@@ -234,65 +236,11 @@ function Kn() {
 //         createFromAM(matrix);
 //     }
 // }
-
-/**
- * Generate a complete graph of n vertices by first generating its corresponding adjacency matrix
- * @function
- * @public
- * @return void
- * */
-function Kn() {
-    stopAnimation();
-    clearSource();
-    const numOfNodes = parseInt(prompt('Please enter the number of vertices', '5'));
-    const weightRange = prompt(
-        'Please specify the weight range.\nLeave this blank if you want an unweighted graph.\nExample: 1-5 represents range from 1 to 5.\nLower limit must be greater than 0.',
-        ''
-    );
-    const matrix = new Array(numOfNodes);
-    if (weightRange.length > 0) {
-        const temp = weightRange.split('-');
-        const lower = parseInt(temp[0]) > 0 ? parseInt(temp[0]) : 1;
-        const range = parseInt(temp[1]) > lower ? parseInt(temp[1]) - lower + 1 : lower + 4;
-
-        // fill in the half above the major diagonal (exclude major diagonal) with random weights in the give range
-        for (let i = 0; i < numOfNodes; i++) {
-            matrix[i] = new Array(numOfNodes);
-            for (let j = 0; j < numOfNodes; j++)
-                if (i !== j) matrix[i][j] = parseInt(Math.random() * range + lower);
-        }
-        createFromWM(matrix);
-    } else {
-        // fill in the half above the major diagonal (exclude major diagonal) with 1
-        for (let i = 0; i < numOfNodes; i++) {
-            matrix[i] = new Array(numOfNodes);
-            for (let j = 0; j < numOfNodes; j++) if (i !== j) matrix[i][j] = 1;
-        }
-        createFromAM(matrix);
-    }
-}
-
-/**
- * @public
- * @function
- * @param {string} prompt_text
- * @param {string} default_value
- * @return {object|undefined} The first node (selected or entered)
- * */
-function getCyStartNode(prompt_text, default_value) {
-    let root = cy.nodes(':selected');
-    if (root.length <= 0) {
-        root = cy.$id(prompt(prompt_text, default_value));
-        if (root.length <= 0) return undefined;
-    } else root = root[0];
-    return root;
-}
-
 /**
  * Breadth first search is implemented in the library
  * @function
  * @public
- * @return void
+ * @return {void}
  * */
 function breadthFirstSearch() {
     stopAnimation();
@@ -300,10 +248,10 @@ function breadthFirstSearch() {
     if (root === undefined) return;
     clearCyStyle();
     cy.elements(':grabbable').unselect();
-    const path = cy.elements(':grabbable').bfs({
+    const { path } = cy.elements(':grabbable').bfs({
         root,
         directed: true
-    }).path;
+    });
     clearResult();
     const pathList = new LinkedList();
     path.select();
@@ -319,7 +267,7 @@ function breadthFirstSearch() {
  * DFS implemented in the library
  * @function
  * @public
- * @return void
+ * @return {void}
  * */
 function depthFirstSearch() {
     stopAnimation();
@@ -327,10 +275,10 @@ function depthFirstSearch() {
     if (root === undefined) return;
     clearCyStyle();
     cy.elements(':grabbable').unselect();
-    const path = cy.elements(':grabbable').dfs({
+    const { path } = cy.elements(':grabbable').dfs({
         root,
         directed: true
-    }).path;
+    });
     clearResult();
     const pathList = new LinkedList();
     path.select();
@@ -342,44 +290,11 @@ function depthFirstSearch() {
     pathList.traverse(animation_check.checked, true);
 }
 
-// /**
-//  * Kruskal is implemented in the library
-//  * @function
-//  * @public
-//  * @return void
-//  * */
-// function performKruskal() {
-//     stopAnimation();
-//     clearCyStyle();
-//     cy.elements(":grabbable").unselect();
-//     let spanningTree = cy.elements(":grabbable").kruskal(getWeight);
-//     clearResult();
-//     ca.add(spanningTree);
-//     spanningTree.select();
-//     caReLayout();
-//     let pathList = new LinkedList();
-//     spanningTree.forEach((ele)=> {
-//         if (ele.isEdge()) {
-//             pathList.add(ele);
-//             if (pathList.search((e) => {
-//                     return e.data('id') === ele.source().data('id');
-//                 }) === null) {
-//                 pathList.add(ele.source());
-//             }
-//             if (pathList.search((e) => {
-//                     return e.data('id') === ele.target().data('id');
-//                 }) === null) {
-//                 pathList.add(ele.target());
-//             }
-//         }
-//     });
-//     pathList.traverse(animation_check.checked, false);
-// }
 /**
  * Dijkstra is implemented in the library
  * @function
  * @public
- * @return void
+ * @return {void}
  * */
 function performDijkstra() {
     stopAnimation();
@@ -421,8 +336,8 @@ function performDijkstra() {
  * convert a RGB array to a hexadecimal string
  * @public
  * @function
- * @param {Array} color
- * @return string
+ * @param {[number, number, number]} color
+ * @return {string}
  * */
 function colorRGB2Hex(color) {
     const r = color[0];
@@ -571,7 +486,7 @@ const jetMapHex = [
  * perform page rank
  * @public
  * @function
- * @return void
+ * @return {void}
  * */
 function pageRank() {
     const len = cy.nodes().length;
@@ -601,7 +516,7 @@ function pageRank() {
         });
         n.style({
             fontSize: `${13 + Math.floor(size ** 0.33)}px`,
-            label: n => `${n.data('id')}\n${(r * 100).toFixed(2)}%`,
+            label: node => `${node.data('id')}\n${(r * 100).toFixed(2)}%`,
             textWrap: 'wrap',
             textValign: 'top'
         });
@@ -612,39 +527,33 @@ function pageRank() {
  * perform detailed page rank
  * @public
  * @function
- * @return void
+ * @return {void}
  * */
 function myPageRank() {
-    /**
-     * @type {Number} damping factor d
-     * */
+    // damping factor d
     const dpFactor = 0.85;
-    /**
-     * @type {Number} minimal difference ε
-     * */
+    // minimal difference ε
     const minimalDifference = 1e-4;
     const nodes = getAllNodes(cy);
     const len = nodes.length;
+    /**
+     * @type {Array<number>}
+     */
     const outEdgeStats = new Array(len);
+    const [adjacencyMatrix] = getAM(cy, false, true);
     /**
-     * @type {Array} adjacency matrix
-     * */
-    const adjacencyMatrix = getAM(cy, false);
-    /**
-     * @type {int} basic size of nodes in pixels
+     * @type {number} basic size of nodes in pixels
      * */
     const basicSize = 250;
     const delSize = 15;
 
-    /**
-     * @type {Number} (1 - d) / N
-     * */
+    // (1 - d) / N
     const tailNumber = (1 - dpFactor) / len;
     const animationDuration = Math.round(+duration.value);
     const normalizeInMiddle = true;
 
     /**
-     * @type {int} no-animation calculation method
+     * @type {number} no-animation calculation method
      * 1 -> iterative
      * 2 -> matrix-iterative
      * 3 -> algebraic
@@ -656,29 +565,32 @@ function myPageRank() {
         outEdgeStats[i] = n.outgoers('edge').length;
     });
 
-    // initial rankings
+    /**
+     * initial rankings
+     * @type {Array<number>}
+     */
     let ranks = new Array(len);
     for (let i = 0; i < len; i++) ranks[i] = 1 / len;
 
     /**
      * find the maximum and minimum anomg the vector of ranks
-     * @param {Array} ranks
-     * @return Array
+     * @param {Array<number>} rks
+     * @return {Array<number>}
      * */
-    function findMinAndMax(ranks) {
+    function findMinAndMax(rks) {
         let min = Infinity;
         let max = 0;
         for (let i = 0; i < len; i++) {
-            if (ranks[i] < min) min = ranks[i];
-            if (ranks[i] > max) max = ranks[i];
+            if (ranks[i] < min) min = rks[i];
+            if (ranks[i] > max) max = rks[i];
         }
         return [min, max];
     }
 
     /**
-     * @param {int} size
+     * @param {number} size
      * @param {string} color
-     * @return Object
+     * @return {Object}
      * */
     function getAnimationStyle(size, color) {
         return {
@@ -689,25 +601,12 @@ function myPageRank() {
     }
 
     /**
-     * @param {int} size
-     * @param {Number} rank
-     * @return Object
+     * @param {number} size
+     * @param {number} rank
+     * @return {Object}
      * */
     function getLabelStyle(size, rank) {
         const fs = 13 + Math.floor(size ** 0.33);
-        // let s = Math.ceil(size * 0.5 / fs);
-        // let wp = '\n';
-        // for (let i = 0; i < s; i++)
-        //     wp += '\n';
-        // return {
-        //     fontSize: fs + 'px',
-        //     label: (n) => {
-        //         return (rank * 100).toFixed(2) + '%' + wp + n.data('id')
-        //     },
-        //     textWrap: 'wrap',
-        //     textValign: 'center',
-        //     textMarginY: -(s - 1) * fs
-        // };
         return {
             fontSize: `${fs}px`,
             label: n => `${n.data('id')}\n${(rank * 100).toFixed(2)}%`,
@@ -717,9 +616,9 @@ function myPageRank() {
     }
 
     /**
-     * @param {Array} ranks
-     * @param {int} duration
-     * @param {function} callback
+     * @param {Array<number>} ranks
+     * @param {number} duration
+     * @param {Function} callback
      * */
     function animateNodes(ranks, duration, callback = () => {}) {
         let [min, max] = findMinAndMax(ranks);
@@ -738,10 +637,19 @@ function myPageRank() {
     }
 
     /**
-     * @param {int} i index of current node
-     * @param {Array} cRanks current PR
-     * @param {Array} pRanks previous PR
-     * @param {int} t iteration index
+     * @param {Array<number>} v
+     * @return {Array<number>}
+     * */
+    function normalize(v) {
+        const sum = math.sum(v);
+        return v.map(val => val / sum);
+    }
+
+    /**
+     * @param {number} i index of current node
+     * @param {Array<number>} cRanks current PR
+     * @param {Array<number>} pRanks previous PR
+     * @param {number} t iteration index
      * */
     function call(t, i, cRanks, pRanks) {
         cy.edges().removeStyle();
@@ -825,54 +733,41 @@ function myPageRank() {
                                 call(t, i, cRanks, pRanks);
                             }
                             // go to next iteration
+                            // normalize PR right after each iteration
+                            else if (normalizeInMiddle) {
+                                processDiv.innerHTML = 'Normalizing PR values...';
+                                cy.edges().removeStyle();
+                                cRanks = normalize(cRanks);
+                                animateNodes(cRanks, animationDuration, () => {
+                                    cy.elements(':grabbable').stop();
+                                    setTimeout(() => {
+                                        // continue to iterate if not converged
+                                        if (
+                                            math.norm(math.subtract(pRanks, cRanks)) >
+                                            minimalDifference
+                                        )
+                                            call(t + 1, 0, cRanks, cRanks.concat());
+                                        else {
+                                            processDiv.innerHTML = 'Done!';
+                                        }
+                                    }, 10);
+                                });
+                            }
+                            // normalize PR values after completion
+                            else if (math.norm(math.subtract(pRanks, cRanks)) > minimalDifference)
+                                call(t + 1, 0, cRanks, cRanks.concat());
                             else {
-                                // normalize PR right after each iteration
-                                if (normalizeInMiddle) {
-                                    processDiv.innerHTML = 'Normalizing PR values...';
+                                processDiv.innerHTML = 'Normalizing PR values...';
+                                animateNodes(normalize(cRanks), animationDuration, () => {
+                                    processDiv.innerHTML = 'Done!';
                                     cy.edges().removeStyle();
-                                    cRanks = normalize(cRanks);
-                                    animateNodes(cRanks, animationDuration, () => {
-                                        cy.elements(':grabbable').stop();
-                                        setTimeout(() => {
-                                            // continue to iterate if not converged
-                                            if (
-                                                math.norm(math.subtract(pRanks, cRanks)) >
-                                                minimalDifference
-                                            )
-                                                call(t + 1, 0, cRanks, cRanks.concat());
-                                            else {
-                                                processDiv.innerHTML = 'Done!';
-                                            }
-                                        }, 10);
-                                    });
-                                }
-                                // normalize PR values after completion
-                                else if (
-                                    math.norm(math.subtract(pRanks, cRanks)) > minimalDifference
-                                )
-                                    call(t + 1, 0, cRanks, cRanks.concat());
-                                else {
-                                    processDiv.innerHTML = 'Normalizing PR values...';
-                                    animateNodes(normalize(cRanks), animationDuration, () => {
-                                        processDiv.innerHTML = 'Done!';
-                                        cy.edges().removeStyle();
-                                    });
-                                }
+                                });
                             }
                         }
                     }
                 });
             }, 10);
         }
-    }
-
-    /**
-     * @param {Array|Object} v
-     * @return Array|Object
-     * */
-    function normalize(v) {
-        const sum = math.sum(v);
-        return v.map(val => val / sum);
     }
 
     if (animation_check.checked) {

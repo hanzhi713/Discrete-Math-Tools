@@ -216,9 +216,10 @@
                     <option value="prim()">Prim</option>
                     <option value="performDijkstra()">Dijkstra</option>
                     <option value="myDijkstra()">Dijkstra (detailed)</option>
+                    <option value="findBridge()">Bridge Finding Algorithm</option>
                     <option value="minimalWeightCycle()">Minimal Weight Cycle</option>
                     <option value="eulerianCycle()">Eulerian Trial/Cycle</option>
-                    <option value="minimalWeightMatching()">Minimal Weight Matching</option>
+                    <option value="pathTreeFlower()">Min/Max Weight Matching</option>
                     <option value="CPP()">Chinese Postman Problem</option>
                     <option value="nearestNeighbor()">Nearest Neighbor Algorithm</option>
                     <option value="TSPGlobalLowerBound()">TSP Lower Bound</option>
@@ -250,9 +251,9 @@
                         <div style="width: 500px; margin: auto auto; text-align: center">
                             <span style="font-weight: bold">Total Weight:&nbsp;</span>
                             <span id="cy_weight">0</span><br/>
-                            <button class="btn btn-small" onclick="getGraphML(cy)">Export to GraphML</button>
-                            <button class="btn btn-small" onclick="getAM(cy, true)">Get AM</button>
-                            <button class="btn btn-small" onclick="getWM(cy, true)">Get WM</button>
+                            <button class="btn btn-small" onclick="enableDrawing(this)">Enable drawing</button>
+                            <button class="btn btn-small" onclick="getAM(cy, true, false)">Get AM</button>
+                            <button class="btn btn-small" onclick="getWM(cy, true, false)">Get WM</button>
                             <button class="btn btn-small" onclick="clearCyStyle()">Clear Color</button>
                             <button class="btn btn-small btn-danger" onclick="clearSource()">Clear Elements</button>
                         </div>
@@ -264,9 +265,8 @@
                             <span style="font-weight: bold">Total Weight:&nbsp;</span>
                             <span id="ca_weight">0</span><br/>
                             <div id="path" style="width: 500px;"></div>
-                            <button class="btn btn-small" onclick="getGraphML(ca)">Export to GraphML</button>
-                            <button class="btn btn-small" onclick="getAM(ca, true)">Get AM</button>
-                            <button class="btn btn-small" onclick="getWM(ca, true)">Get WM</button>
+                            <button class="btn btn-small" onclick="getAM(ca, true, false)">Get AM</button>
+                            <button class="btn btn-small" onclick="getWM(ca, true, false)">Get WM</button>
                             <button class="btn btn-small" onclick="clearCaStyle()">Clear Color</button>
                             <button class="btn btn-small btn-danger" onclick="clearResult()">Clear Elements</button>
                         </div>
@@ -290,5 +290,6 @@
 <script src="js/style-undirected.js"></script>
 <script src="js/main-common.js"></script>
 <script src="js/main-undirected.js"></script>
+<script src="js/max-weight-matching.js"></script>
 </body>
 </html>
