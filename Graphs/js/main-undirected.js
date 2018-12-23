@@ -391,6 +391,7 @@ function myDijkstra() {
         if (root.length <= 0 || target.length <= 0) return;
     }
     clearCyStyle();
+    stopAnimation();
 
     // set all labels to undefined
     ns.data('temporary', []);
@@ -850,6 +851,90 @@ function prim() {
     ca.add(cy.$(':selected'));
     caReLayout();
     tree.traverse(animation_check.checked, true);
+}
+/**
+ * @function
+ * @public
+ * @returns {void}
+ */
+function findBridge() {
+    stopAnimation();
+    clearCyStyle();
+
+    const nodes = getAllNodes(cy);
+    nodes.forEach(node => {
+        node.data({
+            visited: false,
+            _parent: null, // parent is a protect attribute. Used _parent instead
+            low: Infinity,
+            disc: Infinity
+        });
+    });
+
+    cy.style()
+        .selector('node')
+        .style({
+            label: n =>
+                `p: ${n.data('_parent') === null ? 'N/A' : n.data('_parent').id()}\n${n.data(
+                    'id'
+                )}|${n.data('low') === Infinity ? 'inf' : n.data('low')}|${
+                    n.data('disc') === Infinity ? 'inf' : n.data('disc')
+                }`,
+            textWrap: 'wrap'
+        });
+
+    /**
+     * @type {Array<[cytoscape.NodeSingular, cytoscape.NodeSingular]>}
+     */
+    const bridges = [];
+
+    let discTime = 0;
+
+    /**
+     * @param {cytoscape.NodeSingular} node
+     * @param {Array<[cytoscape.NodeSingular, cytoscape.NodeSingular]>} bridges
+     */
+    function bridgeHelper(node, bridges) {
+        node.data({
+            visited: true,
+            low: discTime,
+            disc: discTime
+        });
+
+        discTime += 1;
+
+        node.neighborhood()
+            .nodes()
+            .forEach(n => {
+                if (!n.data('visited')) {
+                    n.data('_parent', node);
+                    bridgeHelper(n, bridges);
+                    node.data('low', Math.min(node.data('low'), n.data('low')));
+
+                    if (n.data('low') > node.data('disc')) bridges.push([node, n]);
+                } else if (n !== node.data('_parent')) {
+                    node.data('low', Math.min(node.data('low'), n.data('disc')));
+                }
+            });
+    }
+
+    for (let i = 0; i < nodes.length; i++) {
+        const node = nodes[i];
+        if (!node.data('visited')) {
+            bridgeHelper(node, bridges);
+        }
+    }
+
+    for (const [n1, n2] of bridges) {
+        n1.select();
+        n2.select();
+        let edge = cy.$id(`${n1.id()}-${n2.id()}-0`);
+        if (edge.length === 0) edge = cy.$id(`${n2.id()}-${n1.id()}-0`);
+        edge.select();
+    }
+
+    clearResult();
+    ca.add(cy.elements(':selected'));
 }
 /**
  * @function
