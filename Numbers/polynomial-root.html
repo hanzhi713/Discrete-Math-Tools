@@ -126,7 +126,7 @@
                 solution += "Diophantine equations to solve: \n";
 
                 for (var w = 0; w < c.length; w++) {
-                    solution += c[w] + " * x" + w + " ≡ " + divisors[w] + " (mod" + r[w] + ")\n";
+                    solution += c[w] + " * x" + w + " ≡ " + r[w] + " (mod " +  divisors[w]+ ")\n";
                 }
 
                 var decoeff_r = [];
@@ -142,7 +142,7 @@
                 solution += "Diophantine equations with coefficients removed:\n";
 
                 for (var q = 0; q < decoeff_r.length; q++) {
-                    solution += "x" + q + " ≡ " + divisors[q] + "(mod " + decoeff_r[q] + ")\n";
+                    solution += "x" + q + " ≡ " + decoeff_r[q]+ " (mod " + divisors[q] + ")\n";
                 }
 
                 solution += "Solving simultaneous congruences...\n";
@@ -150,7 +150,7 @@
                 var prod = simultaneous_congruences(decoeff_r, divisors);
 
                 if (prod[0] === -1 && prod[1] === -1) {
-                    solution += "No solution found.\n";
+                    solution += "No solution found.\n\n";
                     continue;
                 }
 
