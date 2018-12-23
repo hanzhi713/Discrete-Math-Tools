@@ -185,7 +185,7 @@ function Kn() {
         for (let i = 0; i < numOfNodes; i++) {
             matrix[i] = new Array(numOfNodes);
             for (let j = 0; j < numOfNodes; j++)
-                if (i !== j) matrix[i][j] = parseInt(Math.random() * range + lower);
+                if (i !== j) matrix[i][j] = Math.floor(Math.random() * range + lower);
         }
         createFromWM(matrix);
     } else {
@@ -236,23 +236,6 @@ function Kn() {
 //         createFromAM(matrix);
 //     }
 // }
-
-/**
- * @public
- * @function
- * @param {string} prompt_text
- * @param {string} default_value
- * @return {cytoscape.NodeSingular|undefined} The first node (selected or entered)
- * */
-function getCyStartNode(prompt_text, default_value) {
-    let root = cy.nodes(':selected');
-    if (root.length <= 0) {
-        root = cy.$id(prompt(prompt_text, default_value));
-        if (root.length <= 0) return undefined;
-    } else root = root[0];
-    return root;
-}
-
 /**
  * Breadth first search is implemented in the library
  * @function

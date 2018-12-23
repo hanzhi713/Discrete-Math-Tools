@@ -214,8 +214,8 @@ function addOneNode(random, position) {
                 id: v
             },
             position: {
-                x: parseInt(Math.random() * 500 + 25),
-                y: parseInt(Math.random() * 500 + 25)
+                x: Math.floor(Math.random() * 500 + 25),
+                y: Math.floor(Math.random() * 500 + 25)
             }
         });
 
@@ -615,15 +615,15 @@ function readWM() {
  * @function
  * @param {string} prompt_text
  * @param {string} default_value
- * @return {cytoscape.NodeSingular} The first node (selected or entered)
+ * @return {cytoscape.NodeSingular|undefined} The first node (selected or entered)
  * */
 function getCyStartNode(prompt_text, default_value) {
     let root = cy.nodes(':selected');
     if (root.length <= 0) {
         root = cy.$id(prompt(prompt_text, default_value));
         if (root.length <= 0) return undefined;
-    } else root = root[0];
-    return root;
+    } else return root[0];
+    return undefined;
 }
 /**
  * Concert a two dimensional matrix to string
@@ -644,7 +644,7 @@ function matrixToString(m) {
  * @public
  * @param {cytoscape.Core} c The Cytoscape object
  * @param {boolean} output
- * @param {directed}
+ * @param {boolean} directed
  * @return {[Array<Array<number>>, Object]}
  * */
 function getAM(c, output, directed) {
@@ -705,25 +705,6 @@ function getWM(c, output, directed) {
     if (output) document.getElementById('matrix_input').value = matrixToString(matrix);
     return [matrix, id_index];
 }
-
-/**
- * @typedef LinkedListNode
- * @type {object}
- * @property cargo
- * @property {LinkedListNode} next
- * */
-/**
- * js implementation of a single linked list
- * @typedef LinkedList
- * @type {object}
- * @property {LinkedListNode} head
- * @property {number} length
- * @property {function} getTail
- * @property {function} add
- * @property {function} addNode
- * @property {function} traverse
- * */
-
 class LinkedListNode {
     constructor(cargo, next) {
         /**

@@ -200,7 +200,7 @@ function Kn() {
         for (let i = 0; i < numOfNodes; i++) {
             matrix[i] = new Array(numOfNodes);
             for (let j = i + 1; j < numOfNodes; j++)
-                matrix[i][j] = parseInt(Math.random() * range + lower);
+                matrix[i][j] = Math.floor(Math.random() * range + lower);
         }
         createFromWM(matrix);
     } else {
@@ -243,7 +243,7 @@ function Kn_n() {
         // I think you can understand this
         for (let i = 0; i < n1; i++)
             for (let j = n1; j < numOfNodes; j++)
-                matrix[i][j] = parseInt(Math.random() * range + lower);
+                matrix[i][j] = Math.floor(Math.random() * range + lower);
         createFromWM(matrix);
     } else {
         for (let i = 0; i < n1; i++) for (let j = n1; j < numOfNodes; j++) matrix[i][j] = 1;
@@ -339,7 +339,7 @@ function performDijkstra() {
     if (nodes.length >= 2) {
         path = cy
             .elements(':grabbable')
-            .dijkstra(nodes[0], getWeight)
+            .dijkstra({ root: nodes[0], weight: getWeight })
             .pathTo(nodes[1]);
     } else {
         const p = prompt(
@@ -349,8 +349,8 @@ function performDijkstra() {
         const pt = p.split('-');
         path = cy
             .elements(':grabbable')
-            .dijkstra(`#${pt[0]}`, getWeight)
-            .pathTo(`#${pt[1]}`);
+            .dijkstra({ root: `#${pt[0]}`, weight: getWeight })
+            .pathTo(cy.$id(`${pt[1]}`));
     }
     const pathList = new LinkedList();
     path.forEach(ele => {
@@ -377,12 +377,15 @@ function myDijkstra() {
     let root;
     let target;
     const ns = getAllNodes(cy);
-    let temp = cy.nodes(':selected');
+    const temp = cy.nodes(':selected');
     if (temp.length >= 2) {
         [root, target] = [temp[0], temp[1]];
     } else {
-        temp = prompt('Please enter the id of source and target nodes, src-tg.\nExample: 1-2', '');
-        const p = temp.split('-');
+        const input = prompt(
+            'Please enter the id of source and target nodes, src-tg.\nExample: 1-2',
+            ''
+        );
+        const p = input.split('-');
         root = cy.$id(p[0]);
         target = cy.$id(p[1]);
         if (root.length <= 0 || target.length <= 0) return;
@@ -872,7 +875,7 @@ function localMinimalWeightCycle(root) {
         // Find the minimal weight connector connecting these two nodes
         // If found, then a cycle is established after adding the edge back
         // Dijkstra method:
-        const d = cy.elements(':grabbable').dijkstra(root, getWeight);
+        const d = cy.elements(':grabbable').dijkstra({ root, weight: getWeight });
         const distance = d.distanceTo(current_node) + weight;
 
         // Find the minimal weight cycle starting from root node
@@ -1316,7 +1319,7 @@ function CPP() {
 
     // get the collection of odd nodes
     getAllNodes(cy).forEach(ele => {
-        if (ele.degree() % 2 !== 0) ele.select();
+        if (ele.degree(false) % 2 !== 0) ele.select();
     });
     const nodes = cy.nodes(':selected');
     const n = nodes.length;
@@ -1331,7 +1334,7 @@ function CPP() {
      */
     const paths = new Array(n);
     for (let x = 0; x < n; x++) {
-        paths[x] = cy.elements(':grabbable').dijkstra(nodes[x], getWeight);
+        paths[x] = cy.elements(':grabbable').dijkstra({ root: nodes[x], weight: getWeight });
         weightMatrix[x] = new Array(n);
         for (let y = x + 1; y < n; y++) weightMatrix[x][y] = paths[x].distanceTo(nodes[y]);
     }
@@ -1426,7 +1429,6 @@ function TSPGlobalLowerBound() {
         'Please enter id of the starting node.\nIf you want apply this algorithm too all nodes and get the highest lower bound, leave it blank',
         ''
     );
-    let results;
     clearCyStyle();
     cy.elements(':grabbable').unselect();
     if (root === undefined) {
@@ -1434,6 +1436,7 @@ function TSPGlobalLowerBound() {
         let maxResults;
         let maxRoot;
         let sumWeight;
+        let results;
         getAllNodes(cy).forEach(currentNode => {
             // Find the maximal lower bound...
             results = TSPLowerBound(currentNode);
@@ -1447,28 +1450,30 @@ function TSPGlobalLowerBound() {
         });
         clearResult();
 
-        // select the node, the two deleted edges, and the minimal spanning tree
-        maxResults[3].nodes().style({
-            backgroundColor: '#eba300'
-        });
-        maxResults[3].edges().style({
-            lineColor: '#eba300'
-        });
-        maxResults[2].select();
-        maxResults[1].select();
+        if (maxResults) {
+            // select the node, the two deleted edges, and the minimal spanning tree
+            maxResults[3].nodes().style({
+                backgroundColor: '#eba300'
+            });
+            maxResults[3].edges().style({
+                lineColor: '#eba300'
+            });
+            maxResults[2].select();
+            maxResults[1].select();
 
-        // Order must be correct...
-        ca.add(maxResults[3]);
-        ca.elements(':grabbable').select();
-        ca.add(maxRoot);
-        ca.add(maxResults[2]);
-        ca.add(maxResults[1]);
-        caReLayout();
+            // Order must be correct...
+            ca.add(maxResults[3]);
+            ca.elements(':grabbable').select();
+            ca.add(maxRoot);
+            ca.add(maxResults[2]);
+            ca.add(maxResults[1]);
+            caReLayout();
+        }
     }
 
     // the lower bound at a given starting node
     else {
-        results = TSPLowerBound(root);
+        const results = TSPLowerBound(root);
         clearResult();
         results[3].nodes().style({
             backgroundColor: '#eba300'
