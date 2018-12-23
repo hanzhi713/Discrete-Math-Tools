@@ -3,6 +3,10 @@
 'use strict';
 
 /**
+ * @author Hanzhi Zhou (Tom)
+ * */
+
+/**
  * @function
  * @private
  * @param {HTMLInputElement} isSimple
@@ -42,18 +46,40 @@ function callToAlgorithms() {
     eval(algo.options[algo.selectedIndex].value);
 }
 /**
- * @author Hanzhi Zhou (Tom)
+ * @function
+ * @param {string} div_name
+ * @public
+ * @return {cytoscape.Core}
  * */
+function initializeCytoscapeObjects(div_name) {
+    const c = cytoscape({
+        container: document.getElementById(div_name),
+        style: defaultStyle
+    });
+    c.on('select', event => {
+        event.target.style({
+            'background-color': 'green',
+            'line-color': 'green'
+        });
+    });
+    c.on('unselect', event => {
+        event.target.style({
+            'background-color': '#666',
+            'line-color': '#ccc'
+        });
+    });
+    return c;
+}
 /**
  * The cytoscape instance of the source
  * @type {cytoscape.Core}
  * */
-let cy;
+const cy = initializeCytoscapeObjects('cy');
 /**
  * The cytoscape instance of the result
  * @type {cytoscape.Core}
  * */
-let ca;
+const ca = initializeCytoscapeObjects('ca');
 /**
  * @type {string}
  * */
@@ -148,43 +174,6 @@ function clearCaStyle() {
  * */
 function copy(eles) {
     copiedEles = eles;
-}
-/**
- * @function
- * @param {string} div_name
- * @public
- * @return {cytoscape.Core}
- * */
-function initializeCytoscapeObjects(div_name) {
-    const c = cytoscape({
-        container: document.getElementById(div_name),
-        style: defaultStyle
-    });
-    c.on('select', event => {
-        event.target.style({
-            'background-color': 'green',
-            'line-color': 'green'
-        });
-    });
-    c.on('unselect', event => {
-        event.target.style({
-            'background-color': '#666',
-            'line-color': '#ccc'
-        });
-    });
-    c.panzoom({
-        zoomDelay: 20,
-        zoomFactor: 0.02,
-        panSpeed: 5,
-        panDistance: 1,
-        fitPadding: 20,
-        animateOnFit: true,
-        fitAnimationDuration: 500
-    });
-    c.snapToGrid();
-    c.snapToGrid('snapOff');
-    c.snapToGrid('gridOff');
-    return c;
 }
 /**
  * @function
@@ -1136,8 +1125,6 @@ function initCircularMenu(c) {
 
 // initialization function
 $(() => {
-    cy = initializeCytoscapeObjects('cy');
-    ca = initializeCytoscapeObjects('ca');
     clearCyStyle();
     clearCaStyle();
     initCircularMenu(cy);
@@ -1210,6 +1197,25 @@ $(() => {
             });
         }
     });
+
+    const panzoomOptions = {
+        zoomDelay: 20,
+        zoomFactor: 0.02,
+        panSpeed: 5,
+        panDistance: 1,
+        fitPadding: 20,
+        animateOnFit: true,
+        fitAnimationDuration: 500
+    };
+
+    cy.panzoom(panzoomOptions);
+    ca.panzoom(panzoomOptions);
+    cy.snapToGrid();
+    cy.snapToGrid('snapOff');
+    cy.snapToGrid('gridOff');
+    ca.snapToGrid();
+    ca.snapToGrid('snapOff');
+    ca.snapToGrid('gridOff');
 
     // add key bindings
     document.addEventListener('keydown', e => {
