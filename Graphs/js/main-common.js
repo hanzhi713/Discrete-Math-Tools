@@ -121,6 +121,22 @@ const animation_check = document.getElementById('animation');
  * */
 const duration = document.getElementById('duration');
 
+let edgeHandles;
+
+/**
+ *
+ * @param {HTMLButtonElement} btn
+ */
+function enableDrawing(btn) {
+    if (drawOn) {
+        btn.innerHTML = 'Enable drawing';
+        edgeHandles.disable();
+    } else {
+        btn.innerHTML = 'Disable drawing';
+        edgeHandles.enable();
+    }
+    drawOn = !drawOn;
+}
 /**
  * @param {cytoscape.Core} c
  * @return {cytoscape.NodeCollection}
@@ -128,7 +144,6 @@ const duration = document.getElementById('duration');
 function getAllNodes(c) {
     return c.nodes(':grabbable');
 }
-
 /**
  * @function
  * @public
@@ -1110,14 +1125,6 @@ function initCircularMenu(c) {
                 select: () => {
                     reLayout();
                 }
-            },
-            {
-                content: '<i class="fa fa-external-link fa-2x" aria-hidden="true"></i>',
-                select: () => {
-                    if (drawOn) c.edgehandles('drawoff');
-                    else c.edgehandles('drawon');
-                    drawOn = !drawOn;
-                }
             }
         ]
     });
@@ -1136,7 +1143,7 @@ $(() => {
         layoutBy: 'circle'
     });
 
-    cy.edgehandles({
+    edgeHandles = cy.edgehandles({
         preview: true, // whether to show added edges preview before releasing selection
         hoverDelay: 150, // time spent hovering over a target node before it is considered selected
         handleNodes: 'node', // selector/filter function for whether edges can be made from a given node
@@ -1197,6 +1204,7 @@ $(() => {
             });
         }
     });
+    edgeHandles.disable();
 
     const panzoomOptions = {
         zoomDelay: 20,
