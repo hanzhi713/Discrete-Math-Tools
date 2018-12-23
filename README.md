@@ -32,13 +32,13 @@ Kruskal's Algorithm *
 
 Prim's Algorithm
 
-Bridge Finding Algorithm
+Tarjan's Bridge-Finding algorithm
 
 Minimal Weight Cycle
 
 Eulerian Trail/Eulerian Cycle
 
-Minimal Weight Matching
+Max/Min Weight Matching (Edmonds' Algorithm)
 
 Chinese Postman Problem
 
