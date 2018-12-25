@@ -625,7 +625,7 @@ function getCyStartNode(prompt_text, default_value) {
     let root = cy.nodes(':selected');
     if (root.length <= 0) {
         root = cy.$id(prompt(prompt_text, default_value));
-        if (root.length <= 0) return undefined;
+        if (root.length > 0) return root[0];
     } else return root[0];
     return undefined;
 }
