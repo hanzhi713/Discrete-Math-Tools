@@ -2,3 +2,4 @@
 .babelrc
 node_modules
 Doc/
+test.js

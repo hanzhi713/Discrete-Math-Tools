@@ -591,9 +591,9 @@
     </div>
     <div id="nearest-neighbor-algorithm">
         <h3>Nearest Neighbor Algorithm</h3> Find a Hamiltonian cycle of low but not necessarily of minimal weight in a
-        complete and Euclidean graph. If a node is selected, then it will be the starting point of the algorithm.
+        complete graph. If a node is selected, then it will be the starting point of the algorithm.
         Otherwise this algorithm will be performed at every node, and the one of minimal total weight is returned. This
-        algorithm can run in a non-complete and/or non-Euclidean graph, but the result is not guaranteed.<br />
+        algorithm can run in a non-complete graph, but it may get stuck.<br />
 
         <figure> <img src="demo/nearest-neighbor.png" class="demo-pic" />
             <figcaption class="fig-caption">Finding a Hamiltonian cycle by the nearest neighbor algorithm on a complete
@@ -618,10 +618,9 @@
         </table>
     </div>
     <div id="tsp-lower-bound">
-        <h3>TSP Lower Bound</h3> Find the lower bound for the travelling salesman problem in a complete and Euclidean
-        graph by vertex deletion algorithm. If a node is selected, then it will be the starting point of the algorithm.
-        Otherwise this algorithm will be performed at every node, and the one of maximal total weight is returned. This
-        algorithm can run in a non-complete and/or non-Euclidean graph, but the result is not guaranteed.<br />
+        <h3>TSP Lower Bound</h3> Find the lower bound for the travelling salesman problem in a graph by vertex deletion
+        algorithm. If a node is selected, then it will be the starting point of the algorithm.
+        Otherwise this algorithm will be performed at every node, and the one of maximal total weight is returned.<br />
 
         <figure> <img src="demo/tsp-lower-bound.png" class="demo-pic" />
             <figcaption class="fig-caption">Finding the (global) lower bound for the traveling salesman problem in a
