@@ -1239,7 +1239,7 @@ function pathTreeFlower() {
     const minWeightMatching = confirm('Minimum weight matching?');
 
     if (minWeightMatching) {
-        const maxWeight = Math.max(...weightMatrix.map(arr => Math.max(...arr)));
+        const maxWeight = Math.max(...weightMatrix.map(arr => Math.max(...arr))) + 1;
         weightMatrix = weightMatrix.map(arr => arr.map(x => (x === 0 ? 0 : maxWeight - x)));
     }
 
