@@ -4,8 +4,6 @@
 
 /**
  * the factorial function
- * @public
- * @function
  * @param {number} n
  * @return {number}
  * */
@@ -14,8 +12,6 @@ function f(n) {
 }
 /**
  * check whether the graph is connected by performing breadth first search
- * @function
- * @public
  * @return {boolean}
  * */
 function isConnected() {
@@ -24,8 +20,6 @@ function isConnected() {
 }
 /**
  * create graph from an adjacency matrix
- * @function
- * @public
  * @param {Array<Array<number>>} m
  * The adjacency matrix
  * @return {void}
@@ -69,8 +63,6 @@ function createFromAM(m) {
 }
 /**
  * create the graph from a weight matrix
- * @function
- * @public
  * @param {Array<Array<number>>} m
  * The weight matrix
  * @return {void}
@@ -110,8 +102,6 @@ function createFromWM(m) {
 }
 /**
  * generate a random graph
- * @function
- * @public
  * @return {void}
  * */
 function generateGraph() {
@@ -178,8 +168,6 @@ function generateGraph() {
 }
 /**
  * Generate a complete graph of n vertices by first generating its corresponding adjacency matrix
- * @function
- * @public
  * @return {void}
  * */
 function Kn() {
@@ -215,8 +203,6 @@ function Kn() {
 
 /**
  * generate a complete bipartile graph by first generating its adjacency matrix
- * @function
- * @public
  * @return {void}
  * */
 function Kn_n() {
@@ -253,8 +239,6 @@ function Kn_n() {
 
 /**
  * Breadth first search is implemented in the library
- * @function
- * @public
  * @return {void}
  * */
 function breadthFirstSearch() {
@@ -276,8 +260,6 @@ function breadthFirstSearch() {
 }
 /**
  * DFS implemented in the library
- * @function
- * @public
  * @return {void}
  * */
 function depthFirstSearch() {
@@ -299,8 +281,6 @@ function depthFirstSearch() {
 }
 /**
  * Kruskal is implemented in the library
- * @function
- * @public
  * @return {void}
  * */
 function performKruskal() {
@@ -328,8 +308,6 @@ function performKruskal() {
 }
 /**
  * Dijkstra is implemented in the library
- * @function
- * @public
  * @return {void}
  * */
 function performDijkstra() {
@@ -365,8 +343,6 @@ function performDijkstra() {
 }
 /**
  * a detailed implementation of Dijkstra's algorithm, showing every step
- * @function
- * @public
  * @return {void}
  * */
 function myDijkstra() {
@@ -426,7 +402,6 @@ function myDijkstra() {
     currentNode.data('temporary', [0]);
 
     /**
-     * @function
      * @private
      * @param {cytoscape.NodeSingular} node
      * @callback
@@ -458,7 +433,6 @@ function myDijkstra() {
     }
 
     /**
-     * @function
      * @private
      * @param {cytoscape.EdgeSingular} edge
      * @callback
@@ -488,7 +462,6 @@ function myDijkstra() {
     }
 
     /**
-     * @function
      * @private
      * @param {cytoscape.NodeSingular} node
      * @callback
@@ -520,7 +493,6 @@ function myDijkstra() {
     }
 
     /**
-     * @function
      * @private
      * @param {cytoscape.NodeSingular} current
      * @return {void}
@@ -594,7 +566,6 @@ function myDijkstra() {
     }
 
     /**
-     * @function
      * @private
      * @param {cytoscape.NodeSingular} currentNode
      * current node with a permanent label
@@ -787,19 +758,16 @@ function myDijkstra() {
     }
 }
 /**
- * @function
- * @public
  * @return {void}
  * */
 function prim() {
     stopAnimation();
     clearCyStyle();
     let root = getCyStartNode('Please enter the id of the starting node', '1');
-    if (root === undefined) root = getAllNodes(cy)[0];
+    if (root === undefined) [root] = getAllNodes(cy);
     cy.elements(':grabbable').unselect();
     root.select();
     /**
-     * @function
      * @private
      * @return object
      * Get the edge of minimal weight connected to the selected nodes
@@ -853,8 +821,6 @@ function prim() {
     tree.traverse(animation_check.checked, true);
 }
 /**
- * @function
- * @public
  * @returns {void}
  */
 function findBridge() {
@@ -878,7 +844,7 @@ function findBridge() {
                 `p: ${n.data('_parent') === null ? 'N/A' : n.data('_parent').id()}\n${n.data(
                     'id'
                 )}|${n.data('low') === Infinity ? 'inf' : n.data('low')}|${
-                n.data('disc') === Infinity ? 'inf' : n.data('disc')
+                    n.data('disc') === Infinity ? 'inf' : n.data('disc')
                 }`,
             textWrap: 'wrap'
         });
@@ -937,8 +903,6 @@ function findBridge() {
     ca.add(cy.elements(':selected'));
 }
 /**
- * @function
- * @public
  * @param {cytoscape.NodeSingular} root
  * @return {[number, cytoscape.Collection, cytoscape.EdgeSingular]}
  * */
@@ -977,8 +941,6 @@ function localMinimalWeightCycle(root) {
 
 /**
  * Find the minimal weight cycle, either local or global
- * @function
- * @public
  * @return {void}
  * */
 function minimalWeightCycle() {
@@ -1025,8 +987,6 @@ function minimalWeightCycle() {
 }
 /**
  * The nearest neighbor algorithm starting from a given node
- * @function
- * @public
  * @param {cytoscape.NodeSingular} root
  * @return {[number, LinkedList]}
  * */
@@ -1034,10 +994,9 @@ function nearestNeighborAlgorithm(root) {
     let currentNode = root;
     cy.startBatch();
     /**
-     * @function
      * @private
-     * @param {object} node
-     * @return {object} the edge of minimal weight connected to this node
+     * @param {cytoscape.NodeSingular} node
+     * @return {cytoscape.EdgeSingular} the edge of minimal weight connected to this node
      * */
     const getMinimalEdge = node => {
         let minWeight = Infinity;
@@ -1088,10 +1047,7 @@ function nearestNeighborAlgorithm(root) {
     // apply a very high weight to this solution
     // in case other solution might be complete (therefore better than this one)
     if (lastEdge.length === 0) totalWeight += 2 ** 32;
-    else {
-        lastEdge[0].select();
-        path.add(lastEdge[0]);
-    }
+    else path.add(lastEdge[0].select());
     path.add(root);
     cy.endBatch();
     // If not all nodes are visited, give this solution a very high weight
@@ -1100,8 +1056,6 @@ function nearestNeighborAlgorithm(root) {
 /**
  * The global nearest neighbor algorithm
  * find that of minimal weight by performing the algorithm on every node
- * @function
- * @public
  * @return {void}
  * */
 function nearestNeighbor() {
@@ -1112,19 +1066,18 @@ function nearestNeighbor() {
     );
     clearCyStyle();
     cy.elements(':grabbable').unselect();
-    let results;
     if (root === undefined) {
         let minWeight = Infinity;
         let minElements;
         let minPath;
         cy.startBatch();
         getAllNodes(cy).forEach(currentNode => {
-            results = nearestNeighborAlgorithm(currentNode);
+            const results = nearestNeighborAlgorithm(currentNode);
             const sumWeight = results[0];
             if (sumWeight <= minWeight) {
                 minElements = cy.$(':selected');
                 minWeight = sumWeight;
-                minPath = results[1];
+                [, minPath] = results;
             }
             cy.elements(':grabbable').unselect();
         });
@@ -1134,7 +1087,7 @@ function nearestNeighbor() {
         cy.endBatch();
         minPath.traverse(animation_check.checked, true);
     } else {
-        results = nearestNeighborAlgorithm(root);
+        const results = nearestNeighborAlgorithm(root);
         clearResult();
         ca.add(cy.$(':selected'));
         results[1].traverse(animation_check.checked, true);
@@ -1143,8 +1096,6 @@ function nearestNeighbor() {
 }
 /**
  * Find an Eulerian cycle/trail in an Eulerian/semi-Eulerian graph, by Hierholzer's algorithm
- * @public
- * @function
  * the starting node
  * @param {cytoscape.NodeSingular} start
  * the cytoscape object
@@ -1218,8 +1169,6 @@ function traceEulerianCycle(start, c) {
 
 /**
  * @see traceEulerianCycle()
- * @function
- * @public
  * @return {void}
  * */
 function eulerianCycle() {
@@ -1263,76 +1212,7 @@ function eulerianCycle() {
     }
 }
 /**
- * @param {Array<Array<number>>} weightMatrix
- * @param {number} numOfThreads
- * @param {Function} callback
- * The callback function to be executed after completion of all threads
- * @return {void}
- * */
-function minimalWeightMatchingMultiThread(weightMatrix, numOfThreads, callback) {
-    // generator is used to merge the results from each worker
-    function* join() {
-        while (true) {
-            yield null;
-            let flag = workerFlags[0];
-            for (let i = 1; i < numOfThreads; i++) flag = flag && workerFlags[i];
-            if (flag === true) break;
-        }
-        let minWeight = Infinity;
-        let minPairing = [];
-        for (let i = 0; i < numOfThreads; i++)
-            if (minWeights[i] < minWeight) {
-                minWeight = minWeights[i];
-                minPairing = minPairings[i];
-            }
-        document.getElementById('perform').disabled = false;
-        callback(minPairing);
-    }
-
-    const joiner = join();
-    let workerFlags = new Array(numOfThreads);
-    let minWeights = new Array(numOfThreads);
-    let minPairings = new Array(numOfThreads);
-    const portion = Math.floor(weightMatrix.length / numOfThreads);
-    const eles = _.range(0, weightMatrix.length);
-    document.getElementById('perform').disabled = true;
-
-    // distribute the workload to a number of independent threads
-    for (let i = 0; i < numOfThreads; i++) {
-        workerFlags[i] = false;
-        minWeights[i] = Infinity;
-        const x = i;
-        const worker = new Worker('js/MWMMT.js');
-        worker.onmessage = message => {
-            console.log(`${x} is ready`);
-            minWeights[x] = message.data.minWeight;
-            minPairings[x] = message.data.minPairing;
-            workerFlags[x] = true;
-            joiner.next();
-            worker.terminate();
-        };
-        if (i === numOfThreads - 1)
-            worker.postMessage({
-                weightMatrix,
-                eles,
-                start: x * portion,
-                end: weightMatrix.length
-            });
-        else
-            worker.postMessage({
-                weightMatrix,
-                eles,
-                start: x * portion,
-                end: (x + 1) * portion
-            });
-        worker.onerror = err => {
-            console.log(err.message);
-        };
-    }
-}
-/**
- * @function
- * @public
+ * Solve the max/min weight matching in an undirected graph by Edmonds' algorithm
  * @return {void}
  */
 function pathTreeFlower() {
@@ -1346,14 +1226,7 @@ function pathTreeFlower() {
     const minWeightMatching = confirm('Minimum weight matching?');
 
     if (minWeightMatching) {
-        let maxWeight = -Infinity;
-        for (let i = 0; i < weightMatrix.length; i++) {
-            for (let j = 0; j < weightMatrix.length; j++) {
-                const wt = weightMatrix[i][j];
-                if (wt > maxWeight) maxWeight = wt;
-            }
-        }
-        maxWeight += 1;
+        const maxWeight = Math.max(...weightMatrix.map(arr => Math.max(...arr)));
         weightMatrix = weightMatrix.map(arr => arr.map(x => (x === 0 ? 0 : maxWeight - x)));
     }
 
@@ -1365,7 +1238,7 @@ function pathTreeFlower() {
      */
     function findNodeID(idx) {
         for (const key in id_index) {
-            if (id_index[key] == idx) {
+            if (id_index[key] === idx) {
                 return key;
             }
         }
@@ -1391,8 +1264,6 @@ function pathTreeFlower() {
 
 /**
  * solve the Chinese postman problem
- * @function
- * @public
  * @return {void}
  * */
 function CPP() {
@@ -1474,8 +1345,6 @@ function CPP() {
 }
 /**
  * Get the lower bound for the travelling salesman problem by vertex deletion algorithm
- * @function
- * @public
  * @param {cytoscape.NodeSingular} root
  * @returns {[number, cytoscape.EdgeSingular, cytoscape.EdgeSingular, cytoscape.Collection]}
  * */
@@ -1505,8 +1374,6 @@ function TSPLowerBound(root) {
 }
 /**
  * find the maximal lower bound for TSP by performing the vertex deletion algorithm on every node
- * @function
- * @public
  * @return {void}
  * */
 function TSPGlobalLowerBound() {

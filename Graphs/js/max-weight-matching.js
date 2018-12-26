@@ -49,13 +49,7 @@ function maxWeightMatching(weightMatrix, maxcardinality) {
     const gnodes = weightMatrix[0].map((x, i) => i);
 
     // Find the maximum edge weight.
-    let maxweight = -Infinity;
-    for (let i = 0; i < weightMatrix.length; i++) {
-        for (let j = i + 1; j < weightMatrix.length; j++) {
-            const wt = weightMatrix[i][j];
-            if (wt > maxweight) maxweight = wt;
-        }
-    }
+    const maxweight = Math.max(...weightMatrix.map(arr => Math.max(...arr)));
 
     /**
      * If v is a matched vertex, mate[v] is its partner vertex.

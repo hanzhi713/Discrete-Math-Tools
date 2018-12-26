@@ -7,8 +7,6 @@ const processDiv = document.getElementById('process');
 hideResult(document.getElementById('hide_result'));
 /**
  * create graph from an adjacency matrix
- * @function
- * @public
  * @param {Array<Array<number>>} m
  * The adjacency matrix
  * @return {void}
@@ -52,8 +50,6 @@ function createFromAM(m) {
 }
 /**
  * create the graph from a weight matrix
- * @function
- * @public
  * @param {Array<Array<number>>} m
  * The weight matrix
  * @return {void}
@@ -93,8 +89,6 @@ function createFromWM(m) {
 }
 /**
  * generate a random graph
- * @function
- * @public
  * @return {void}
  * */
 function generateGraph() {
@@ -163,8 +157,6 @@ function generateGraph() {
 }
 /**
  * Generate a complete graph of n vertices by first generating its corresponding adjacency matrix
- * @function
- * @public
  * @return {void}
  * */
 function Kn() {
@@ -200,9 +192,7 @@ function Kn() {
 
 // /**
 //  * generate a complete bipartile graph by first generating its adjacency matrix
-//  * @function
-//  * @public
-//  * @return {void}
+// // //  * @return {void}
 //  * */
 // function Kn_n() {
 //     stopAnimation();
@@ -238,8 +228,6 @@ function Kn() {
 // }
 /**
  * Breadth first search is implemented in the library
- * @function
- * @public
  * @return {void}
  * */
 function breadthFirstSearch() {
@@ -265,8 +253,6 @@ function breadthFirstSearch() {
 
 /**
  * DFS implemented in the library
- * @function
- * @public
  * @return {void}
  * */
 function depthFirstSearch() {
@@ -292,8 +278,6 @@ function depthFirstSearch() {
 
 /**
  * Dijkstra is implemented in the library
- * @function
- * @public
  * @return {void}
  * */
 function performDijkstra() {
@@ -334,8 +318,6 @@ function performDijkstra() {
 
 /**
  * convert a RGB array to a hexadecimal string
- * @public
- * @function
  * @param {[number, number, number]} color
  * @return {string}
  * */
@@ -484,8 +466,6 @@ const jetMapHex = [
 
 /**
  * perform page rank
- * @public
- * @function
  * @return {void}
  * */
 function pageRank() {
@@ -525,8 +505,6 @@ function pageRank() {
 
 /**
  * perform detailed page rank
- * @public
- * @function
  * @return {void}
  * */
 function myPageRank() {

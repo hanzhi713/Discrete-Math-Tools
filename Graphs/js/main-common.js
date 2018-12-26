@@ -7,11 +7,9 @@
  * */
 
 /**
- * @function
- * @private
+ * Hide the weighted checkbox
  * @param {HTMLInputElement} isSimple
  * @return {void}
- * Hide the weighted checkbox
  * */
 function hideWeight(isSimple) {
     const a = $('#weighted');
@@ -24,11 +22,9 @@ function hideWeight(isSimple) {
     }
 }
 /**
- * @public
- * @function
- * @param {object} cb
- * @return {void}
  * Hide the animation duration input box
+ * @param {HTMLInputElement} cb
+ * @return {void}
  */
 function hideDuration(cb) {
     const d = $('#label-duration');
@@ -36,19 +32,15 @@ function hideDuration(cb) {
     else d.hide(400);
 }
 /**
- * @public
- * @function
- * @return {void}
  * Call the corresponding algorithm
+ * @return {void}
  * */
 function callToAlgorithms() {
     const algo = document.getElementById('algorithms');
     eval(algo.options[algo.selectedIndex].value);
 }
 /**
- * @function
  * @param {string} div_name
- * @public
  * @return {cytoscape.Core}
  * */
 function initializeCytoscapeObjects(div_name) {
@@ -124,7 +116,6 @@ const duration = document.getElementById('duration');
 let edgeHandles;
 
 /**
- *
  * @param {HTMLButtonElement} btn
  */
 function enableDrawing(btn) {
@@ -134,6 +125,7 @@ function enableDrawing(btn) {
     } else {
         btn.innerHTML = 'Disable drawing';
         edgeHandles.enable();
+        auto_refresh.checked = false;
     }
     drawOn = !drawOn;
 }
@@ -145,8 +137,7 @@ function getAllNodes(c) {
     return c.nodes(':grabbable');
 }
 /**
- * @function
- * @public
+ * Stop animation and set animation flag to false
  * @return {void}
  * */
 function stopAnimation() {
@@ -156,8 +147,6 @@ function stopAnimation() {
 }
 /**
  * restore the default style of cy elements
- * @function
- * @public
  * @return {void}
  * */
 function clearCyStyle() {
@@ -169,8 +158,6 @@ function clearCyStyle() {
     cy.$(':selected').select();
 }
 /**
- * @function
- * @public
  * @return {void}
  * */
 function clearCaStyle() {
@@ -182,8 +169,6 @@ function clearCaStyle() {
     ca.$(':selected').select();
 }
 /**
- * @function
- * @public
  * @param {cytoscape.Collection} eles
  * @return {void}
  * */
@@ -191,9 +176,7 @@ function copy(eles) {
     copiedEles = eles;
 }
 /**
- * @function
  * @param {cytoscape.Singular} ele
- * @public
  * @return {void}
  * */
 function selectAllOfTheSameType(ele) {
@@ -202,10 +185,8 @@ function selectAllOfTheSameType(ele) {
     else if (ele.isEdge()) cy.edges().select();
 }
 /**
- * @function
  * @param {boolean} random
- * @param {object} position
- * @public
+ * @param {{x: number, y:number}} position
  * @return {cytoscape.NodeSingular} the added node
  * */
 function addOneNode(random, position) {
@@ -239,8 +220,6 @@ function addOneNode(random, position) {
     });
 }
 /**
- * @function
- * @public
  * @param {cytoscape.EdgeSingular} edge
  * @return {number} weight
  * */
@@ -250,8 +229,6 @@ function getWeight(edge) {
 }
 /**
  * Rerun the layout for the graph and recalculate its total weight
- * @function
- * @public
  * @return {void}
  * */
 function cyReLayout() {
@@ -266,8 +243,6 @@ function cyReLayout() {
 }
 /**
  * Rerun the layout for the graph and recalculate its total weight
- * @function
- * @public
  * @return {void}
  * */
 function caReLayout() {
@@ -281,8 +256,6 @@ function caReLayout() {
     }
 }
 /**
- * @function
- * @public
  * @return {void}
  * */
 function reLayout() {
@@ -291,8 +264,6 @@ function reLayout() {
 }
 
 /**
- * @function
- * @public
  * @param {HTMLInputElement} c
  * @return {void}
  * Hide the result canvas
@@ -327,10 +298,8 @@ function hideResult(c) {
     }
 }
 /**
- * @function
  * @param {boolean} random
- * @param {object} position
- * @public
+ * @param {{x: number, y: number}} position
  * @return {void}
  * */
 function addNode(random, position) {
@@ -341,8 +310,6 @@ function addNode(random, position) {
     if (auto_refresh.checked) cyReLayout();
 }
 /**
- * @function
- * @public
  * @return {void}
  * */
 function addEdge() {
@@ -370,8 +337,6 @@ function addEdge() {
     if (auto_refresh.checked) cyReLayout();
 }
 /**
- * @function
- * @public
  * @param {cytoscape.Core} c
  * @param {boolean} flag
  * @return {void}
@@ -386,8 +351,6 @@ function snapToGrid(c, flag) {
     }
 }
 /**
- * @function
- * @public
  * @param {number} idx
  * @return {void}
  * */
@@ -405,8 +368,6 @@ function changeLayout(idx) {
     reLayout();
 }
 /**
- * @function
- * @public
  * @return {void}
  * */
 function removeNode() {
@@ -429,8 +390,6 @@ function removeNode() {
     if (auto_refresh.checked) cyReLayout();
 }
 /**
- * @function
- * @public
  * @return {void}
  * */
 function removeEdge() {
@@ -445,8 +404,6 @@ function removeEdge() {
     if (auto_refresh.checked) cyReLayout();
 }
 /**
- * @public
- * @function
  * @param {cytoscape.EdgeCollection} edge
  * @param {cytoscape.Core} c
  * @return {cytoscape.EdgeSingular}
@@ -469,8 +426,6 @@ function duplicateEdge(edge, c) {
     });
 }
 /**
- * @function
- * @public
  * @return {void}
  * */
 function removeSelected() {
@@ -479,8 +434,6 @@ function removeSelected() {
     if (auto_refresh.checked) cyReLayout();
 }
 /**
- * @function
- * @public
  * @param {string} src
  * @param {string} tg
  * @param {number} w
@@ -501,8 +454,6 @@ function addEdgeBwt(src, tg, w) {
     });
 }
 /**
- * @function
- * @public
  * @return {void}
  * */
 function addEdgeBetweenSelected() {
@@ -514,13 +465,12 @@ function addEdgeBetweenSelected() {
         for (let i = 0; i < nodes.length; i++)
             for (let j = i + 1; j < nodes.length; j++)
                 addEdgeBwt(nodes[i].data('id'), nodes[j].data('id'), weight);
-    else if (x === 1) addEdgeBwt(nodes[0].data('id'), nodes[0].data('id'), weight);
+    else if (x === 1 && document.getElementById('simple').checked)
+        addEdgeBwt(nodes[0].data('id'), nodes[0].data('id'), weight);
     if (auto_refresh.checked) cyReLayout();
 }
 /**
  * paste the copied elements
- * @function
- * @public
  * @return {void}
  * */
 function paste() {
@@ -551,8 +501,6 @@ function paste() {
 /**
  * given a node and the edge connected to it,
  * get the other node
- * @function
- * @public
  * @param {cytoscape.NodeSingular} node
  * @param {cytoscape.EdgeSingular} edge
  * @return {cytoscape.NodeSingular} the target node
@@ -564,8 +512,6 @@ function getTarget(node, edge) {
     return targetNode;
 }
 /**
- * @function
- * @public
  * @param {cytoscape.NodeSingular} node
  * @param {cytoscape.EdgeSingular} edge
  * @return {cytoscape.NodeSingular} the target node
@@ -575,8 +521,6 @@ function getCaTarget(node, edge) {
     return ca.$id(edge.data('source'));
 }
 /**
- * @function
- * @public
  * @return {void}
  * */
 function clearSource() {
@@ -585,8 +529,6 @@ function clearSource() {
     document.getElementById('cy_weight').innerHTML = '';
 }
 /**
- * @function
- * @public
  * @return {void}
  * */
 function clearResult() {
@@ -596,8 +538,6 @@ function clearResult() {
     document.getElementById('path').innerHTML = '';
 }
 /**
- * @function
- * @public
  * @return {void}
  * */
 function readAM() {
@@ -605,8 +545,6 @@ function readAM() {
     createFromAM(eval(document.getElementById('matrix_input').value));
 }
 /**
- * @function
- * @public
  * @return {void}
  * */
 function readWM() {
@@ -615,8 +553,6 @@ function readWM() {
 }
 
 /**
- * @public
- * @function
  * @param {string} prompt_text
  * @param {string} default_value
  * @return {cytoscape.NodeSingular|undefined} The first node (selected or entered)
@@ -631,8 +567,6 @@ function getCyStartNode(prompt_text, default_value) {
 }
 /**
  * Concert a two dimensional matrix to string
- * @function
- * @public
  * @param {Array<Array<number>>} m
  * @return {string}
  * */
@@ -644,8 +578,6 @@ function matrixToString(m) {
 }
 /**
  * Get the adjacency matrix
- * @function
- * @public
  * @param {cytoscape.Core} c The Cytoscape object
  * @param {boolean} output
  * @param {boolean} directed
@@ -680,8 +612,6 @@ function getAM(c, output, directed) {
 }
 /**
  * get the weight matrix
- * @function
- * @public
  * @param {cytoscape.Core} c The Cytoscape object
  * @param {boolean} output
  * @param {boolean} directed
@@ -710,36 +640,27 @@ function getWM(c, output, directed) {
     return [matrix, id_index];
 }
 class LinkedListNode {
+    /**
+     * @param {any} cargo
+     * @param {LinkedListNode} next
+     */
     constructor(cargo, next) {
-        /**
-         * @public
-         * */
         this.cargo = cargo;
-        /**
-         * @public
-         * @type {LinkedListNode}
-         * */
         this.next = next;
     }
 }
 class LinkedList {
     constructor() {
         /**
-         * @type {LinkedListNode}
          * @public
+         * @type {LinkedListNode}
          * */
         this.head = null;
-        /**
-         * @type {number}
-         * @public
-         * */
         this.length = 0;
     }
 
     /**
      * Get the last node of the linked list
-     * @public
-     * @function
      * @return {LinkedListNode}
      * */
     getTail() {
@@ -749,10 +670,8 @@ class LinkedList {
     }
 
     /**
-     * @public
-     * @function
-     * @param {*} cargo
      * add a cargo
+     * @param {*} cargo
      * */
     add(cargo) {
         if (this.length === 0) this.head = new LinkedListNode(cargo, null);
@@ -762,9 +681,7 @@ class LinkedList {
 
     /**
      * add a node
-     * @function
      * @param {LinkedListNode} node
-     * @public
      * */
     addNode(node) {
         if (this.length === 0) this.head = node;
@@ -774,8 +691,6 @@ class LinkedList {
 
     /**
      * search a specific node using user defined function
-     * @public
-     * @function
      * @param {function} func
      * @return {LinkedListNode}
      * */
@@ -791,8 +706,6 @@ class LinkedList {
     /**
      * traverse the linked list, with visualizations on the graph,
      * assuming each cargo is either a node or an edge
-     * @public
-     * @function
      * @param {boolean} animate
      * whether or not to animate
      * @param {boolean} trace
@@ -821,7 +734,6 @@ class LinkedList {
             counter = 1;
             /**
              * animate nodes and edges by the order of addition into the linekd list
-             * @function
              * @private
              * @param {LinkedListNode} node
              * */
@@ -907,9 +819,7 @@ class LinkedList {
 
 /**
  * initialize the conventional right-click menu
- * @function
  * @param {cytoscape.Core} c
- * @public
  * @return {void}
  * */
 function initConventionalMenu(c) {
@@ -1026,9 +936,7 @@ function initConventionalMenu(c) {
     });
 }
 /**
- * @function
  * @param {cytoscape.Core} c
- * @public
  * @return {void}
  * */
 function initCircularMenu(c) {
