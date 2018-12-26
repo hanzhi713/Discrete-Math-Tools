@@ -264,9 +264,9 @@ function reLayout() {
 }
 
 /**
+ * Hide the result canvas
  * @param {HTMLInputElement} c
  * @return {void}
- * Hide the result canvas
  * */
 function hideResult(c) {
     const cy_div = $('#cy');
@@ -499,26 +499,17 @@ function paste() {
     });
 }
 /**
- * given a node and the edge connected to it,
- * get the other node
+ * given a node and the edge connected to it, get the other node
  * @param {cytoscape.NodeSingular} node
  * @param {cytoscape.EdgeSingular} edge
+ * @param {cytoscape.Core} c
  * @return {cytoscape.NodeSingular} the target node
  * */
-function getTarget(node, edge) {
+function getTarget(node, edge, c = cy) {
     let targetNode;
-    if (edge.data('source') === node.data('id')) targetNode = cy.$id(edge.data('target'));
-    else targetNode = cy.$id(edge.data('source'));
+    if (edge.data('source') === node.data('id')) targetNode = c.$id(edge.data('target'));
+    else targetNode = c.$id(edge.data('source'));
     return targetNode;
-}
-/**
- * @param {cytoscape.NodeSingular} node
- * @param {cytoscape.EdgeSingular} edge
- * @return {cytoscape.NodeSingular} the target node
- * */
-function getCaTarget(node, edge) {
-    if (edge.data('source') === node.data('id')) return ca.$id(edge.data('target'));
-    return ca.$id(edge.data('source'));
 }
 /**
  * @return {void}
@@ -566,8 +557,8 @@ function getCyStartNode(prompt_text, default_value) {
     return undefined;
 }
 /**
- * Concert a two dimensional matrix to string
- * @param {Array<Array<number>>} m
+ * Convert a two dimensional matrix to string
+ * @param {number[][]} m
  * @return {string}
  * */
 function matrixToString(m) {
@@ -580,10 +571,11 @@ function matrixToString(m) {
  * Get the adjacency matrix
  * @param {cytoscape.Core} c The Cytoscape object
  * @param {boolean} output
- * @param {boolean} directed
- * @return {[Array<Array<number>>, Object]}
+ * @param {boolean} [directed=false]
+ * @return {[number[][], Object<string, number>]}
+ * a 2D-array and a mapping from node id in cytoscape to node index in matrix
  * */
-function getAM(c, output, directed) {
+function getAM(c, output, directed = false) {
     const nodes = getAllNodes(c);
     const numOfNodes = nodes.length;
     const matrix = new Array(numOfNodes);
@@ -614,10 +606,11 @@ function getAM(c, output, directed) {
  * get the weight matrix
  * @param {cytoscape.Core} c The Cytoscape object
  * @param {boolean} output
- * @param {boolean} directed
- * @return {[Array<Array<number>>, object]}
+ * @param {boolean} [directed=false]
+ * @return {[number[][], Object<string, number>]}
+ * a 2D-array and a mapping from node id in cytoscape to node index in matrix
  * */
-function getWM(c, output, directed) {
+function getWM(c, output, directed = false) {
     const nodes = getAllNodes(c);
     const numOfNodes = nodes.length;
     const matrix = new Array(numOfNodes);

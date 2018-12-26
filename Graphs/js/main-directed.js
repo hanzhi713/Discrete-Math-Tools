@@ -1,4 +1,4 @@
-/* global _, addEdge, addEdgeBetweenSelected, addEdgeBwt, addNode, addOneNode, animation_check, animationFlag: true, auto_refresh, ca, CaLayout, callToAlgorithms, caReLayout, changeLayout, clearCaStyle, clearCyStyle, clearResult, clearSource, copiedEles, copy, cy, CyLayout, cyReLayout, drawOn, duplicateEdge, duration, getAM, getAllNodes, getCaTarget, getCyStartNode, getTarget, getWeight, getWM, hideDuration, hideResult, hideWeight, initCircularMenu, initConventionalMenu, initializeCytoscapeObjects, layoutName, LinkedList, LinkedListNode, math, matrixToString, paste, readAM, readWM, reLayout, removeEdge, removeNode, removeSelected, perform_button, selectAllOfTheSameType, snapToGrid, stopAnimation */
+/* global _, addEdge, addEdgeBetweenSelected, addEdgeBwt, addNode, addOneNode, animation_check, animationFlag: true, auto_refresh, ca, CaLayout, callToAlgorithms, caReLayout, changeLayout, clearCaStyle, clearCyStyle, clearResult, clearSource, copiedEles, copy, cy, CyLayout, cyReLayout, drawOn, duplicateEdge, duration, getAM, getAllNodes, getCyStartNode, getTarget, getWeight, getWM, hideDuration, hideResult, hideWeight, initCircularMenu, initConventionalMenu, initializeCytoscapeObjects, layoutName, LinkedList, LinkedListNode, math, matrixToString, paste, readAM, readWM, reLayout, removeEdge, removeNode, removeSelected, perform_button, selectAllOfTheSameType, snapToGrid, stopAnimation */
 
 'use strict';
 
@@ -7,7 +7,7 @@ const processDiv = document.getElementById('process');
 hideResult(document.getElementById('hide_result'));
 /**
  * create graph from an adjacency matrix
- * @param {Array<Array<number>>} m
+ * @param {number[][]} m
  * The adjacency matrix
  * @return {void}
  * */
@@ -50,7 +50,7 @@ function createFromAM(m) {
 }
 /**
  * create the graph from a weight matrix
- * @param {Array<Array<number>>} m
+ * @param {number[][]} m
  * The weight matrix
  * @return {void}
  * */
@@ -515,7 +515,7 @@ function myPageRank() {
     const nodes = getAllNodes(cy);
     const len = nodes.length;
     /**
-     * @type {Array<number>}
+     * @type {number[]}
      */
     const outEdgeStats = new Array(len);
     const [adjacencyMatrix] = getAM(cy, false, true);
@@ -545,15 +545,15 @@ function myPageRank() {
 
     /**
      * initial rankings
-     * @type {Array<number>}
+     * @type {number[]}
      */
     let ranks = new Array(len);
     for (let i = 0; i < len; i++) ranks[i] = 1 / len;
 
     /**
      * find the maximum and minimum anomg the vector of ranks
-     * @param {Array<number>} rks
-     * @return {Array<number>}
+     * @param {number[]} rks
+     * @return {number[]}
      * */
     function findMinAndMax(rks) {
         let min = Infinity;
@@ -594,7 +594,7 @@ function myPageRank() {
     }
 
     /**
-     * @param {Array<number>} ranks
+     * @param {number[]} ranks
      * @param {number} duration
      * @param {Function} callback
      * */
@@ -615,8 +615,8 @@ function myPageRank() {
     }
 
     /**
-     * @param {Array<number>} v
-     * @return {Array<number>}
+     * @param {number[]} v
+     * @return {number[]}
      * */
     function normalize(v) {
         const sum = math.sum(v);
@@ -625,8 +625,8 @@ function myPageRank() {
 
     /**
      * @param {number} i index of current node
-     * @param {Array<number>} cRanks current PR
-     * @param {Array<number>} pRanks previous PR
+     * @param {number[]} cRanks current PR
+     * @param {number[]} pRanks previous PR
      * @param {number} t iteration index
      * */
     function call(t, i, cRanks, pRanks) {

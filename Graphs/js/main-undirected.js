@@ -1,4 +1,4 @@
-/* global _, addEdge, addEdgeBetweenSelected, addEdgeBwt, addNode, addOneNode, animation_check, animationFlag: true, auto_refresh, ca, CaLayout, callToAlgorithms, caReLayout, changeLayout, clearCaStyle, clearCyStyle, clearResult, clearSource, copiedEles, copy, cy, CyLayout, cyReLayout, drawOn, duplicateEdge, duration, getAM, getAllNodes, getCaTarget, getCyStartNode, getTarget, getWeight, getWM, hideDuration, hideResult, hideWeight, initCircularMenu, initConventionalMenu, initializeCytoscapeObjects, layoutName, LinkedList, LinkedListNode, math, matrixToString, paste, readAM, readWM, reLayout, removeEdge, removeNode, removeSelected, perform_button, selectAllOfTheSameType, snapToGrid, stopAnimation, maxWeightMatching */
+/* global _, addEdge, addEdgeBetweenSelected, addEdgeBwt, addNode, addOneNode, animation_check, animationFlag: true, auto_refresh, ca, CaLayout, callToAlgorithms, caReLayout, changeLayout, clearCaStyle, clearCyStyle, clearResult, clearSource, copiedEles, copy, cy, CyLayout, cyReLayout, drawOn, duplicateEdge, duration, getAM, getAllNodes, , getCyStartNode, getTarget, getWeight, getWM, hideDuration, hideResult, hideWeight, initCircularMenu, initConventionalMenu, initializeCytoscapeObjects, layoutName, LinkedList, LinkedListNode, math, matrixToString, paste, readAM, readWM, reLayout, removeEdge, removeNode, removeSelected, perform_button, selectAllOfTheSameType, snapToGrid, stopAnimation, maxWeightMatching */
 
 'use strict';
 
@@ -20,7 +20,7 @@ function isConnected() {
 }
 /**
  * create graph from an adjacency matrix
- * @param {Array<Array<number>>} m
+ * @param {number[][]} m
  * The adjacency matrix
  * @return {void}
  * */
@@ -63,7 +63,7 @@ function createFromAM(m) {
 }
 /**
  * create the graph from a weight matrix
- * @param {Array<Array<number>>} m
+ * @param {number[][]} m
  * The weight matrix
  * @return {void}
  * */
@@ -821,6 +821,7 @@ function prim() {
     tree.traverse(animation_check.checked, true);
 }
 /**
+ * Bridge finding algorithm that runs in linear time
  * @returns {void}
  */
 function findBridge() {
@@ -903,6 +904,7 @@ function findBridge() {
     ca.add(cy.elements(':selected'));
 }
 /**
+ * Find a cycle of minimal weight starting from a given node
  * @param {cytoscape.NodeSingular} root
  * @return {[number, cytoscape.Collection, cytoscape.EdgeSingular]}
  * */
@@ -969,19 +971,27 @@ function minimalWeightCycle() {
         clearResult();
 
         // select the cycle
-        globalPath.select();
-        globalE.select();
-        ca.add(globalPath);
-        ca.add(globalE);
+        if (globalPath === undefined) {
+            alert('This graph is acyclic!');
+        } else {
+            globalPath.select();
+            globalE.select();
+            ca.add(globalPath);
+            ca.add(globalE);
+        }
     }
     // The local one
     else {
-        const results = localMinimalWeightCycle(root);
-        clearResult();
-        results[1].select();
-        results[2].select();
-        ca.add(results[1]);
-        ca.add(results[2]);
+        const [, path, lastEdge] = localMinimalWeightCycle(root);
+        if (path === undefined) {
+            alert(`There does not exist a cycle starting from node ${root.id()}`);
+        } else {
+            clearResult();
+            path.select();
+            lastEdge.select();
+            ca.add(path);
+            ca.add(lastEdge);
+        }
     }
     caReLayout();
 }
@@ -1130,7 +1140,7 @@ function traceEulerianCycle(start, c) {
 
             // select its source node (equivalently, the last target node)
             currentNode.select();
-            currentNode = getCaTarget(currentNode, edge);
+            currentNode = getTarget(currentNode, edge, ca);
 
             // get the unselected edges which are connected to the target node
             connectedEdges = currentNode.connectedEdges(':unselected');
@@ -1174,7 +1184,10 @@ function traceEulerianCycle(start, c) {
 function eulerianCycle() {
     // first check if this graph is connected
     stopAnimation();
-    if (!isConnected()) return alert('This graph is not connected');
+    if (!isConnected()) {
+        alert('This graph is not connected');
+        return;
+    }
 
     // then check whether there're none or two vertices of odd degree
     let numOfOddDegrees = 0;
@@ -1286,7 +1299,7 @@ function CPP() {
      */
     let weightMatrix = new Array(n);
     /**
-     * @type {Array<cytoscape.SearchDijkstraResult>}
+     * @type {cytoscape.SearchDijkstraResult[]}
      */
     const paths = new Array(n);
     let maxWeight = -Infinity;
