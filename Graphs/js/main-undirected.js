@@ -1,4 +1,4 @@
-/* global _, addEdge, addEdgeBetweenSelected, addEdgeBwt, addNode, addOneNode, animation_check, animationFlag: true, auto_refresh, ca, CaLayout, callToAlgorithms, caReLayout, changeLayout, clearCaStyle, clearCyStyle, clearResult, clearSource, copiedEles, copy, cy, CyLayout, cyReLayout, drawOn, duplicateEdge, duration, getAM, getAllNodes, , getCyStartNode, getTarget, getWeight, getWM, hideDuration, hideResult, hideWeight, initCircularMenu, initConventionalMenu, initializeCytoscapeObjects, layoutName, LinkedList, LinkedListNode, math, matrixToString, paste, readAM, readWM, reLayout, removeEdge, removeNode, removeSelected, perform_button, selectAllOfTheSameType, snapToGrid, stopAnimation, maxWeightMatching */
+/* global addEdge, addEdgeBetweenSelected, addEdgeBwt, addNode, addOneNode, animation_check, animationFlag: true, auto_refresh, ca, CaLayout, callToAlgorithms, caReLayout, changeLayout, clearCaStyle, clearCyStyle, clearResult, clearSource, copiedEles, copy, cy, CyLayout, cyReLayout, drawOn, duplicateEdge, duration, getAM, getAllNodes, , getCyStartNode, getTarget, getWeight, getWM, hideDuration, hideResult, hideWeight, initCircularMenu, initConventionalMenu, initializeCytoscapeObjects, layoutName, LinkedList, LinkedListNode, math, matrixToString, paste, readAM, readWM, reLayout, removeEdge, removeNode, removeSelected, perform_button, selectAllOfTheSameType, snapToGrid, stopAnimation, maxWeightMatching */
 
 'use strict';
 
@@ -1352,6 +1352,115 @@ function CPP() {
 
     // get the minimal weight perfect matching
     displayResult(maxWeightMatching(weightMatrix, true));
+}
+/**
+ * Find a hamiltonian path/cycle in a graph, if it exists
+ */
+function hamiltonianPath() {
+    if (!isConnected()) {
+        alert('This graph is not connected!');
+        return;
+    }
+    stopAnimation();
+    clearCyStyle();
+    cy.elements().unselect();
+
+    const nodes = getAllNodes(cy);
+    const len = nodes.length;
+    /**
+     * @param {cytoscape.NodeSingular[]} path
+     * @param {boolean[]} visited
+     * @param {number} idx
+     * @param {Array<cytoscape.NodeSingular[]>} hamPaths
+     * Record a hamiltonian path in this array
+     * if a hamiltonian cycle is not found and a hamiltonian path exists
+     * @return {boolean}
+     * true - a hamiltonian cycle is found.
+     * false - a hamiltonian cycle is not found.
+     */
+    function helper(path, visited, idx, hamPaths) {
+        if (idx === len) {
+            // if the edge connecting the first and the last vertex exists, then this is a hamiltonian cycle
+            const lastEdge = path[path.length - 1].edgesWith(path[0]);
+            if (lastEdge.length !== 0) return true;
+
+            // otherwise it's a hamiltonian path
+            // we record only one hamiltonian path
+            if (hamPath.length === 0) hamPaths.push(path.concat());
+            return false;
+        }
+
+        for (let i = 1; i < len; i++) {
+            // check that the vertex is not in the path and it's adjacent to
+            // the previous node in the path constructed
+            if (!visited[i] && nodes[i].edgesWith(path[idx - 1]).length > 0) {
+                // add this node to the path
+                path[idx] = nodes[i];
+                visited[i] = true;
+
+                // continuing construction..
+                const result = helper(path, visited, idx + 1, hamPaths);
+                if (result) return result;
+
+                // if adding it does not construct a hamiltonian cycle, remove it from the path
+                path[idx] = undefined;
+                visited[i] = false;
+            }
+        }
+        return false;
+    }
+    /**
+     * @type {cytoscape.NodeSingular[]}
+     */
+    let hamPath = new Array(len);
+    /**
+     * @type {Array<cytoscape.NodeSingular[]>}
+     */
+    const sols = [];
+
+    const visited = new Array(len).map(x => false);
+    visited[0] = true;
+
+    // we start from node 0
+    hamPath[0] = nodes['0'];
+    const result = helper(hamPath, visited, 1, sols);
+
+    if (!result) {
+        if (sols.length === 0) {
+            alert('No hamiltonian path/cycle is found!');
+            return;
+        }
+        [hamPath] = sols;
+    }
+
+    console.log(sols);
+
+    const p = new LinkedList();
+
+    for (let i = 0; i < len - 1; i++) {
+        const [v1, v2] = [hamPath[i], hamPath[i + 1]];
+        p.add(v1);
+        p.add(
+            v1
+                .select()
+                .edgesWith(v2.select())
+                .select()
+        );
+    }
+
+    const lastNode = hamPath[hamPath.length - 1];
+    p.add(lastNode);
+
+    // select the last edge to form a cycle if it's a hamiltonian cycle
+    if (result === 1) {
+        p.add(hamPath[0].edgesWith(lastNode).select());
+        p.add(hamPath[0]);
+    }
+
+    clearResult();
+    ca.add(cy.elements(':selected'));
+    caReLayout();
+    p.traverse(animation_check.checked, true);
 }
 /**
  * Get the lower bound for the travelling salesman problem by vertex deletion algorithm
