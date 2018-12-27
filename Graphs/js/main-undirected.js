@@ -1193,7 +1193,7 @@ function eulerianCycle() {
     let numOfOddDegrees = 0;
     const nodesOfOddDegrees = [];
     getAllNodes(cy).forEach(ele => {
-        if (ele.degree() % 2 !== 0) {
+        if (ele.degree(false) % 2 !== 0) {
             numOfOddDegrees += 1;
             nodesOfOddDegrees.push(ele);
         }
@@ -1215,7 +1215,7 @@ function eulerianCycle() {
             const caNodes = ca.nodes(':grabbable');
             let oddNode;
             for (let i = 0; i < caNodes.length; i++) {
-                if (caNodes[i].degree() % 2 !== 0) {
+                if (caNodes[i].degree(false) % 2 !== 0) {
                     oddNode = caNodes[i];
                     break;
                 }
@@ -1251,9 +1251,7 @@ function pathTreeFlower() {
      */
     function findNodeID(idx) {
         for (const key in id_index) {
-            if (id_index[key] === idx) {
-                return key;
-            }
+            if (id_index[key] === idx) return key;
         }
         return '';
     }
@@ -1262,11 +1260,10 @@ function pathTreeFlower() {
     for (const [n1, n2] of pairing) {
         const id1 = findNodeID(n1);
         const id2 = findNodeID(n2);
-        cy.$id(id1).select();
-        cy.$id(id2).select();
-        let edge = cy.$id(`${id1}-${id2}-0`);
-        if (edge.length === 0) edge = cy.$id(`${id2}-${id1}-0`);
-        edge.select();
+        cy.$id(id1)
+            .select()
+            .edgesWith(cy.$id(id2).select())
+            .select();
     }
     cy.endBatch();
 
@@ -1416,7 +1413,7 @@ function TSPGlobalLowerBound() {
         });
         clearResult();
 
-        if (maxResults) {
+        if (maxResults !== undefined) {
             // select the node, the two deleted edges, and the minimal spanning tree
             maxResults[3].nodes().style({
                 backgroundColor: '#eba300'

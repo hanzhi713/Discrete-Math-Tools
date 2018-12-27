@@ -316,9 +316,8 @@ function addEdge() {
     stopAnimation();
     const w = +document.getElementById('weight').value;
     const src_tg = document.getElementById('src_tg');
-    const ns = src_tg.value.split('-');
-    const [n1, n2, count] = ns;
-    let num = count === undefined ? 1 : isNaN(parseInt(count)) ? 1 : parseInt(count);
+    const [n1, n2, count] = src_tg.value.split('-');
+    let num = count === undefined ? 1 : isNaN(+count) ? 1 : +count;
     if (num < 1) num = 1;
     let v = 0;
     const id_pre = `${n1}-${n2}-`;
@@ -404,23 +403,23 @@ function removeEdge() {
     if (auto_refresh.checked) cyReLayout();
 }
 /**
- * @param {cytoscape.EdgeCollection} edge
+ * @param {cytoscape.EdgeSingular} edge
  * @param {cytoscape.Core} c
  * @return {cytoscape.EdgeSingular}
  * */
 function duplicateEdge(edge, c) {
-    const temp = edge.data('id').split('-');
+    const [source, target] = edge.id().split('-');
     let last = 0;
 
     // make sure that the id of an edge is not duplicated
-    while (c.$id(`${temp[0]}-${temp[1]}-${last}`).length !== 0) last += 1;
+    while (c.$id(`${source}-${target}-${last}`).length !== 0) last += 1;
 
     return c.add({
         group: 'edges',
         data: {
-            id: `${temp[0]}-${temp[1]}-${last}`,
-            source: temp[0],
-            target: temp[1],
+            id: `${source}-${target}-${last}`,
+            source,
+            target,
             weight: edge.data('weight')
         }
     });
