@@ -153,9 +153,9 @@ function maxWeightMatching(weightMatrix, maxcardinality) {
      * If(v, w) in allowedge or(w, v) in allowedg, then the edge
      * (v, w) is known to have zero slack in the optimization problem;
      * otherwise the edge may or may not have zero slack.
-     * @type {Object<string, boolean>}
+     * @type {Map<string, boolean>}
      */
-    let allowedge = {};
+    const allowedge = new Map();
 
     /**
      * @type {number[]}
@@ -446,14 +446,14 @@ function maxWeightMatching(weightMatrix, maxcardinality) {
                 label.set(q, null);
                 assignLabel(w, 2, v);
                 // Step to the next S-sub-blossom and note its forward edge.
-                allowedge[[p, q].toString()] = true;
-                allowedge[[q, p].toString()] = true;
+                allowedge.set([p, q].toString(), true);
+                allowedge.set([q, p].toString(), true);
                 j += jstep;
                 if (jstep === 1) [v, w] = b.edges[j < 0 ? len + j : j];
                 else [w, v] = b.edges[j - 1 < 0 ? len + j - 1 : j - 1];
                 // Step to the next T-sub-blossom.
-                allowedge[[v, w].toString()] = true;
-                allowedge[[w, v].toString()] = true;
+                allowedge.set([v, w].toString(), true);
+                allowedge.set([w, v].toString(), true);
                 j += jstep;
             }
             // Relabel the base T-sub-blossom WITHOUT stepping through to
@@ -670,7 +670,7 @@ function maxWeightMatching(weightMatrix, maxcardinality) {
 
         // Loss of labeling means that we can not be sure that currently
         // allowable edges remain allowable throughout this stage.
-        allowedge = {};
+        allowedge.clear();
 
         // Make queue empty.
         queue = [];
@@ -708,15 +708,15 @@ function maxWeightMatching(weightMatrix, maxcardinality) {
                     if (bv === bw)
                         // this edge is internal to a blossom; ignore it
                         continue;
-                    if (!([v, w].toString() in allowedge)) {
+                    if (!allowedge.has([v, w].toString())) {
                         kslack = slack(v, w);
                         if (kslack <= 0) {
                             // edge k has zero slack => it is allowable
-                            allowedge[[v, w].toString()] = true;
-                            allowedge[[w, v].toString()] = true;
+                            allowedge.set([v, w].toString(), true);
+                            allowedge.set([w, v].toString(), true);
                         }
                     }
-                    if ([v, w].toString() in allowedge) {
+                    if (allowedge.has([v, w].toString())) {
                         if (nu(label, bw))
                             // (C1) w is a free vertex;
                             // label w with T and label its mate with S (R12).
@@ -856,14 +856,14 @@ function maxWeightMatching(weightMatrix, maxcardinality) {
                 // Use the least-slack edge to continue the search.
                 const [v, w] = deltaedge;
                 assertTrue(label.get(inblossom.get(v)) === 1);
-                allowedge[[v, w].toString()] = true;
-                allowedge[[w, v].toString()] = true;
+                allowedge.set([v, w].toString(), true);
+                allowedge.set([w, v].toString(), true);
                 queue.push(v);
             } else if (deltatype === 3) {
                 // Use the least-slack edge to continue the search.
                 const [v, w] = deltaedge;
-                allowedge[[v, w].toString()] = true;
-                allowedge[[w, v].toString()] = true;
+                allowedge.set([v, w].toString(), true);
+                allowedge.set([w, v].toString(), true);
                 assertTrue(label.get(inblossom.get(v)) === 1);
                 queue.push(v);
             } else if (deltatype === 4)

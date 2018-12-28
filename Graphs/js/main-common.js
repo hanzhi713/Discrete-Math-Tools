@@ -1036,13 +1036,6 @@ $(() => {
     clearCaStyle();
     initCircularMenu(cy);
 
-    cy.graphml({
-        layoutBy: 'circle'
-    });
-    ca.graphml({
-        layoutBy: 'circle'
-    });
-
     edgeHandles = cy.edgehandles({
         preview: true, // whether to show added edges preview before releasing selection
         hoverDelay: 150, // time spent hovering over a target node before it is considered selected
