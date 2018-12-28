@@ -36,11 +36,13 @@ Tarjan's Bridge-Finding algorithm
 
 Minimal Weight Cycle
 
-Eulerian Trail/Eulerian Cycle
+Eulerian Trail/Cycle
 
 Max/Min Weight Matching (Edmonds' Algorithm)
 
 Chinese Postman Problem
+
+Hamiltonian Path/Cycle
 
 Nearest Neighbor Algorithm
 
