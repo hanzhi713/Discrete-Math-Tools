@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <link rel="shortcut icon" href="../img/head.ico" type="image/x-icon">
     <link href="css/font-awesome.min.css?ver=4.7" rel="stylesheet" type="text/css">
@@ -584,6 +585,32 @@
                     <td>Show the graph after the duplication of these edges</td>
                     <td>Traverse all nodes and edges by order of visits in the Eulerian cycle obtained on the graph
                         after duplication of these edges </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div id="Hamiltonian">
+        <h3>Hamiltonian Path/Cycle</h3> Find a Hamiltonian path or cycle in a graph. If both are present, a Hamiltonian
+        cycle is returned. The time complexity of this algorithm is exponential, and it will start to take a
+        considerable amount of time on a graph with more than 20 vertices.<br />
+
+        <figure> <img src="demo/hamiltonian-path.png" class="demo-pic" />
+            <figcaption class="fig-caption">Finding a Hamiltonian cycle by backtracking</figcaption>
+        </figure>
+        <table class="table table-striped">
+            <!--<caption><h3>Meaning of Visualizations</h3></caption>-->
+            <thead>
+                <tr class="tb-title">
+                    <td>Source canvas</td>
+                    <td>Result canvas</td>
+                    <td>Animation</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Highlight the Hamiltonian cycle obtained</td>
+                    <td>Show the Hamiltonian cycle</td>
+                    <td>Traverse the Hamiltonian cycle</td>
                 </tr>
             </tbody>
         </table>

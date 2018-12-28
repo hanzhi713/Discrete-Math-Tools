@@ -769,10 +769,10 @@ function prim() {
     root.select();
     /**
      * @private
-     * @return object
+     * @return {cytoscape.EdgeSingular}
      * Get the edge of minimal weight connected to the selected nodes
      * */
-    const getMinimalEdge = () => {
+    function getMinimalEdge() {
         const nodes = cy.nodes(':selected');
         let minWeight = Infinity;
         let minEdge;
@@ -791,7 +791,7 @@ function prim() {
             }
         }
         return minEdge;
-    };
+    }
     const tree = new LinkedList();
 
     // starting from a given node
@@ -1452,7 +1452,7 @@ function hamiltonianPath() {
     p.add(lastNode);
 
     // select the last edge to form a cycle if it's a hamiltonian cycle
-    if (result === 1) {
+    if (result) {
         p.add(hamPath[0].edgesWith(lastNode).select());
         p.add(hamPath[0]);
     }
