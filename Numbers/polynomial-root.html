@@ -75,6 +75,7 @@
             var moduli = parseInt(document.getElementById("moduli").value);
             if (isNaN(moduli)) {
                 document.getElementById("result").value = "Illegal input!!!";
+                return false;
             }
 
             var solution = "Factorizing composite moduli...\n";
@@ -235,7 +236,7 @@
                 f += 2;
             }
 
-            if (num !== 0) {
+            if (num !== 1) {
                 a.add(num);
             }
 
