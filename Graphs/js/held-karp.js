@@ -1,9 +1,34 @@
+function heldKarp(){
+    stopAnimation();
+    const root = getCyStartNode('Please enter the id of the starting node', '1');
+    clearCyStyle();
+    cy.elements(':grabbable').select();
+    if (!isComplete()) return alert('This graph is not complete! Please set the possibility that two nodes are connected to 1.');
+    const nodes = cy.nodes(':selected');
+    cy.elements(':grabbable').unselect();
+    
+    //construct weight matrix
+    let wm = new Array(nodes.length);
+
+    for(let i = 0; i < nodes.length; i++){
+        wm[i] = new Array(nodes.length);
+        wm[i][i] = 0;
+        for(let j = 0; j < nodes.length; j++){
+            if(i === j) continue;
+            wm[i][j] = getWeight(nodes[i].edgesWith(nodes[j]));
+        }
+    }
+    
+    heldKarpHelp(wm, root);
+
+}
+
 /**
  * 
- * @param {Array} wm weight matrix
- * @param {Number} x starting point
+ * @param {number[]} wm weight matrix
+ * @param {number} x starting point
  */
-function heldKarp(wm, x) {
+function heldKarpHelp(wm, x) {
     let n = wm.length;
     var memo = new Array(n);
     for (let i = 0; i < n; i++) {
@@ -33,16 +58,24 @@ function heldKarp(wm, x) {
             minArr.unshift(x);
         }
     }
+    const pathList = new LinkedList();
+
+    minArr.array.forEach(element => {
+        pathList.add(nodes[element]);
+    });
+
+    pathList.traverse();
+
     return { distance: min, arr: minArr };
 }
 
 /**
  *
- * @param {Number} x current node
- * @param {Number} rt starting node
- * @param {Array} nums nodes to connect
- * @param {Array} wm distance matrix; wm(ij) represents distance from i to j
- * @param {Array} memo memo(ij) represents min distance between nodes i j
+ * @param {number} x current node
+ * @param {number} rt starting node
+ * @param {number[]} nums nodes to connect
+ * @param {number[]} wm distance matrix; wm(ij) represents distance from i to j
+ * @param {number[]} memo memo(ij) represents min distance between nodes i j
  */
 function heldKarpPath(x, rt, nums, wm, memo) {
     if (nums.length === 0) {
@@ -63,6 +96,14 @@ function heldKarpPath(x, rt, nums, wm, memo) {
                 minArr.push(x);
             }
         }
+
+        const pathList = new LinkedList();
+
+        minArr.array.forEach(element => {
+            pathList.add(nodes[element]);
+        });
+
+        pathList.traverse();
 
         return { distance: Math.min(...dist), arr: minArr };
     }
