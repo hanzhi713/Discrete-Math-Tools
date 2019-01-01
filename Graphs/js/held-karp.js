@@ -64,7 +64,7 @@ function heldKarpHelp(wm, x) {
         pathList.add(nodes[element]);
     });
 
-    pathList.traverse();
+    pathList.traverse(animation_check.checked, true);
 
     return { distance: min, arr: minArr };
 }
@@ -103,7 +103,7 @@ function heldKarpPath(x, rt, nums, wm, memo) {
             pathList.add(nodes[element]);
         });
 
-        pathList.traverse();
+        pathList.traverse(animation_check.checked);
 
         return { distance: Math.min(...dist), arr: minArr };
     }
