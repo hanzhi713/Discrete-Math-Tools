@@ -827,3 +827,159 @@ function myPageRank() {
         animateNodes(ranks, 1000);
     }
 }
+
+
+function heldKarp(){
+    stopAnimation();
+    const selectedNode;
+    if(cy.elements(':selected').length >= 1){
+        selectedNode = cy.elements(':selected')[0];
+    }
+    const root = prompt(
+        'Please enter the id of the start node.\n',
+        '1'
+    );
+    root = parseInt(root) - 1;
+    clearCyStyle();
+    // cy.elements(':grabbable').select();
+    if (!isComplete()) return alert('This graph is not complete! Please set the possibility that two nodes are connected to 1.');
+    const nodes = getAllNodes(cy);
+    
+    cy.elements(':grabbable').unselect();
+    
+    //construct weight matrix
+    // let wm = new Array(nodes.length);
+
+    // for(let i = 0; i < nodes.length; i++){
+    //     wm[i] = new Array(nodes.length);
+    //     wm[i][i] = 0;
+    //     for(let j = 0; j < nodes.length; j++){
+    //         if(i === j) continue;
+    //         wm[i][j] = getWeight(nodes[i].edgesWith(nodes[j]));
+    //     }
+    // }
+
+    wm = getWM(cy, false, true);
+    
+    heldKarpHelp(wm, root);
+
+}
+
+/**
+ * 
+ * @param {number[]} wm weight matrix
+ * @param {number} x starting point
+ */
+function heldKarpHelp(wm, x) {
+    let n = wm.length;
+    var memo = new Map();
+
+
+    let nums = new Array(n);
+    for (let i = 0; i < n; i++) {
+        nums[i] = i;
+    }
+    nums.splice(x, 1);
+
+    let rst = new Array(n - 1);
+    let min = Infinity;
+    let minArr;
+
+
+    for (let i = 0; i < nums.length; i++) {
+        let tempNums = nums.concat();
+        tempNums.splice(i, 1);
+        let h = heldKarpPath(nums[i], x, tempNums, wm, memo);
+        rst[i] = wm[x][nums[i]] + h.distance;
+
+        if (wm[x][nums[i]] + h.distance < min) {
+            min = wm[x][nums[i]] + h.distance;
+            minArr = h.arr.concat();
+            minArr.unshift(x);
+        }
+    }
+    let pathList = new LinkedList();
+    let path = new Array();
+    let nodes = getAllNodes(cy);
+    
+    for(let i = 0; i < minArr.length; i++){
+        if(i === minArr.length - 1){
+            path.push(nodes[minArr[i]]);
+            pathList.add(nodes[minArr[i]]);
+            break;
+        }
+        path.push(nodes[minArr[i]]);
+        pathList.add(nodes[minArr[i]]);
+        path.push(nodes[i].edgesWith(nodes[i + 1]));
+        pathList.add(nodes[i].edgesWith(nodes[i + 1]));
+    }
+    path.select();
+    clearCyStyle();
+    pathList.traverse(animation_check.checked, true);
+
+    return { distance: min, arr: minArr };
+}
+
+/**
+ *
+ * @param {number} x current node
+ * @param {number} rt starting node
+ * @param {number[]} nums nodes to connect
+ * @param {number[]} wm distance matrix; wm(ij) represents distance from i to j
+ * @param {Map} memo
+ */
+function heldKarpPath(x, rt, nums, wm, memo) {
+    let nodes = getAllNodes(cy);
+    cy.elements(':grabbable').unselect();
+    if (nums.length === 0) {
+        return { distance: wm[x][rt], arr: [x] };
+    } else {
+        
+        let dist = new Array(nums.length);
+        let min = Infinity;
+        let minArr;
+        for (let i = 0; i < nums.length; i++) {
+            let tempNums = nums.concat();
+            tempNums.splice(i, 1);
+            let key = {from:nums[i], to:x, through:nums};
+            let h;
+            if(memo[JSON.stringify(key)] !== undefined){
+                h = memo[JSON.stringify(key)];
+            }else{
+                h = heldKarpPath(nums[i], rt, tempNums, wm, memo);
+                memo[JSON.stringify(key)] = h;
+            }
+            
+            dist[i] = wm[x][nums[i]] + h.distance;
+
+            if (dist[i] < min) {
+                min = dist[i];
+                minArr = h.arr.concat();
+                minArr.push(x);
+            }
+        }
+        let path = new Array();
+        let pathList = new LinkedList();
+        for(let i = 0; i < minArr.length; i++){
+            if(i === minArr.length - 1){
+                path.push(nodes[minArr[i]]);
+                pathList.add(nodes[minArr[i]]);
+                break;
+            }
+            path.push(nodes[minArr[i]]);
+            pathList.add(nodes[minArr[i]]);
+            path.push(nodes[i].edgesWith(nodes[i + 1]));
+            pathList.add(nodes[i].edgesWith(nodes[i + 1]));
+        }
+        path.select();
+        clearCyStyle();
+        pathList.traverse(animation_check.checked, true);
+
+        return { distance: Math.min(...dist), arr: minArr };
+    }
+}
+
+function isComplete() {
+    let n = cy.nodes.length;
+    return (n * (n - 1)) / 2 === cy.edges.length;
+}
