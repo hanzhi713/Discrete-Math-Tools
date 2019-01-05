@@ -828,57 +828,35 @@ function myPageRank() {
     }
 }
 
-
-function heldKarp(){
+function heldKarp() {
     stopAnimation();
     let root;
-    const[wm, id_index] = getWM(cy, false, true);
+    const [wm, id_index] = getWM(cy, false, true);
 
-    if(cy.elements(':selected').length >= 1){
+    if (cy.elements(':selected').length >= 1) {
         root = cy.elements(':selected')[0];
-    }else{
-        root = prompt(
-            'Please enter the id of the start node.\n',
-            '1'
-        );
+    } else {
+        root = prompt('Please enter the id of the start node.\n', '1');
         root = parseInt(root) - 1;
     }
-    
-    
+
     clearCyStyle();
-    // cy.elements(':grabbable').select();
-    // if (!isComplete()) return alert('This graph is not complete! Please set the possibility that two nodes are connected to 1.');
+    
     const nodes = getAllNodes(cy);
-    
+
     cy.elements(':grabbable').unselect();
-    
-    //construct weight matrix
-    // let wm = new Array(nodes.length);
 
-    // for(let i = 0; i < nodes.length; i++){
-    //     wm[i] = new Array(nodes.length);
-    //     wm[i][i] = 0;
-    //     for(let j = 0; j < nodes.length; j++){
-    //         if(i === j) continue;
-    //         wm[i][j] = getWeight(nodes[i].edgesWith(nodes[j]));
-    //     }
-    // }
-
-    // const[wm, id_index] = getWM(cy, false, true);
-    
     heldKarpHelp(wm, root);
-
 }
 
 /**
- * 
+ *
  * @param {number[][]} wm weight matrix
  * @param {number} x starting point
  */
 function heldKarpHelp(wm, x) {
     let n = wm.length;
     var memo = new Map();
-
 
     let nums = new Array(n);
     for (let i = 0; i < n; i++) {
@@ -889,7 +867,6 @@ function heldKarpHelp(wm, x) {
     let rst = new Array(n - 1);
     let min = Infinity;
     let minArr;
-
 
     for (let i = 0; i < nums.length; i++) {
         let tempNums = nums.concat();
@@ -902,10 +879,10 @@ function heldKarpHelp(wm, x) {
             minArr = h.arr.concat();
         }
     }
-    
+
     let minArrInv = [];
 
-    for(let i = 0; i < minArr.length; i++){
+    for (let i = 0; i < minArr.length; i++) {
         minArrInv.push(minArr[minArr.length - i - 1]);
     }
 
@@ -916,15 +893,8 @@ function heldKarpHelp(wm, x) {
     let pathList = new LinkedList();
     let path = new Array();
     let nodes = getAllNodes(cy);
-    
-    for(let i = 0; i < minArrInv.length; i++){
-        // if(i === minArrInv.length - 1){
-        //     path.push(nodes[minArrInv[i]]);
-        //     pathList.add(nodes[minArrInv[i]]);
-        //     path.push(nodes[minArrInv[i]].edgesWith(nodes[minArrInv[0]])[0]);
-        //     pathList.add(nodes[minArrInv[i]].edgesWith(nodes[minArrInv[0]])[0]);
-        //     break;
-        // }
+
+    for (let i = 0; i < minArrInv.length; i++) {
         path.push(nodes[minArrInv[i]]);
         pathList.add(nodes[minArrInv[i]]);
         path.push(nodes[minArrInv[i]].edgesTo(nodes[minArrInv[(i + 1) % minArrInv.length]])[0]);
@@ -936,7 +906,7 @@ function heldKarpHelp(wm, x) {
     console.log(minArrInv);
     console.log(path);
     pathList.traverse(animation_check.checked, true);
-    
+
     return { distance: min, arr: minArr };
 }
 
@@ -954,22 +924,21 @@ function heldKarpPath(x, rt, nums, wm, memo) {
     if (nums.length === 0) {
         return { distance: wm[x][rt], arr: [x] };
     } else {
-        
         let dist = new Array(nums.length);
         let min = Infinity;
         let minArr;
         for (let i = 0; i < nums.length; i++) {
             let tempNums = nums.concat();
             tempNums.splice(i, 1);
-            let key = {from:nums[i], to:x, through:nums};
+            let key = { from: nums[i], to: x, through: nums };
             let h;
-            if(memo[JSON.stringify(key)] !== undefined){
+            if (memo[JSON.stringify(key)] !== undefined) {
                 h = memo[JSON.stringify(key)];
-            }else{
+            } else {
                 h = heldKarpPath(nums[i], rt, tempNums, wm, memo);
                 memo[JSON.stringify(key)] = h;
             }
-            
+
             dist[i] = wm[x][nums[i]] + h.distance;
 
             if (dist[i] < min) {
@@ -980,8 +949,8 @@ function heldKarpPath(x, rt, nums, wm, memo) {
         }
         let path = new Array();
         let pathList = new LinkedList();
-        for(let i = 0; i < minArr.length; i++){
-            if(i === minArr.length - 1){
+        for (let i = 0; i < minArr.length; i++) {
+            if (i === minArr.length - 1) {
                 path.push(nodes[minArr[i]]);
                 pathList.add(nodes[minArr[i]]);
                 break;
@@ -1001,5 +970,5 @@ function heldKarpPath(x, rt, nums, wm, memo) {
 
 function isComplete() {
     let n = cy.nodes.length;
-    return (n * (n - 1)) === cy.edges.length;
+    return n * (n - 1) === cy.edges.length;
 }
