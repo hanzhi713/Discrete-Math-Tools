@@ -833,6 +833,11 @@ function heldKarp() {
     let root;
     const [wm, id_index] = getWM(cy, false, true);
 
+    if(!isComplete()){
+        alert('Graph not complete. Please set the probability that two nodes are connected to 1.');
+        return;
+    } 
+
     if (cy.elements(':selected').length >= 1) {
         root = cy.elements(':selected')[0];
     } else {
@@ -887,8 +892,6 @@ function heldKarpHelp(wm, x) {
     }
 
     minArrInv.unshift(x);
-    console.log(x);
-    console.log(minArrInv);
 
     let pathList = new LinkedList();
     let path = new Array();
@@ -900,11 +903,19 @@ function heldKarpHelp(wm, x) {
         path.push(nodes[minArrInv[i]].edgesTo(nodes[minArrInv[(i + 1) % minArrInv.length]])[0]);
         pathList.add(nodes[minArrInv[i]].edgesTo(nodes[minArrInv[(i + 1) % minArrInv.length]])[0]);
     }
-    // path.select();
+    
     clearCyStyle();
-    console.log(min);
-    console.log(minArrInv);
-    console.log(path);
+
+    let val = "";
+
+    for(let i = 0; i < minArrInv.length; i++){
+        val += (minArrInv[i] + 1) + "→"
+    }
+
+    val += (x + 1) + "</br>";
+    val += "Sum of weight of the shortest path is " + min;
+    processDiv.innerHTML = val;
+
     pathList.traverse(animation_check.checked, true);
 
     return { distance: min, arr: minArr };
@@ -947,28 +958,12 @@ function heldKarpPath(x, rt, nums, wm, memo) {
                 minArr.push(x);
             }
         }
-        let path = new Array();
-        let pathList = new LinkedList();
-        for (let i = 0; i < minArr.length; i++) {
-            if (i === minArr.length - 1) {
-                path.push(nodes[minArr[i]]);
-                pathList.add(nodes[minArr[i]]);
-                break;
-            }
-            path.push(nodes[minArr[i]]);
-            pathList.add(nodes[minArr[i]]);
-            path.push(nodes[i].edgesWith(nodes[i + 1]));
-            pathList.add(nodes[i].edgesWith(nodes[i + 1]));
-        }
-        path.select;
-        clearCyStyle();
-        // pathList.traverse(animation_check.checked, true);
-
+        
         return { distance: Math.min(...dist), arr: minArr };
     }
 }
 
 function isComplete() {
-    let n = cy.nodes.length;
-    return n * (n - 1) === cy.edges.length;
+    let n = getAllNodes(cy).length;
+    return n * (n - 1) === cy.edges(':grabbable').length;
 }
