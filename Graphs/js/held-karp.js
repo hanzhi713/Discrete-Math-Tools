@@ -59,6 +59,7 @@ function heldKarpHelp(wm, x) {
         }
     }
     const pathList = new LinkedList();
+    const path = new Array();
 
     minArr.array.forEach(element => {
         pathList.add(nodes[element]);

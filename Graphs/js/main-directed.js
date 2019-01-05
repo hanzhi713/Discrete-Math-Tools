@@ -831,18 +831,23 @@ function myPageRank() {
 
 function heldKarp(){
     stopAnimation();
-    const selectedNode;
+    let root;
+    const[wm, id_index] = getWM(cy, false, true);
+
     if(cy.elements(':selected').length >= 1){
-        selectedNode = cy.elements(':selected')[0];
+        root = cy.elements(':selected')[0];
+    }else{
+        root = prompt(
+            'Please enter the id of the start node.\n',
+            '1'
+        );
+        root = parseInt(root) - 1;
     }
-    const root = prompt(
-        'Please enter the id of the start node.\n',
-        '1'
-    );
-    root = parseInt(root) - 1;
+    
+    
     clearCyStyle();
     // cy.elements(':grabbable').select();
-    if (!isComplete()) return alert('This graph is not complete! Please set the possibility that two nodes are connected to 1.');
+    // if (!isComplete()) return alert('This graph is not complete! Please set the possibility that two nodes are connected to 1.');
     const nodes = getAllNodes(cy);
     
     cy.elements(':grabbable').unselect();
@@ -859,7 +864,7 @@ function heldKarp(){
     //     }
     // }
 
-    wm = getWM(cy, false, true);
+    // const[wm, id_index] = getWM(cy, false, true);
     
     heldKarpHelp(wm, root);
 
@@ -867,7 +872,7 @@ function heldKarp(){
 
 /**
  * 
- * @param {number[]} wm weight matrix
+ * @param {number[][]} wm weight matrix
  * @param {number} x starting point
  */
 function heldKarpHelp(wm, x) {
@@ -895,28 +900,43 @@ function heldKarpHelp(wm, x) {
         if (wm[x][nums[i]] + h.distance < min) {
             min = wm[x][nums[i]] + h.distance;
             minArr = h.arr.concat();
-            minArr.unshift(x);
         }
     }
+    
+    let minArrInv = [];
+
+    for(let i = 0; i < minArr.length; i++){
+        minArrInv.push(minArr[minArr.length - i - 1]);
+    }
+
+    minArrInv.unshift(x);
+    console.log(x);
+    console.log(minArrInv);
+
     let pathList = new LinkedList();
     let path = new Array();
     let nodes = getAllNodes(cy);
     
-    for(let i = 0; i < minArr.length; i++){
-        if(i === minArr.length - 1){
-            path.push(nodes[minArr[i]]);
-            pathList.add(nodes[minArr[i]]);
-            break;
-        }
-        path.push(nodes[minArr[i]]);
-        pathList.add(nodes[minArr[i]]);
-        path.push(nodes[i].edgesWith(nodes[i + 1]));
-        pathList.add(nodes[i].edgesWith(nodes[i + 1]));
+    for(let i = 0; i < minArrInv.length; i++){
+        // if(i === minArrInv.length - 1){
+        //     path.push(nodes[minArrInv[i]]);
+        //     pathList.add(nodes[minArrInv[i]]);
+        //     path.push(nodes[minArrInv[i]].edgesWith(nodes[minArrInv[0]])[0]);
+        //     pathList.add(nodes[minArrInv[i]].edgesWith(nodes[minArrInv[0]])[0]);
+        //     break;
+        // }
+        path.push(nodes[minArrInv[i]]);
+        pathList.add(nodes[minArrInv[i]]);
+        path.push(nodes[minArrInv[i]].edgesTo(nodes[minArrInv[(i + 1) % minArrInv.length]])[0]);
+        pathList.add(nodes[minArrInv[i]].edgesTo(nodes[minArrInv[(i + 1) % minArrInv.length]])[0]);
     }
-    path.select();
+    // path.select();
     clearCyStyle();
+    console.log(min);
+    console.log(minArrInv);
+    console.log(path);
     pathList.traverse(animation_check.checked, true);
-
+    
     return { distance: min, arr: minArr };
 }
 
@@ -925,7 +945,7 @@ function heldKarpHelp(wm, x) {
  * @param {number} x current node
  * @param {number} rt starting node
  * @param {number[]} nums nodes to connect
- * @param {number[]} wm distance matrix; wm(ij) represents distance from i to j
+ * @param {number[][]} wm distance matrix; wm(ij) represents distance from i to j
  * @param {Map} memo
  */
 function heldKarpPath(x, rt, nums, wm, memo) {
@@ -971,9 +991,9 @@ function heldKarpPath(x, rt, nums, wm, memo) {
             path.push(nodes[i].edgesWith(nodes[i + 1]));
             pathList.add(nodes[i].edgesWith(nodes[i + 1]));
         }
-        path.select();
+        path.select;
         clearCyStyle();
-        pathList.traverse(animation_check.checked, true);
+        // pathList.traverse(animation_check.checked, true);
 
         return { distance: Math.min(...dist), arr: minArr };
     }
@@ -981,5 +1001,5 @@ function heldKarpPath(x, rt, nums, wm, memo) {
 
 function isComplete() {
     let n = cy.nodes.length;
-    return (n * (n - 1)) / 2 === cy.edges.length;
+    return (n * (n - 1)) === cy.edges.length;
 }
