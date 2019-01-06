@@ -863,7 +863,7 @@ function heldKarpHelp(wm, x) {
     let n = wm.length;
     var memo = new Map();
 
-    let nums = new Array(n);
+    const nums = new Array(n);
     for (let i = 0; i < n; i++) {
         nums[i] = i;
     }
@@ -885,13 +885,9 @@ function heldKarpHelp(wm, x) {
         }
     }
 
-    let minArrInv = [];
+    const minArrInv = minArr.concat();
 
-    for (let i = 0; i < minArr.length; i++) {
-        minArrInv.push(minArr[minArr.length - i - 1]);
-    }
-
-    minArrInv.unshift(x);
+    minArrInv.reverse().unshift(x);
 
     let pathList = new LinkedList();
     let path = new Array();
@@ -927,7 +923,7 @@ function heldKarpHelp(wm, x) {
  * @param {number} rt starting node
  * @param {number[]} nums nodes to connect
  * @param {number[][]} wm distance matrix; wm(ij) represents distance from i to j
- * @param {Map} memo
+ * @param {Map<string, {distance: number, arr: number[]}>} memo
  */
 function heldKarpPath(x, rt, nums, wm, memo) {
     let nodes = getAllNodes(cy);
@@ -943,11 +939,12 @@ function heldKarpPath(x, rt, nums, wm, memo) {
             tempNums.splice(i, 1);
             let key = { from: nums[i], to: x, through: nums };
             let h;
-            if (memo[JSON.stringify(key)] !== undefined) {
-                h = memo[JSON.stringify(key)];
+            let keyStr = ($.map(key, function(val){ return val;})).toString();
+            if (memo.get(keyStr) !== undefined) {
+                h = memo.get(keyStr);
             } else {
                 h = heldKarpPath(nums[i], rt, tempNums, wm, memo);
-                memo[JSON.stringify(key)] = h;
+                memo.set(keyStr, h);
             }
 
             dist[i] = wm[x][nums[i]] + h.distance;
