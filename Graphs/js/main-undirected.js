@@ -1567,7 +1567,7 @@ function TSPGlobalLowerBound() {
 function heldKarp() {
     stopAnimation();
     let root;
-    const [wm, id_index] = getWM(cy, false, true);
+    const [wm, id_index] = getWM(cy, false, false);
 
     if(!isComplete()){
         alert('Graph not complete. Please set the probability that two nodes are connected to 1.');
