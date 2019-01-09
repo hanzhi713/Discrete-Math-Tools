@@ -13,7 +13,6 @@ function heldKarpUndirected() {
         root = prompt('Please enter the id of the start node.\n', '1');
         root = parseInt(root) - 1;
     }
-    caReLayout();
     clearCyStyle();
     clearCaStyle();
     ca.remove(':grabbable');
