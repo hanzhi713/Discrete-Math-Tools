@@ -1,5 +1,5 @@
 /**
- * 
+ *
  * @param {boolean} dir whether this is for a directed graph or not
  */
 function heldKarp(dir) {
@@ -7,10 +7,10 @@ function heldKarp(dir) {
     let root;
     const [wm, id_index] = getWM(cy, false, dir);
 
-    if(!isComplete(dir)){
+    if (!isComplete(dir)) {
         alert('Graph not complete. Please set the probability that two nodes are connected to 1.');
         return;
-    } 
+    }
 
     if (cy.elements(':selected').length >= 1) {
         root = cy.elements(':selected')[0];
@@ -20,12 +20,12 @@ function heldKarp(dir) {
     }
 
     clearCyStyle();
-    if(!dir){
+    if (!dir) {
         clearCaStyle();
         ca.remove(':grabbable');
         ca.add(cy.elements(':grabbable'));
     }
-    
+
     cy.elements(':grabbable').unselect();
     heldKarpHelp(wm, root, dir);
 }
@@ -71,27 +71,31 @@ function heldKarpHelp(wm, x, dir) {
 
     for (let i = 0; i < minArrInv.length; i++) {
         pathList.add(nodes[minArrInv[i]]);
-        if(dir){
-            pathList.add(nodes[minArrInv[i]].edgesTo(nodes[minArrInv[(i + 1) % minArrInv.length]])[0]);
-        }else{
-            pathList.add(nodes[minArrInv[i]].edgesWith(nodes[minArrInv[(i + 1) % minArrInv.length]])[0]);
+        if (dir) {
+            pathList.add(
+                nodes[minArrInv[i]].edgesTo(nodes[minArrInv[(i + 1) % minArrInv.length]])[0]
+            );
+        } else {
+            pathList.add(
+                nodes[minArrInv[i]].edgesWith(nodes[minArrInv[(i + 1) % minArrInv.length]])[0]
+            );
         }
     }
-    
+
     clearCyStyle();
 
-    if(dir){
-        let val = "";
-        for(let i = 0; i < minArrInv.length; i++){
-            val += (minArrInv[i] + 1) + "→"
+    if (dir) {
+        let val = '';
+        for (let i = 0; i < minArrInv.length; i++) {
+            val += minArrInv[i] + 1 + '→';
         }
-        val += (x + 1) + "</br>";
-        val += "Sum of weight of the shortest path is " + min;
+        val += x + 1 + '</br>';
+        val += 'Sum of weight of the shortest path is ' + min;
         processDiv.innerHTML = val;
-    }else{
+    } else {
         document.getElementById('ca_weight').innerHTML = min;
     }
-    
+
     pathList.traverse(animation_check.checked, true);
     return { distance: min, arr: minArr };
 }
@@ -119,7 +123,9 @@ function heldKarpPath(x, rt, nums, wm, memo, dir) {
             tempNums.splice(i, 1);
             let key = { from: nums[i], to: x, through: nums };
             let h;
-            let keyStr = ($.map(key, function(val){ return val;})).toString();
+            let keyStr = $.map(key, function(val) {
+                return val;
+            }).toString();
             if (memo.get(keyStr) !== undefined) {
                 h = memo.get(keyStr);
             } else {
@@ -135,8 +141,8 @@ function heldKarpPath(x, rt, nums, wm, memo, dir) {
                 minArr.push(x);
             }
         }
-        
-        if(!dir){
+
+        if (!dir) {
             const minArrInv = minArr.concat();
 
             clearCaStyle();
@@ -153,16 +159,16 @@ function heldKarpPath(x, rt, nums, wm, memo, dir) {
 
             pathList.traverse(animation_check.checked, false);
         }
-        
+
         return { distance: Math.min(...dist), arr: minArr };
     }
 }
 
 /**
- * 
+ *
  * @param {boolean} dir whether this is for a directed graph or not
  */
 function isComplete(dir) {
     let n = getAllNodes(cy).length;
-    return n * (n - 1) / (dir ? 1 : 2) === cy.edges(':grabbable').length;
+    return (n * (n - 1)) / (dir ? 1 : 2) === cy.edges(':grabbable').length;
 }
