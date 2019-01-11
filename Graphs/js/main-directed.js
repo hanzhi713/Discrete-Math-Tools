@@ -232,7 +232,7 @@ function Kn() {
  * */
 function breadthFirstSearch() {
     stopAnimation();
-    processDiv.innerHTML = "";
+    processDiv.innerHTML = '';
     const root = getCyStartNode('Please enter the id of the starting node', '1');
     if (root === undefined) return;
     clearCyStyle();
@@ -258,7 +258,7 @@ function breadthFirstSearch() {
  * */
 function depthFirstSearch() {
     stopAnimation();
-    processDiv.innerHTML = "";
+    processDiv.innerHTML = '';
     const root = getCyStartNode('Please enter the id of the starting node', '1');
     if (root === undefined) return;
     clearCyStyle();
@@ -284,7 +284,7 @@ function depthFirstSearch() {
  * */
 function performDijkstra() {
     stopAnimation();
-    processDiv.innerHTML = "";
+    processDiv.innerHTML = '';
     const nodes = cy.nodes(':selected');
     let path;
     if (nodes.length >= 2) {
@@ -472,7 +472,7 @@ const jetMapHex = [
  * @return {void}
  * */
 function pageRank() {
-    processDiv.innerHTML = "";
+    processDiv.innerHTML = '';
     const len = cy.nodes().length;
     const basicSize = 250;
     const delSize = 15;

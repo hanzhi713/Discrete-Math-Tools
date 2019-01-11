@@ -75,7 +75,7 @@ const ca = initializeCytoscapeObjects('ca');
 /**
  * @type {string}
  * */
-let layoutName = 'spread';
+let layoutName = 'circle';
 /**
  * @type {cytoscape.Layouts}
  * */
@@ -554,6 +554,14 @@ function getCyStartNode(prompt_text, default_value) {
         if (root.length > 0) return root[0];
     } else return root[0];
     return undefined;
+}
+/**
+ * @param {boolean} dir whether this is for a directed graph or not
+ * @return {boolean}
+ */
+function isComplete(dir) {
+    const n = getAllNodes(cy).length;
+    return (n * (n - 1)) / (dir ? 1 : 2) === cy.edges(':grabbable').length;
 }
 /**
  * Convert a two dimensional matrix to string
