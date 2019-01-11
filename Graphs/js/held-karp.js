@@ -4,7 +4,7 @@
  */
 function heldKarp(dir) {
     stopAnimation();
-    let root;
+
     const [wm, id_index] = getWM(cy, false, dir);
 
     if (!isComplete(dir)) {
@@ -12,14 +12,10 @@ function heldKarp(dir) {
         return;
     }
 
-    if (cy.elements(':selected').length >= 1) {
-        root = cy.elements(':selected')[0];
-    } else {
-        root = prompt('Please enter the id of the start node.\n', '1');
-        root = parseInt(root) - 1;
-    }
+    const root = +getCyStartNode('Please enter the id of the start node.\n', '1').id() - 1;
 
     clearCyStyle();
+
     if (!dir) {
         clearCaStyle();
         ca.remove(':grabbable');
