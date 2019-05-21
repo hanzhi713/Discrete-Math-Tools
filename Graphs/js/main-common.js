@@ -1066,23 +1066,37 @@ $(() => {
             // for the specified node, return whether edges from itself to itself are allowed
             return true;
         },
+        /**
+         * @param {cytoscape.NodeSingular} sourceNode
+         * @param {cytoscape.NodeSingular} targetNode
+         * @param {number} i
+         */
         edgeParams: (sourceNode, targetNode, i) => {
             // for edges between the specified source and target
             // return element object to be passed to cy.add() for edge
             // NB: i indicates edge index in case of edgeType: 'node'
             const id_pre = `${sourceNode.data('id')}-${targetNode.data('id')}-`;
-            const w = +document.getElementById('weight').value;
+            const temp = document.getElementById('weight').value;
+
             let x = 0;
             while (cy.$id(id_pre + x).length !== 0) x += 1;
-            return {
+            const data = {
                 data: {
                     id: id_pre + x,
                     source: sourceNode.data('id'),
-                    target: targetNode.data('id'),
-                    weight: w
+                    target: targetNode.data('id')
                 }
             };
+            if (temp) {
+                data.weight = +temp;
+            }
+            return data;
         },
+        /**
+         * @param {cytoscape.NodeSingular} sourceNode
+         * @param {cytoscape.NodeCollection} targetNodes
+         * @param {cytoscape.Collection} addedEntities
+         */
         complete: (sourceNode, targetNodes, addedEntities) => {
             // fired when edgehandles is done and entities are added
             if (auto_refresh.checked) cyReLayout();

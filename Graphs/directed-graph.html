@@ -128,13 +128,13 @@
                         <label for="layout"></label>
                         <select style="font-size: 17px; margin: 2px; width: 160px;" id="layout" onchange="changeLayout(this.selectedIndex)">
                             <option value="breadthfirst">Breadth First</option>
-                            <option value="circle">Circle</option>
+                            <option value="circle" selected>Circle</option>
                             <option value="cose-bilkent">CoSE-Bilkent</option>
                             <option value="cola">Cola</option>
                             <option value="grid">Grid</option>
                             <option value="random">Random</option>
                             <option value="snapToGrid">Snap to grid</option>
-                            <option value="spread" selected>Spread</option>
+                            <option value="spread">Spread</option>
                         </select>
                         <button class="btn btn-info" onclick="reLayout()">
                             <i class="fa fa-refresh fa-1x" aria-hidden="true"></i>
@@ -244,7 +244,6 @@
                                 <button class="btn btn-small" onclick="enableDrawing(this)">
                                     Enable drawing
                                 </button>
-                                <button class="btn btn-small" onclick="getGraphML(cy)">Export to GraphML</button>
                                 <button class="btn btn-small" onclick="getAM(cy, true, true)">Get AM</button>
                                 <button class="btn btn-small" onclick="getWM(cy, true, true)">Get WM</button>
                                 <button class="btn btn-small" onclick="clearCyStyle()">Clear Color</button>

@@ -20,7 +20,7 @@ const defaultStyle = [
             'font-size': '20px',
             'target-arrow-color': '#910c95',
             'target-arrow-fill': 'filled',
-            'target-arrow-scale': '15',
+            'arrow-scale': '1.1',
             'target-arrow-shape': 'triangle'
         }
     },

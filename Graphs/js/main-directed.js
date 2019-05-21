@@ -662,7 +662,7 @@ function myPageRank() {
                     es.data('tpr', `${(tpr * 100).toFixed(1)}%`);
 
                     // collect these edges
-                    edges = edges ? es : edges.union(es);
+                    edges = edges ? edges.union(es) : es;
                 }
             }
         }
