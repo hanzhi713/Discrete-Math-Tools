@@ -77,7 +77,7 @@ function heldKarp(dir) {
  * @param {number[][]} wm weight matrix
  * @param {number} x starting node
  * @param {boolean} dir whether this is for a directed graph or not
- * @return {{ distance: min, arr: minArr }}
+ * @return {{ distance: number, arr: number[] }}
  */
 function heldKarpHelp(wm, x, dir) {
     const memo = new Map();
@@ -109,7 +109,7 @@ function heldKarpHelp(wm, x, dir) {
  * @param {number[]} nums nodes in the sub-path
  * @param {number[][]} wm weight matrix; wm(ij) represents distance from i to j
  * @param {Map<string, {distance: number, arr: number[]}>} memo
- * @return {[distance: number, arr: number[]]}
+ * @return {[number, number[]]}
  */
 function heldKarpPath(x, rt, nums, wm, memo) {
     if (nums.length === 0) {

@@ -196,7 +196,7 @@ function addOneNode(random, position) {
         return cy.add({
             group: 'nodes',
             data: {
-                id: v
+                id: v.toString()
             },
             position: {
                 x: Math.floor(Math.random() * 500 + 25),
@@ -208,13 +208,13 @@ function addOneNode(random, position) {
         return cy.add({
             group: 'nodes',
             data: {
-                id: v
+                id: v.toString()
             }
         });
     return cy.add({
         group: 'nodes',
         data: {
-            id: v
+            id: v.toString()
         },
         position
     });
@@ -383,7 +383,7 @@ function removeNode() {
             for (let i = lower; i <= upper; i++) cy.remove(cy.$id(i));
         }
     } else {
-        for (let i = 0; i < ids.length; i++) cy.remove(cy.$id(parseInt(ids[i])));
+        for (let i = 0; i < ids.length; i++) cy.remove(cy.$id(ids[i]));
     }
     n_id.value = '';
     if (auto_refresh.checked) cyReLayout();

@@ -25,7 +25,7 @@ function createFromAM(m) {
         cy.add({
             group: 'nodes',
             data: {
-                id: i
+                id: i.toString()
             },
             position: {
                 x: Math.random() * 300 + 25,
@@ -64,7 +64,7 @@ function createFromWM(m) {
         cy.add({
             group: 'nodes',
             data: {
-                id: i
+                id: i.toString()
             },
             position: {
                 x: Math.random() * 300 + 25,
@@ -304,8 +304,12 @@ function performDijkstra() {
         const pt = p.split('-');
         path = cy
             .elements(':grabbable')
-            .dijkstra(`#${pt[0]}`, getWeight, true)
-            .pathTo(`#${pt[1]}`);
+            .dijkstra({
+                root: `#${pt[0]}`,
+                weight: getWeight,
+                directed: true
+            })
+            .pathTo(cy.$id(pt[1]));
     }
     const pathList = new LinkedList();
     path.forEach(ele => {
@@ -600,7 +604,7 @@ function myPageRank() {
     /**
      * @param {number[]} ranks
      * @param {number} duration
-     * @param {Function} callback
+     * @param {()=>void} callback
      * */
     function animateNodes(ranks, duration, callback = () => {}) {
         let [min, max] = findMinAndMax(ranks);
@@ -635,11 +639,14 @@ function myPageRank() {
      * */
     function call(t, i, cRanks, pRanks) {
         cy.edges().removeStyle();
-        cy.edges()
-            .hide()
-            .show();
+        // cy.edges()
+        //     .hide()
+        //     .show();
         processDiv.innerHTML = `Iteration ${t}, Calculating PR for node ${i + 1}`;
         let del = 0;
+        /**
+         * @type {cytoscape.EdgeCollection}
+         */
         let edges;
         for (let j = 0; j < len; j++) {
             if (i !== j) {
@@ -655,7 +662,7 @@ function myPageRank() {
                     es.data('tpr', `${(tpr * 100).toFixed(1)}%`);
 
                     // collect these edges
-                    edges = edges === undefined ? es : edges.union(es);
+                    edges = edges ? es : edges.union(es);
                 }
             }
         }

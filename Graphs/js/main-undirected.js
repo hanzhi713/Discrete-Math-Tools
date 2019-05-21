@@ -15,7 +15,7 @@ function f(n) {
  * @return {boolean}
  * */
 function isConnected() {
-    const { path } = cy.elements(':grabbable').bfs(getAllNodes(cy)[0]);
+    const { path } = cy.elements(':grabbable').bfs({ root: getAllNodes(cy)[0] });
     return path.nodes().length === cy.nodes(':grabbable').length;
 }
 /**
@@ -38,7 +38,7 @@ function createFromAM(m) {
         cy.add({
             group: 'nodes',
             data: {
-                id: i
+                id: i.toString()
             },
             position: {
                 x: Math.random() * 300 + 25,
@@ -77,7 +77,7 @@ function createFromWM(m) {
         cy.add({
             group: 'nodes',
             data: {
-                id: i
+                id: i.toString()
             },
             position: {
                 x: Math.random() * 300 + 25,
@@ -207,8 +207,7 @@ function Kn() {
  * */
 function Kn_n() {
     stopAnimation();
-    let n = prompt('Please enter n,n.\nExample: 3,3 represents K3,3', '3,3');
-    n = n.split(',');
+    let n = prompt('Please enter n,n.\nExample: 3,3 represents K3,3', '3,3').split(',');
     const n1 = parseInt(n[0]);
     const n2 = parseInt(n[1]);
     const numOfNodes = n1 + n2;
@@ -404,8 +403,7 @@ function myDijkstra() {
     /**
      * @private
      * @param {cytoscape.NodeSingular} node
-     * @callback
-     * @param {Function} callback
+     * @param {()=>void} callback
      * the function to execute after completion of animation
      * @return {void}
      * */
@@ -435,8 +433,7 @@ function myDijkstra() {
     /**
      * @private
      * @param {cytoscape.EdgeSingular} edge
-     * @callback
-     * @param {Function} callback
+     * @param {()=>void} callback
      * the function to execute after completion of animation
      * @return {void}
      * */
@@ -464,8 +461,7 @@ function myDijkstra() {
     /**
      * @private
      * @param {cytoscape.NodeSingular} node
-     * @callback
-     * @param {Function} callback
+     * @param {() => void} callback
      * the function to execute after completion of animation
      * @return {void}
      * */
@@ -1522,7 +1518,7 @@ function TSPGlobalLowerBound() {
         });
         clearResult();
 
-        if (maxResults !== undefined) {
+        if (maxResults) {
             // select the node, the two deleted edges, and the minimal spanning tree
             maxResults[3].nodes().style({
                 backgroundColor: '#eba300'

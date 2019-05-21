@@ -1,16 +1,10 @@
 {
     "compilerOptions": {
         "target": "ES6",
-        "checkJs": false
+        "checkJs": true
     },
     "typeAcquisition": {
-        "include": [
-            "jquery",
-            "cytoscape",
-            "mathjs",
-        ]
+        "include": ["jquery", "cytoscape", "mathjs"]
     },
-    "exclude": [
-        "js/MWMMT.js"
-    ],
+    "exclude": ["js/MWMMT.js"]
 }

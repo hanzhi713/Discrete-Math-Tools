@@ -1,6 +1,6 @@
 # Discrete Math Tools
 
-#### Please visit https://hanzhi713.github.io/Discrete-Math-Tools for online demo
+Please visit https://hanzhi713.github.io/Discrete-Math-Tools for online demo
 
 ### How to Use
 
@@ -20,15 +20,15 @@ Simultaneous Congruences
 
 ### Implemented undirected graph theory algorithms
 
-Breadth First Search *
+Breadth First Search \*
 
-Depth First Search *
+Depth First Search \*
 
-Dijkstra's Algorithm *
+Dijkstra's Algorithm \*
 
 Step-by-step Dijkstra
 
-Kruskal's Algorithm *
+Kruskal's Algorithm \*
 
 Prim's Algorithm
 
@@ -50,14 +50,14 @@ Lower Bound for the Travelling Salesman Problem
 
 ### Implemented directed graph theory algorithms
 
-Breadth First Search *
+Breadth First Search \*
 
-Depth First Search *
+Depth First Search \*
 
-Dijkstra's Algorithm *
+Dijkstra's Algorithm \*
 
-Page Rank Algorithm *
+Page Rank Algorithm \*
 
 Step-by-step Page Rank
 
-Visualization of graph theory algorithms is based on Cytoscape.js. Algorithms marked with * are implemented by Cytoscape
+Visualization of graph theory algorithms is based on Cytoscape.js. Algorithms marked with \* are implemented by Cytoscape
