@@ -64,21 +64,57 @@
     Note: 'node' and 'vertex' are of the same
     meaning<br />
 
-    <h2>Layout options:</h2> Breadthfirst: Place the nodes based on the result of breadth first traversal. Not
-    recommended for complicated graphs.<br />
-    Circle: Put nodes on a circle<br />
-    Cola: Dynamic physical simulations of
-    nodes. With smooth animations.<br />
-    CoSE-Bilken: The best choice for trees and graphs that are not too
-    complicated. With animation. It is computationally expensive, so it will take a noticeable time for large graphs.<br />
-
-    Grid: Put nodes in grids<br />
-    Random: Randomly place the nodes<br />
-    Snap to grid: Display grid, allowing nodes to
-    be snapped to the middle of grids<br />
-    Spread: Maximize the use of the space, making nodes as far as from each
-    other as possible<br />
-
+    <h2>Layout options:</h2>
+    <table class="table table-striped">
+        <thead class="thead-light">
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Breadthfirst</td>
+                <td>
+                    Place the nodes based on the result of breadth first traversal. Not
+                    recommended for complicated graphs.
+                </td>
+            </tr>
+            <tr>
+                <td>Circle</td>
+                <td>Put nodes on a circle</td>
+            </tr>
+            <tr>
+                <td>Cola</td>
+                <td>Dynamic physical simulations of nodes with smooth animations.</td>
+            </tr>
+            <tr>
+                <td>
+                    CoSE-Bilken
+                </td>
+                <td>
+                    The best choice for trees and graphs that are not too complicated. With animation. It is
+                    computationally expensive, so it will take a noticeable time for large graphs.
+                </td>
+            </tr>
+            <tr>
+                <td>Grid</td>
+                <td>Put nodes in grids</td>
+            </tr>
+            <tr>
+                <td>Random</td>
+                <td>Randomly place the nodes</td>
+            </tr>
+            <tr>
+                <td>Snap to grid</td>
+                <td>Display grid, allowing nodes to be snapped to the middle of grids</td>
+            </tr>
+            <tr>
+                <td>Spread</td>
+                <td>Maximize the use of the space, making nodes as far as from each other as possible</td>
+            </tr>
+        </tbody>
+    </table>
     <table class="table" style="vertical-align: bottom">
         <tr>
             <td style="vertical-align: bottom">
@@ -124,57 +160,72 @@
                 </figure>
             </td>
         </tr>
-    </table> <strong>Other options</strong><br />
+    </table>
+    <strong>Other options</strong><br />
     Auto-refresh: Refresh the layout after any addition / deletion of
     elements<br />
-    Hide result: Hide the result canvas, thereby increasing the size for drawing in source canvas.<br />
+    Hide result: Hide the result canvas, thereby increasing the size for drawing in the source canvas.<br />
 
     <h2>Create Nodes</h2>
-    To create a node, you can just click the 'add a node' button, which will create a node with
-    the minimal id that is not in the graph. If you want to create multiple nodes, enter the number of nodes you want
-    to create in the 'number' field.<br />
+    <p>
+        To create a node, you can just click the 'add a node' button, which will create a node with
+        the minimal id that is not in the graph. If you want to create multiple nodes,
+        enter the number of nodes you want to create in the 'number' field.
+    </p>
 
     <h2>Remove Nodes</h2>
-    To remove a node, enter the id of this node and click remove.<br />
-    You can remove multiple
-    nodes by entering their id respectively, separated by commas, or entering the range.<br />
-    Example: enter 1,2,3,4
-    or 1-4 to remove node 1, node 2, node 3, and node 4.<br />
+    <p>
+        To remove a node, enter the id of this node and click remove. You can remove multiple nodes by
+        entering their id respectively, separated by commas, or entering the range.<br />
+        <strong>Example:</strong> enter 1,2,3,4 or 1-4 to remove node 1, node 2, node 3, and node 4.
+    </p>
 
     <h2>Create Edges</h2>
-    To create an edge connecting node src and node tg, enter the src-tg-num, which stands for
-    source-target-number.<br />
-    If the '-num' part is omitted, it will create one edge connecting node src and node tg.<br />
+    <p>
+        To create an edge connecting node src and node tg, enter the src-tg-num input box, which stands for
+        source-target-number. If the '-num' part is omitted,
+        it will create one edge connecting node src and node tg. <br>
 
-    Example: 1-2-3 will add three edges connecting node 1 and 2.<br />
-    Alternatively, you can create edges by selecting
-    nodes and clicking the 'add edge(s) between selected' button. This will create edges connecting all nodes that
-    you've selected.<br />
-    Or you can use the edge handle plugin: Click the "enable drawing" button below the canvas and start adding edges by simply dragging<br />
-    <img src="demo/edgehandles.png" /> <br />
-    <br />
+        <strong>Example</strong>: 1-2-3 will add three edges connecting node 1 and 2.
+    </p>
+    <p>
+        Alternatively, you can create edges by selecting nodes and clicking the 'add edge(s) between selected' button.
+        This will create edges connecting all nodes that you've selected.
+        Or you can use the edge handle plugin: Click the "enable drawing" button below the canvas
+        and start adding edges by simply dragging.
+        <figure><img src="demo/edgehandles.png" /></figure>
+    </p>
 
     To put weight on these edges, input the weight number before adding the edge.<br />
-    Weight can be omitted. The default
-    weight is 1.<br />
+    Weight can be omitted.
+    The default weight is 1.<br />
     <br />
 
-    <h2>Remove Edges</h2> To remove an edge, just enter the src-tg-num for this edge, where num is the number of edges
-    connecting src and tg that will be removed. If the '-num' part is omitted, it will remove one edge connecting node
-    src and node tg.<br />
-    Example: 1-2-2 means remove 2 edges connecting node 1 and node 2. <br />
-    Or you can just select all the edges that you want to remove, then click 'remove selected' button.<br />
+    <h2>Remove Edges</h2>
+    <p>
+        To remove an edge, just enter the src-tg-num for this edge, where num is the number of edges
+        connecting src and tg that will be removed.
+        If the '-num' part is omitted, it will remove one edge connecting node src and node tg.
+        Or you can just select all the edges that you want to remove, then click 'remove selected' button.
 
-    <h2>Create Graph from Adjacency Matrix / Weight Matrix</h2> Graph can also be created from the adjacency matrix or
-    weight matrix. The matrix must be declared as the javascript nested array format.<br />
-    <br />
-    In the adjacency matrix,
-    the element in ith row and jth column denotes the number of edges connecting node i and node j.<br />
-    <br />
+        <strong>Example:</strong> 1-2-2 means remove 2 edges connecting node 1 and node 2. <br />
+    </p>
 
-    In the weight matrix, the element in ith row and jth column denotes the weight of the edge connecting node i and
-    node j. If weight &lt;= 0, it means that these two nodes are not connected<br />
-    <br />
+    <h2>Create Graph from Adjacency Matrix / Weight Matrix</h2>
+    <p>
+        Graph can also be created from the adjacency matrix or weight matrix.
+        The matrix must be declared as a javascript nested array format.
+    </p>
+    <p>
+        In the adjacency matrix,
+        the element in ith row and jth column denotes the number of edges connecting node i and node j.
+    </p>
+    <p>
+        In the weight matrix, the element in ith row and jth column denotes the
+        weight of the edge connecting node i andnode j.
+        If weight &lt;= 0, it means that these two nodes are not connected
+    </p>
+
 
     <table class="table table-bordered">
         <caption>Examples of creating from matrix</caption>
@@ -188,27 +239,35 @@
         <tbody>
             <tr>
                 <td>Weight matrix</td>
-                <td> <code lang="javascript">[[0,4,3,0,0],<br/>&nbsp;[4,0,4,4,0],<br/>&nbsp;[3,4,0,2,4],<br/>&nbsp;[0,4,2,0,0],<br/>&nbsp;[0,0,4,0,0]]</code>
+                <td> <code
+                        lang="javascript">[[0,4,3,0,0],<br/>&nbsp;[4,0,4,4,0],<br/>&nbsp;[3,4,0,2,4],<br/>&nbsp;[0,4,2,0,0],<br/>&nbsp;[0,0,4,0,0]]</code>
                 </td>
                 <td style="text-align: center"><img style="height: 400px;" src="demo/weight-matrix-example.png" /></td>
             </tr>
             <tr>
                 <td>Adjacency matrix</td>
-                <td> <code lang="javascript">[[0,1,0,0,0,2,1],<br/>&nbsp;[1,0,1,1,1,1,1],<br/>&nbsp;[0,1,0,0,1,0,1],<br/>&nbsp;[0,1,0,0,0,0,2],<br/>&nbsp;[0,1,1,0,0,2,0],<br/>&nbsp;[2,1,0,0,2,1,0],<br/>&nbsp;[1,1,1,2,0,0,0]]</code>
+                <td> <code
+                        lang="javascript">[[0,1,0,0,0,2,1],<br/>&nbsp;[1,0,1,1,1,1,1],<br/>&nbsp;[0,1,0,0,1,0,1],<br/>&nbsp;[0,1,0,0,0,0,2],<br/>&nbsp;[0,1,1,0,0,2,0],<br/>&nbsp;[2,1,0,0,2,1,0],<br/>&nbsp;[1,1,1,2,0,0,0]]</code>
                 </td>
                 <td style="text-align: center"><img style="height: 400px;" src="demo/adj-matrix-example.png" /></td>
             </tr>
         </tbody>
-    </table> <br />
-    The whole matrix must be enclosed by a pair of square parentheses, and each row also should be
-    enclosed by a pair of square parentheses. Rows and columns are separated by commas.<br />
-    <br />
-    In theory, the
-    matrix should be symmetric about the major diagonal (because the graph is undirected), yet this is not checked. My
-    program only take the half above the major diagonal.<br />
+    </table>
+    <p>
+        The whole matrix must be enclosed by a pair of square parentheses, and each row also should be
+        enclosed by a pair of square parentheses. Rows and columns are separated by commas.
+    </p>
+    <p>
+        In theory, the
+        matrix should be symmetric about the major diagonal (because the graph is undirected),
+        yet this is not checked. My program only take the half above the major diagonal.<br />
+    </p>
 
-    <h2>Context menu</h2> A circular menu will be shown when you right click on a node, an edge, or the canvas. Thank
-    to FontAwesome for creating these icons.<br />
+    <h2>Context menu</h2>
+    <p>
+        A circular menu will be shown when you right click on a node, an edge, or the canvas.
+        Thanks FontAwesome for creating these icons.
+    </p>
 
     <table class="table table-striped table-bordered" style="font-size: 16px;">
         <caption class="tb-head">
@@ -463,7 +522,8 @@
     <div id="bridge">
         <h3>Bridge Finding Algorithm</h3> Find all bridges in an undirected graph. A bridge is an edge whose removal
         causes the number of connected components to increase.<br />
-        Reference: <a href="https://www.geeksforgeeks.org/bridge-in-a-graph/">https://www.geeksforgeeks.org/bridge-in-a-graph/</a>
+        Reference: <a
+            href="https://www.geeksforgeeks.org/bridge-in-a-graph/">https://www.geeksforgeeks.org/bridge-in-a-graph/</a>
 
         <figure> <img src="demo/bridge.png" class="demo-pic" />
             <figcaption class="fig-caption">All bridges in a graph</figcaption>
@@ -687,15 +747,24 @@
     Lodash.js<br />
     <h2>Update catalog</h2>
 
+    <strong>
+        For latest changes, please refer to my 
+        <a href="https://github.com/hanzhi713/Discrete-Math-Tools/commits/master"
+        target="_blank">commits</a>
+    </strong><br /><br />
+
     <strong>February 23rd, 2018</strong><br />
-    1. Fixed a bug of minimal weight matching (see this <a href="https://github.com/hanzhi713/Discrete-Math-Tools/commit/32125ba3efd65a62d28213b125b111df71a930cb"
+    1. Fixed a bug of minimal weight matching (see this
+    <a href="https://github.com/hanzhi713/Discrete-Math-Tools/commit/32125ba3efd65a62d28213b125b111df71a930cb"
         target="_blank">commit</a>)<br /><br />
+
     <strong>November 13th, 2017</strong><br />
     1. Fixed a bug of Dijkstra (detailed)<br /><br />
 
     <strong>August 26th, 2017</strong><br />
     1. Adapted ECMAScript 2015. Babel is used to compile the script.<br />
     2. Fixed some issues.<br /><br />
+
     <strong>August 19th, 2017</strong><br />
     1. Updated key bindings.<br />
     2. Improved performance by reducing style updates and redraws.<br /><br />
@@ -715,10 +784,12 @@
     2. Applied jQuery.<br />
     3. Optimized the "Generate random graph" function.<br />
 
-    Note that the multi-threading support will be automatically disabled if the browser doesn't support generators<br /><br />
+    Note that the multi-threading support will be automatically disabled if the browser doesn't support
+    generators<br /><br />
 
     <strong>August 6th, 2017</strong><br />
-    1. Improved the efficiency of minimal weight matching algorithm by replacing objects with primitive data types.<br />
+    1. Improved the efficiency of minimal weight matching algorithm by replacing objects with primitive data
+    types.<br />
     2. Redesigned the function for minimal weight matching so that it can also be applied to CPP.<br /><br />
 
     <strong>August 4th, 2017</strong><br />
