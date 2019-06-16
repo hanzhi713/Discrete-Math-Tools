@@ -5,7 +5,7 @@ function heldKarp(dir) {
     stopAnimation();
 
     const [wm, id_index] = getWM(cy, false, dir);
-    const nodes = getAllNodes(cy);
+    const nodes = cy.nodes();
 
     if (!isComplete(dir)) {
         alert(

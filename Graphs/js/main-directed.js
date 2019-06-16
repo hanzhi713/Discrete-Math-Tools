@@ -1,4 +1,4 @@
-/* global addEdge, addEdgeBetweenSelected, addEdgeBwt, addNode, addOneNode, animation_check, animationFlag: true, auto_refresh, ca, CaLayout, callToAlgorithms, caReLayout, changeLayout, clearCaStyle, clearCyStyle, clearResult, clearSource, copiedEles, copy, cy, CyLayout, cyReLayout, drawOn, duplicateEdge, duration, getAM, getAllNodes, , getCyStartNode, getTarget, getWeight, getWM, hideDuration, hideResult, hideWeight, initCircularMenu, initConventionalMenu, initializeCytoscapeObjects, layoutName, LinkedList, LinkedListNode, math, matrixToString, paste, readAM, readWM, reLayout, removeEdge, removeNode, removeSelected, perform_button, selectAllOfTheSameType, snapToGrid, stopAnimation, maxWeightMatching */
+/* global addEdge, addEdgeBetweenSelected, addEdgeBwt, addNode, addOneNode, animation_check, animationFlag: true, auto_refresh, ca, CaLayout, callToAlgorithms, caReLayout, changeLayout, clearCaStyle, clearCyStyle, clearResult, clearSource, copiedEles, copy, cy, CyLayout, cyReLayout, drawOn, duplicateEdge, duration, getAM, , getCyStartNode, getTarget, getWeight, getWM, hideDuration, hideResult, hideWeight, initCircularMenu, initConventionalMenu, initializeCytoscapeObjects, layoutName, LinkedList, LinkedListNode, math, matrixToString, paste, readAM, readWM, reLayout, removeEdge, removeNode, removeSelected, perform_button, selectAllOfTheSameType, snapToGrid, stopAnimation, maxWeightMatching */
 
 'use strict';
 
@@ -482,7 +482,7 @@ function pageRank() {
         dampingFactor: 0.85,
         precision: 1e-4
     });
-    const nodes = getAllNodes(cy);
+    const nodes = cy.nodes();
     const ranks = nodes.map(n => rank(n));
     const min = Math.min(...ranks);
     const max = Math.max(...ranks);
@@ -516,7 +516,7 @@ function myPageRank() {
     const dpFactor = 0.85;
     // minimal difference ε
     const minimalDifference = 1e-4;
-    const nodes = getAllNodes(cy);
+    const nodes = cy.nodes();
     const len = nodes.length;
     const [adjacencyMatrix] = getAM(cy, false, true);
     /**

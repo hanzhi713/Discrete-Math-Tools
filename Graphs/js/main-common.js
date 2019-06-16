@@ -130,13 +130,6 @@ function enableDrawing(btn) {
     drawOn = !drawOn;
 }
 /**
- * @param {cytoscape.Core} c
- * @return {cytoscape.NodeCollection}
- */
-function getAllNodes(c) {
-    return c.nodes();
-}
-/**
  * Stop animation and set animation flag to false
  * @return {void}
  * */
@@ -181,7 +174,7 @@ function copy(eles) {
  * */
 function selectAllOfTheSameType(ele) {
     cy.elements().unselect();
-    if (ele.isNode()) getAllNodes(cy).select();
+    if (ele.isNode()) cy.nodes().select();
     else if (ele.isEdge()) cy.edges().select();
 }
 /**
@@ -376,7 +369,7 @@ function removeNode() {
     const ids = v.split(',');
     if (ids.length === 1) {
         const range = v.split('-');
-        if (range.length === 1) cy.remove(getAllNodes(cy).$id(v));
+        if (range.length === 1) cy.remove(cy.nodes().$id(v));
         else {
             const lower = parseInt(range[0]);
             const upper = parseInt(range[1]);
@@ -560,7 +553,7 @@ function getCyStartNode(prompt_text, default_value) {
  * @return {boolean}
  */
 function isComplete(dir) {
-    const n = getAllNodes(cy).length;
+    const n = cy.nodes().length;
     return (n * (n - 1)) / (dir ? 1 : 2) === cy.edges().length;
 }
 /**
@@ -583,7 +576,7 @@ function matrixToString(m) {
  * a 2D-array and a mapping from node id in cytoscape to node index in matrix
  * */
 function getAM(c, output, directed = false) {
-    const nodes = getAllNodes(c);
+    const nodes = c.nodes();
     const numOfNodes = nodes.length;
     const matrix = new Array(numOfNodes);
     const id_index = {};
@@ -618,7 +611,7 @@ function getAM(c, output, directed = false) {
  * a 2D-array and a mapping from node id in cytoscape to node index in matrix
  * */
 function getWM(c, output, directed = false) {
-    const nodes = getAllNodes(c);
+    const nodes = c.nodes();
     const numOfNodes = nodes.length;
     const matrix = new Array(numOfNodes);
     const id_index = {};

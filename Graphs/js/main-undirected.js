@@ -1,4 +1,4 @@
-/* global addEdge, addEdgeBetweenSelected, addEdgeBwt, addNode, addOneNode, animation_check, animationFlag: true, auto_refresh, ca, CaLayout, callToAlgorithms, caReLayout, changeLayout, clearCaStyle, clearCyStyle, clearResult, clearSource, copiedEles, copy, cy, CyLayout, cyReLayout, drawOn, duplicateEdge, duration, getAM, getAllNodes, , getCyStartNode, getTarget, getWeight, getWM, hideDuration, hideResult, hideWeight, initCircularMenu, initConventionalMenu, initializeCytoscapeObjects, layoutName, LinkedList, LinkedListNode, math, matrixToString, paste, readAM, readWM, reLayout, removeEdge, removeNode, removeSelected, perform_button, selectAllOfTheSameType, snapToGrid, stopAnimation, maxWeightMatching */
+/* global addEdge, addEdgeBetweenSelected, addEdgeBwt, addNode, addOneNode, animation_check, animationFlag: true, auto_refresh, ca, CaLayout, callToAlgorithms, caReLayout, changeLayout, clearCaStyle, clearCyStyle, clearResult, clearSource, copiedEles, copy, cy, CyLayout, cyReLayout, drawOn, duplicateEdge, duration, getAM, , getCyStartNode, getTarget, getWeight, getWM, hideDuration, hideResult, hideWeight, initCircularMenu, initConventionalMenu, initializeCytoscapeObjects, layoutName, LinkedList, LinkedListNode, math, matrixToString, paste, readAM, readWM, reLayout, removeEdge, removeNode, removeSelected, perform_button, selectAllOfTheSameType, snapToGrid, stopAnimation, maxWeightMatching */
 
 'use strict';
 
@@ -15,7 +15,7 @@ function f(n) {
  * @return {boolean}
  * */
 function isConnected() {
-    const { path } = cy.elements().bfs({ root: getAllNodes(cy)[0] });
+    const { path } = cy.elements().bfs({ root: cy.nodes()[0] });
     return path.nodes().length === cy.nodes().length;
 }
 /**
@@ -351,7 +351,7 @@ function myDijkstra() {
     }
     let root;
     let target;
-    const ns = getAllNodes(cy);
+    const ns = cy.nodes();
     const temp = cy.nodes(':selected');
     if (temp.length >= 2) {
         [root, target] = [temp[0], temp[1]];
@@ -760,7 +760,7 @@ function prim() {
     stopAnimation();
     clearCyStyle();
     let root = getCyStartNode('Please enter the id of the starting node', '1');
-    if (root === undefined) root = getAllNodes(cy)[0];
+    if (root === undefined) root = cy.nodes()[0];
     cy.elements().unselect();
     root.select();
     /**
@@ -824,7 +824,7 @@ function findBridge() {
     stopAnimation();
     clearCyStyle();
 
-    const nodes = getAllNodes(cy);
+    const nodes = cy.nodes();
     nodes.forEach(node => {
         node.data({
             visited: false,
@@ -958,7 +958,7 @@ function minimalWeightCycle() {
 
         // Traverse every node, finding the minimal weight cycle starting from each node
         // thus finding the minimal one from these local minimal cycles
-        getAllNodes(cy).forEach(startNode => {
+        cy.nodes().forEach(startNode => {
             const results = localMinimalWeightCycle(startNode);
             if (results[0] < globalMinWeight) {
                 [globalMinWeight, globalPath, globalE] = results;
@@ -1057,7 +1057,7 @@ function nearestNeighborAlgorithm(root) {
     path.add(root);
     cy.endBatch();
     // If not all nodes are visited, give this solution a very high weight
-    return [totalWeight + (getAllNodes(cy).length - numOfNodes) * 2 ** 32, path];
+    return [totalWeight + (cy.nodes().length - numOfNodes) * 2 ** 32, path];
 }
 /**
  * The global nearest neighbor algorithm
@@ -1077,7 +1077,7 @@ function nearestNeighbor() {
         let minElements;
         let minPath;
         cy.startBatch();
-        getAllNodes(cy).forEach(currentNode => {
+        cy.nodes().forEach(currentNode => {
             const results = nearestNeighborAlgorithm(currentNode);
             const sumWeight = results[0];
             if (sumWeight <= minWeight) {
@@ -1188,7 +1188,7 @@ function eulerianCycle() {
     // then check whether there're none or two vertices of odd degree
     let numOfOddDegrees = 0;
     const nodesOfOddDegrees = [];
-    getAllNodes(cy).forEach(ele => {
+    cy.nodes().forEach(ele => {
         if (ele.degree(false) % 2 !== 0) {
             numOfOddDegrees += 1;
             nodesOfOddDegrees.push(ele);
@@ -1206,7 +1206,7 @@ function eulerianCycle() {
 
         if (numOfOddDegrees === 0) {
             // starting Eulerian Cycle from node 1
-            traceEulerianCycle(getAllNodes(ca)[0], ca);
+            traceEulerianCycle(ca.nodes()[0], ca);
         } else {
             const caNodes = ca.nodes();
             let oddNode;
@@ -1280,7 +1280,7 @@ function CPP() {
     if (!isConnected()) return alert('This graph is not connected!');
 
     // get the collection of odd nodes
-    getAllNodes(cy).forEach(ele => {
+    cy.nodes().forEach(ele => {
         if (ele.degree(false) % 2 !== 0) ele.select();
     });
     const nodes = cy.nodes(':selected');
@@ -1343,7 +1343,7 @@ function CPP() {
 
         // Eulerian Cycle. See function traceEulerianCycle
         // starting the Eulerian Cycle from the first node
-        traceEulerianCycle(getAllNodes(ca)[0], ca);
+        traceEulerianCycle(ca.nodes()[0], ca);
     }
 
     // get the minimal weight perfect matching
@@ -1361,7 +1361,7 @@ function hamiltonianPath() {
     clearCyStyle();
     cy.elements().unselect();
 
-    const nodes = getAllNodes(cy);
+    const nodes = cy.nodes();
     const len = nodes.length;
     /**
      * @param {cytoscape.NodeSingular[]} path
@@ -1505,7 +1505,7 @@ function TSPGlobalLowerBound() {
         let maxRoot;
         let sumWeight;
         let results;
-        getAllNodes(cy).forEach(currentNode => {
+        cy.nodes().forEach(currentNode => {
             // Find the maximal lower bound...
             results = TSPLowerBound(currentNode);
             sumWeight = results[0];
