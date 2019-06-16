@@ -15,8 +15,8 @@ function f(n) {
  * @return {boolean}
  * */
 function isConnected() {
-    const { path } = cy.elements(':grabbable').bfs({ root: getAllNodes(cy)[0] });
-    return path.nodes().length === cy.nodes(':grabbable').length;
+    const { path } = cy.elements().bfs({ root: getAllNodes(cy)[0] });
+    return path.nodes().length === cy.nodes().length;
 }
 /**
  * create graph from an adjacency matrix
@@ -245,8 +245,8 @@ function breadthFirstSearch() {
     const root = getCyStartNode('Please enter the id of the starting node', '1');
     if (root === undefined) return;
     clearCyStyle();
-    cy.elements(':grabbable').unselect();
-    const { path } = cy.elements(':grabbable').bfs(root);
+    cy.elements().unselect();
+    const { path } = cy.elements().bfs({ root });
     clearResult();
     const pathList = new LinkedList();
     path.select();
@@ -266,8 +266,8 @@ function depthFirstSearch() {
     const root = getCyStartNode('Please enter the id of the starting node', '1');
     if (root === undefined) return;
     clearCyStyle();
-    cy.elements(':grabbable').unselect();
-    const { path } = cy.elements(':grabbable').dfs(root);
+    cy.elements().unselect();
+    const { path } = cy.elements().dfs({ root });
     clearResult();
     const pathList = new LinkedList();
     path.select();
@@ -285,8 +285,8 @@ function depthFirstSearch() {
 function performKruskal() {
     stopAnimation();
     clearCyStyle();
-    cy.elements(':grabbable').unselect();
-    const spanningTree = cy.elements(':grabbable').kruskal(getWeight);
+    cy.elements().unselect();
+    const spanningTree = cy.elements().kruskal(getWeight);
     clearResult();
     ca.add(spanningTree);
     spanningTree.select();
@@ -315,7 +315,7 @@ function performDijkstra() {
     let path;
     if (nodes.length >= 2) {
         path = cy
-            .elements(':grabbable')
+            .elements()
             .dijkstra({ root: nodes[0], weight: getWeight })
             .pathTo(nodes[1]);
     } else {
@@ -325,7 +325,7 @@ function performDijkstra() {
         );
         const pt = p.split('-');
         path = cy
-            .elements(':grabbable')
+            .elements()
             .dijkstra({ root: `#${pt[0]}`, weight: getWeight })
             .pathTo(cy.$id(`${pt[1]}`));
     }
@@ -760,8 +760,8 @@ function prim() {
     stopAnimation();
     clearCyStyle();
     let root = getCyStartNode('Please enter the id of the starting node', '1');
-    if (root === undefined) [root] = getAllNodes(cy);
-    cy.elements(':grabbable').unselect();
+    if (root === undefined) root = getAllNodes(cy)[0];
+    cy.elements().unselect();
     root.select();
     /**
      * @private
@@ -922,7 +922,7 @@ function localMinimalWeightCycle(root) {
         // Find the minimal weight connector connecting these two nodes
         // If found, then a cycle is established after adding the edge back
         // Dijkstra method:
-        const d = cy.elements(':grabbable').dijkstra({ root, weight: getWeight });
+        const d = cy.elements().dijkstra({ root, weight: getWeight });
         const distance = d.distanceTo(current_node) + weight;
 
         // Find the minimal weight cycle starting from root node
@@ -948,7 +948,7 @@ function minimalWeightCycle() {
         ''
     );
     clearCyStyle();
-    cy.elements(':grabbable').unselect();
+    cy.elements().unselect();
     // the global minimal weight cycle
     if (root === undefined) {
         // Find the global minimal weight cycle
@@ -1071,7 +1071,7 @@ function nearestNeighbor() {
         ''
     );
     clearCyStyle();
-    cy.elements(':grabbable').unselect();
+    cy.elements().unselect();
     if (root === undefined) {
         let minWeight = Infinity;
         let minElements;
@@ -1085,7 +1085,7 @@ function nearestNeighbor() {
                 minWeight = sumWeight;
                 [, minPath] = results;
             }
-            cy.elements(':grabbable').unselect();
+            cy.elements().unselect();
         });
         clearResult();
         ca.add(minElements);
@@ -1199,16 +1199,16 @@ function eulerianCycle() {
     if (numOfOddDegrees !== 0 && numOfOddDegrees !== 2)
         alert('This graph is neither Eulerian nor semi-Eulerian');
     else {
-        cy.elements(':grabbable').unselect();
+        cy.elements().unselect();
         clearResult();
-        ca.add(cy.elements(':grabbable'));
+        ca.add(cy.elements());
         caReLayout();
 
         if (numOfOddDegrees === 0) {
             // starting Eulerian Cycle from node 1
             traceEulerianCycle(getAllNodes(ca)[0], ca);
         } else {
-            const caNodes = ca.nodes(':grabbable');
+            const caNodes = ca.nodes();
             let oddNode;
             for (let i = 0; i < caNodes.length; i++) {
                 if (caNodes[i].degree(false) % 2 !== 0) {
@@ -1275,7 +1275,7 @@ function pathTreeFlower() {
 function CPP() {
     stopAnimation();
     clearCyStyle();
-    cy.elements(':grabbable').unselect();
+    cy.elements().unselect();
 
     if (!isConnected()) return alert('This graph is not connected!');
 
@@ -1297,7 +1297,7 @@ function CPP() {
     const paths = new Array(n);
     let maxWeight = -Infinity;
     for (let x = 0; x < n; x++) {
-        paths[x] = cy.elements(':grabbable').dijkstra({ root: nodes[x], weight: getWeight });
+        paths[x] = cy.elements().dijkstra({ root: nodes[x], weight: getWeight });
         weightMatrix[x] = new Array(n);
         for (let y = 0; y < n; y++) {
             if (x === y) weightMatrix[x][x] = 0;
@@ -1318,7 +1318,7 @@ function CPP() {
      */
     function displayResult(minPairing) {
         clearResult();
-        ca.add(cy.elements(':grabbable'));
+        ca.add(cy.elements());
         let addedEdges;
 
         // Once the minimal weight perfect matching is found,
@@ -1339,7 +1339,7 @@ function CPP() {
             paths[n1].pathTo(nodes[n2]).forEach(dupEdges);
         }
         caReLayout();
-        ca.elements(':grabbable').unselect();
+        ca.elements().unselect();
 
         // Eulerian Cycle. See function traceEulerianCycle
         // starting the Eulerian Cycle from the first node
@@ -1474,7 +1474,7 @@ function TSPLowerBound(root) {
     cy.remove(root);
 
     // find the minimal spanning tree of the remaining graph by kruskal
-    const spanningTree = cy.elements(':grabbable').kruskal(getWeight);
+    const spanningTree = cy.elements().kruskal(getWeight);
 
     // calculate the total weight of this tree
     spanningTree.edges().forEach(edge => {
@@ -1498,7 +1498,7 @@ function TSPGlobalLowerBound() {
         ''
     );
     clearCyStyle();
-    cy.elements(':grabbable').unselect();
+    cy.elements().unselect();
     if (root === undefined) {
         let maxWeight = 0;
         let maxResults;
@@ -1531,7 +1531,7 @@ function TSPGlobalLowerBound() {
 
             // Order must be correct...
             ca.add(maxResults[3]);
-            ca.elements(':grabbable').select();
+            ca.elements().select();
             ca.add(maxRoot);
             ca.add(maxResults[2]);
             ca.add(maxResults[1]);
@@ -1552,7 +1552,7 @@ function TSPGlobalLowerBound() {
         results[2].select();
         results[1].select();
         ca.add(results[3]);
-        ca.elements(':grabbable').select();
+        ca.elements().select();
         ca.add(root);
         ca.add(results[2]);
         ca.add(results[1]);

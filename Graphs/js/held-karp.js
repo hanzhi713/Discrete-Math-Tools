@@ -26,7 +26,7 @@ function heldKarp(dir) {
     const root = +getCyStartNode('Please enter the id of the start node.\n', '1').id() - 1;
 
     clearCyStyle();
-    cy.elements(':grabbable').unselect();
+    cy.elements().unselect();
 
     const { distance, arr } = heldKarpHelp(wm, root, dir);
 
@@ -118,7 +118,7 @@ function heldKarpPath(x, rt, nums, wm, memo) {
     if (x === undefined) {
         console.log(nums);
     }
-    const dist = new Array(nums.length);
+    const dist = [];
     let min = Infinity;
     let minArr;
     for (let i = 0; i < nums.length; i++) {
@@ -133,7 +133,7 @@ function heldKarpPath(x, rt, nums, wm, memo) {
             memo.set(key, h);
         }
 
-        dist[i] = wm[x][nums[i]] + h[0];
+        dist.push(wm[x][nums[i]] + h[0]);
 
         if (dist[i] < min) {
             min = dist[i];

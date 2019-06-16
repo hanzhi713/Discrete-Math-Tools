@@ -134,15 +134,15 @@ function enableDrawing(btn) {
  * @return {cytoscape.NodeCollection}
  */
 function getAllNodes(c) {
-    return c.nodes(':grabbable');
+    return c.nodes();
 }
 /**
  * Stop animation and set animation flag to false
  * @return {void}
  * */
 function stopAnimation() {
-    cy.elements(':grabbable').stop();
-    ca.elements(':grabbable').stop();
+    cy.elements().stop();
+    ca.elements().stop();
     animationFlag = false;
 }
 /**
@@ -150,7 +150,7 @@ function stopAnimation() {
  * @return {void}
  * */
 function clearCyStyle() {
-    cy.elements(':grabbable').removeStyle();
+    cy.elements().removeStyle();
     cy.style()
         .resetToDefault()
         .fromJson(defaultStyle)
@@ -161,7 +161,7 @@ function clearCyStyle() {
  * @return {void}
  * */
 function clearCaStyle() {
-    ca.elements(':grabbable').removeStyle();
+    ca.elements().removeStyle();
     ca.style()
         .resetToDefault()
         .fromJson(defaultStyle)
@@ -180,7 +180,7 @@ function copy(eles) {
  * @return {void}
  * */
 function selectAllOfTheSameType(ele) {
-    cy.elements(':grabbable').unselect();
+    cy.elements().unselect();
     if (ele.isNode()) getAllNodes(cy).select();
     else if (ele.isEdge()) cy.edges().select();
 }
@@ -475,7 +475,7 @@ function addEdgeBetweenSelected() {
 function paste() {
     if (copiedEles === undefined) return;
     const idMap = {};
-    cy.elements(':grabbable').unselect();
+    cy.elements().unselect();
     copiedEles.forEach(ele => {
         if (ele.isNode()) {
             const addedNode = addOneNode(false, {
@@ -515,7 +515,7 @@ function getTarget(node, edge, c = cy) {
  * */
 function clearSource() {
     stopAnimation();
-    cy.remove(cy.elements(':grabbable'));
+    cy.remove(cy.elements());
     document.getElementById('cy_weight').innerHTML = '';
 }
 /**
@@ -523,7 +523,7 @@ function clearSource() {
  * */
 function clearResult() {
     stopAnimation();
-    ca.remove(ca.elements(':grabbable'));
+    ca.remove(ca.elements());
     document.getElementById('ca_weight').innerHTML = '';
     document.getElementById('path').innerHTML = '';
 }
@@ -561,7 +561,7 @@ function getCyStartNode(prompt_text, default_value) {
  */
 function isComplete(dir) {
     const n = getAllNodes(cy).length;
-    return (n * (n - 1)) / (dir ? 1 : 2) === cy.edges(':grabbable').length;
+    return (n * (n - 1)) / (dir ? 1 : 2) === cy.edges().length;
 }
 /**
  * Convert a two dimensional matrix to string
@@ -914,7 +914,7 @@ function initConventionalMenu(c) {
                 tooltipText: 'start breadth first search at this node',
                 selector: 'node',
                 onClickFunction: event => {
-                    cy.elements(':grabbable').unselect();
+                    cy.elements().unselect();
                     const tg = event.target || event.cyTarget;
                     tg.select();
                     breadthFirstSearch();
@@ -926,7 +926,7 @@ function initConventionalMenu(c) {
                 tooltipText: 'start depth first search at this node',
                 selector: 'node',
                 onClickFunction: event => {
-                    cy.elements(':grabbable').unselect();
+                    cy.elements().unselect();
                     const tg = event.target || event.cyTarget;
                     tg.select();
                     depthFirstSearch();
@@ -962,7 +962,7 @@ function initCircularMenu(c) {
             {
                 content: 'BFS',
                 select: ele => {
-                    cy.elements(':grabbable').unselect();
+                    cy.elements().unselect();
                     ele.select();
                     breadthFirstSearch();
                 }
@@ -970,7 +970,7 @@ function initCircularMenu(c) {
             {
                 content: 'DFS',
                 select: ele => {
-                    cy.elements(':grabbable').unselect();
+                    cy.elements().unselect();
                     ele.select();
                     depthFirstSearch();
                 }
@@ -1025,7 +1025,7 @@ function initCircularMenu(c) {
             {
                 content: '<i class="fa fa-crosshairs fa-2x" aria-hidden="true"></i>',
                 select: () => {
-                    cy.elements(':grabbable').select();
+                    cy.elements().select();
                 }
             },
             {
@@ -1164,7 +1164,7 @@ $(() => {
             // ctrl + s
             else if (which == 83) stopAnimation();
             // ctrl + a
-            else if (which == 65) cy.elements(':grabbable').select();
+            else if (which == 65) cy.elements().select();
             // ctrl + r
             else if (which == 82) clearCaStyle();
             // ctrl + f

@@ -87,7 +87,8 @@
         .normal {}
     </style>
     <title>Directed Graphs</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cytoscape-context-menus@3/cytoscape-context-menus.min.css">
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/cytoscape-context-menus@3/cytoscape-context-menus.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cytoscape-panzoom@2/cytoscape.js-panzoom.min.css">
 
     <link href="css/font-awesome.min.css" rel="stylesheet" type="text/css">
@@ -126,7 +127,8 @@
                 <div id="layout_div">
                     <p style="margin-top: 2px;margin-bottom: 3px; vertical-align: middle">
                         <label for="layout"></label>
-                        <select style="font-size: 17px; margin: 2px; width: 160px;" id="layout" onchange="changeLayout(this.selectedIndex)">
+                        <select style="font-size: 17px; margin: 2px; width: 160px;" id="layout"
+                            onchange="changeLayout(this.selectedIndex)">
                             <option value="breadthfirst">Breadth First</option>
                             <option value="circle" selected>Circle</option>
                             <option value="cose-bilkent">CoSE-Bilkent</option>
@@ -158,27 +160,32 @@
                             </td>
                             <td>
                                 <label for="weight"></label>
-                                <input class="input_style" type="text" id="weight" name="weight" value="" placeholder="weight" /><br />
+                                <input class="input_style" type="text" id="weight" name="weight" value=""
+                                    placeholder="weight" /><br />
                                 <label for="src_tg"></label>
-                                <input class="input_style" type="text" id="src_tg" name="src_tg" value="" placeholder="src-tg-num" /><br />
+                                <input class="input_style" type="text" id="src_tg" name="src_tg" value=""
+                                    placeholder="src-tg-num" /><br />
                                 <button class="btn btn-default" onclick="addEdge()">Add edges</button>
                             </td>
                         </tr>
                         <tr>
                             <td>
                                 <label for="nodeid"></label>
-                                <input class="input_style" type="text" id="nodeid" name="nodeid" value="" placeholder="Node ID" /><br />
+                                <input class="input_style" type="text" id="nodeid" name="nodeid" value=""
+                                    placeholder="Node ID" /><br />
                                 <button class="btn btn-default" onclick="removeNode()">Remove nodes</button>
                             </td>
                             <td>
                                 <label for="r_src_tg"></label>
-                                <input class="input_style" type="text" id="r_src_tg" value="" placeholder="src-tg-num" /><br />
+                                <input class="input_style" type="text" id="r_src_tg" value=""
+                                    placeholder="src-tg-num" /><br />
                                 <button class="btn btn-default" onclick="removeEdge()">Remove edges</button>
                             </td>
                         </tr>
                     </table>
                     <button class="btn" onclick="removeSelected()">Remove selected</button>
-                    <button class="btn btn-default" onclick="addEdgeBetweenSelected()">Add edges between selected</button>
+                    <button class="btn btn-default" onclick="addEdgeBetweenSelected()">Add edges between
+                        selected</button>
                 </div>
                 <div class="SH" onclick="ShowHide('action_div', this)">◢ Actions</div>
                 <div id="action_div">
@@ -198,7 +205,8 @@
                 <div class="SH" onclick="ShowHide('matrix_div', this)">◢ Create from Matrix</div>
                 <div id="matrix_div">
                     <label for="matrix_input"></label>
-                    <textarea id="matrix_input" rows="5" cols="28" wrap="off" style="overflow-x: auto;overflow-y: auto"></textarea><br />
+                    <textarea id="matrix_input" rows="5" cols="28" wrap="off"
+                        style="overflow-x: auto;overflow-y: auto"></textarea><br />
                     <button class="btn btn-default" onclick="readAM()">From AM</button>
                     <button class="btn btn-default" onclick="readWM()">From WM</button>
                     <!--<button onclick="readGraphML()">From XML</button>-->
@@ -221,11 +229,14 @@
                             onclick="hideDuration(this)" />Animation
                     </label>&nbsp;
                     <label id="label-duration" for="duration">
-                        <input type="number" value="700" step="10" min="0" max="100000" style="width: 50px;" id="duration" />&nbsp;ms
+                        <input type="number" value="700" step="10" min="0" max="100000" style="width: 50px;"
+                            id="duration" />&nbsp;ms
                     </label><br />
-                    <button class="btn btn-primary" id="perform" onclick="callToAlgorithms()" style="font-size: 15px; font-weight: bold;">Perform
+                    <button class="btn btn-primary" id="perform" onclick="callToAlgorithms()"
+                        style="font-size: 15px; font-weight: bold;">Perform
                     </button>
-                    <button class="btn btn-primary" style="font-size: 15px; font-weight: bold;" onclick="stopAnimation()">Stop
+                    <button class="btn btn-primary" style="font-size: 15px; font-weight: bold;"
+                        onclick="stopAnimation()">Stop
                         Animation
                     </button>
                     <br />
@@ -278,10 +289,10 @@
             </td>
         </tr>
     </table>
-    <script src="js/style-directed.js?ver=2"></script>
-    <script src="js/main-common.js?ver=2"></script>
-    <script src="js/main-directed.js?ver=2"></script>
-    <script src="js/held-karp.js?ver=2"></script>
+    <script src="js/style-directed.js?ver=3"></script>
+    <script src="js/main-common.js?ver=3"></script>
+    <script src="js/main-directed.js?ver=3"></script>
+    <script src="js/held-karp.js?ver=3"></script>
 </body>
 
 </html>

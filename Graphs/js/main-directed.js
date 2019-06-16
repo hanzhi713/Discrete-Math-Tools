@@ -102,7 +102,7 @@ function generateGraph() {
     if (simple) {
         const pConnected = parseFloat(
             prompt(
-                'Please specify the propability that two nodes are connected.\nRange: 0 to 1',
+                'Please specify the probability that two nodes are connected.\nRange: 0 to 1',
                 '0.5'
             )
         );
@@ -116,17 +116,15 @@ function generateGraph() {
             const range = parseInt(temp[1]) >= lower ? parseInt(temp[1]) - lower + 1 : lower + 4;
             for (let i = 0; i < numOfNodes; i++)
                 for (let j = 0; j < numOfNodes; j++) {
-                    if (i !== j) {
-                        if (Math.random() < pConnected)
-                            matrix[i][j] = Math.floor(Math.random() * range + lower);
-                        else matrix[i][j] = 0;
-                    }
+                    if (i !== j && Math.random() < pConnected)
+                        matrix[i][j] = Math.floor(Math.random() * range + lower);
+                    else matrix[i][j] = 0;
                 }
             createFromWM(matrix);
         } else {
             for (let i = 0; i < numOfNodes; i++)
                 for (let j = 0; j < numOfNodes; j++) {
-                    if (Math.random() < pConnected) matrix[i][j] = 1;
+                    if (i !== j && Math.random() < pConnected) matrix[i][j] = 1;
                     else matrix[i][j] = 0;
                 }
             createFromAM(matrix);
@@ -236,8 +234,8 @@ function breadthFirstSearch() {
     const root = getCyStartNode('Please enter the id of the starting node', '1');
     if (root === undefined) return;
     clearCyStyle();
-    cy.elements(':grabbable').unselect();
-    const { path } = cy.elements(':grabbable').bfs({
+    cy.elements().unselect();
+    const { path } = cy.elements().bfs({
         root,
         directed: true
     });
@@ -262,8 +260,8 @@ function depthFirstSearch() {
     const root = getCyStartNode('Please enter the id of the starting node', '1');
     if (root === undefined) return;
     clearCyStyle();
-    cy.elements(':grabbable').unselect();
-    const { path } = cy.elements(':grabbable').dfs({
+    cy.elements().unselect();
+    const { path } = cy.elements().dfs({
         root,
         directed: true
     });
@@ -289,7 +287,7 @@ function performDijkstra() {
     let path;
     if (nodes.length >= 2) {
         path = cy
-            .elements(':grabbable')
+            .elements()
             .dijkstra({
                 root: nodes[0],
                 weight: getWeight,
@@ -303,7 +301,7 @@ function performDijkstra() {
         );
         const pt = p.split('-');
         path = cy
-            .elements(':grabbable')
+            .elements()
             .dijkstra({
                 root: `#${pt[0]}`,
                 weight: getWeight,
@@ -480,19 +478,17 @@ function pageRank() {
     const len = cy.nodes().length;
     const basicSize = 250;
     const delSize = 15;
-    const rank = cy.elements(':grabbable').pageRank({
+    const { rank } = cy.elements().pageRank({
         dampingFactor: 0.85,
         precision: 1e-4
     });
-    const ranks = new Array(cy.nodes().length);
-    cy.nodes().forEach(n => {
-        ranks.push(rank.rank(n));
-    });
+    const nodes = getAllNodes(cy);
+    const ranks = nodes.map(n => rank(n));
     const min = Math.min(...ranks);
     const max = Math.max(...ranks);
     const rg = max - min;
-    cy.nodes().forEach(n => {
-        const r = rank.rank(n);
+    nodes.forEach((n, i) => {
+        const r = ranks[i];
         const size = Math.round((basicSize + delSize * len) * r);
         n.animate({
             style: {
@@ -522,10 +518,6 @@ function myPageRank() {
     const minimalDifference = 1e-4;
     const nodes = getAllNodes(cy);
     const len = nodes.length;
-    /**
-     * @type {number[]}
-     */
-    const outEdgeStats = new Array(len);
     const [adjacencyMatrix] = getAM(cy, false, true);
     /**
      * @type {number} basic size of nodes in pixels
@@ -547,21 +539,17 @@ function myPageRank() {
     const NACM = 2;
     animationFlag = true;
 
-    nodes.forEach((n, i) => {
-        outEdgeStats[i] = n.outgoers('edge').length;
-    });
+    const outEdgeStats = nodes.map((n, i) => n.outgoers('edge').length);
 
     /**
      * initial rankings
-     * @type {number[]}
      */
-    let ranks = new Array(len);
-    for (let i = 0; i < len; i++) ranks[i] = 1 / len;
+    let ranks = outEdgeStats.map(() => 1 / len);
 
     /**
      * find the maximum and minimum anomg the vector of ranks
      * @param {number[]} rks
-     * @return {number[]}
+     * @return {[number, number]}
      * */
     function findMinAndMax(rks) {
         let min = Infinity;
@@ -576,7 +564,6 @@ function myPageRank() {
     /**
      * @param {number} size
      * @param {string} color
-     * @return {Object}
      * */
     function getAnimationStyle(size, color) {
         return {
@@ -589,7 +576,6 @@ function myPageRank() {
     /**
      * @param {number} size
      * @param {number} rank
-     * @return {Object}
      * */
     function getLabelStyle(size, rank) {
         const fs = 13 + Math.floor(size ** 0.33);
@@ -728,7 +714,7 @@ function myPageRank() {
                                 cy.edges().removeStyle();
                                 cRanks = normalize(cRanks);
                                 animateNodes(cRanks, animationDuration, () => {
-                                    cy.elements(':grabbable').stop();
+                                    cy.elements().stop();
                                     setTimeout(() => {
                                         // continue to iterate if not converged
                                         if (
